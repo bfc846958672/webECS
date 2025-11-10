@@ -1,25 +1,25 @@
-# 🧩 WebECS — 基于 ECS 架构的 Web Canvas 渲染引擎
+#  WebECS — 基于 ECS 架构的 Web Canvas 渲染引擎
 
 > 一款使用 TypeScript 构建的 **ECS（Entity-Component-System）架构 Web 渲染引擎**，目前支持 Canvas 渲染，未来将扩展至 WebGL / WebGPU。
 
 ---
 
-## ✨ 特性亮点
+##  特性亮点
 
-- 🔧 **ECS 架构设计**
+-  **ECS 架构设计**
   - 实体（Entity）、组件（Component）、系统（System）分离，结构清晰、易扩展、易调优。
-- 🎨 **Canvas 渲染封装**
+-  **Canvas 渲染封装**
   - 渲染组件 API 基于原生 Canvas API 封装，保持灵活性与简洁性。
-- 🌲 **场景树系统**
+-  **场景树系统**
   - 支持层级结构的场景组织与渲染。
-- 🧠 **事件系统**
+-  **事件系统**
   - 提供实体级别的事件响应（如点击、鼠标移动等）。
-- 💪 **TypeScript 开发**
+-  **TypeScript 开发**
   - 类型安全、智能提示完善、开发体验友好。
 
 ---
 
-## 📦 目录结构
+##  目录结构
 
 ```
 E:\game\webECS\src
@@ -69,7 +69,7 @@ E:\game\webECS\src
 
 ---
 
-## 🚀 快速开始
+##  快速开始
 
 ### 1️⃣ 安装依赖
 
