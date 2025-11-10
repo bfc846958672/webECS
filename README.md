@@ -7,7 +7,7 @@
 ## ✨ 特性亮点
 
 - 🔧 **ECS 架构设计**
-  - 实体（Entity）、组件（Component）、系统（System）分离，结构清晰、易扩展、易调试。
+  - 实体（Entity）、组件（Component）、系统（System）分离，结构清晰、易扩展、易调优。
 - 🎨 **Canvas 渲染封装**
   - 渲染组件 API 基于原生 Canvas API 封装，保持灵活性与简洁性。
 - 🌲 **场景树系统**
@@ -133,7 +133,7 @@ npm run build
 
 ---
 
-## 🧠 架构设计
+##  架构设计
 
 ```
 Entity —— Component —— System
@@ -149,7 +149,7 @@ ECS 的解耦设计让引擎具有极高的灵活性与可扩展性。
 
 ---
 
-## 🧩 当前功能
+##  当前功能
 
 - ✅ Canvas 渲染管线  
 - ✅ AABB 计算与调试盒系统  
