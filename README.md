@@ -141,7 +141,7 @@ Entity —— Component —— System
 
 | 模块 | 描述 |
 |------|------|
-| **Entity** | 游戏中所有对象的抽象标识 |
+| **Entity** | 画布中所有对象的抽象标识 |
 | **Component** | 用于定义实体的属性和行为数据（例如：Transform、Render、Event 等） |
 | **System** | 负责具体逻辑与更新（例如：渲染、事件分发、AABB 计算等） |
 
