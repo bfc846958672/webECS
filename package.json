@@ -1,0 +1,35 @@
+{
+  "name": "webECS",
+  "private": false,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/web-ecs.umd.js",
+  "module": "dist/web-ecs.es.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/web-ecs.es.js",
+      "require": "./dist/web-ecs.umd.js"
+    }
+  },
+  "scripts": {
+    "html": "vite",
+    "build:vite": "vite build",
+    "build": "npm run build:vite",
+    "test": "vitest ",
+    "dev": "tsc --noEmit --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "jsdom": "^27.1.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.7",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.6"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.4",
+    "reflect-metadata": "^0.2.2"
+  }
+}
