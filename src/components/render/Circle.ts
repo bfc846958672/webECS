@@ -1,4 +1,3 @@
-import { Component } from "../../ecs/decorators/Component";
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
@@ -8,7 +7,6 @@ import { Engine } from "../../engine/Engine.ts";
  * 若 radiusY 与 radius 相同，则为圆形；否则为椭圆。
  * 可通过 startAngle、endAngle 和 clockwise 绘制圆弧。
  */
-@Component("Circle")
 export class Circle extends RenderComponent implements IComponent {
   render = true;
 

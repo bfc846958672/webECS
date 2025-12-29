@@ -1,1 +1,0 @@
-export const ComponentRegistry = new Map<string, Function>();

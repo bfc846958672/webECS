@@ -1,4 +1,3 @@
-import { Component } from "../../ecs/decorators/Component";
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
@@ -7,7 +6,6 @@ import { Engine } from "../../engine/Engine.ts";
  * 矩形组件，仅存储渲染数据
  * 不包含绘制逻辑，系统负责渲染
  */
-@Component("Rect")
 export class Rect extends RenderComponent implements IComponent {
   width: number;
   height: number;

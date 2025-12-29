@@ -1,4 +1,3 @@
-import { Component } from "../../ecs/decorators/Component";
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
@@ -7,7 +6,6 @@ import { Engine } from "../../engine/Engine.ts";
  * 图片组件，仅存储渲染数据
  * 不包含绘制逻辑，系统负责渲染
  */
-@Component("Image")
 export class Image extends RenderComponent implements IComponent {
     #bitmap: ImageBitmap | null = null;  // 私有 bitmap
     #width: number = 0;                   // 私有宽度

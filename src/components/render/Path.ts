@@ -1,4 +1,3 @@
-import { Component } from "../../ecs/decorators/Component.ts";
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
@@ -14,7 +13,6 @@ export type IPathCommand =
   | { type: "ellipse"; center: [number, number]; radiusX: number; radiusY: number; rotation?: number; start?: number; end?: number; counterClockwise?: boolean } // 新增椭圆
   | { type: "close" };
 
-@Component("Path")
 export class Path extends RenderComponent implements IComponent {
   commands: IPathCommand[] = [];
   strokeStyle?: string;

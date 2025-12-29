@@ -2,15 +2,14 @@ import { EntityManager } from "../entity/EntityManager.ts";
 import { ComponentManager } from "./ComponentManager.ts";
 import type { ISystem, ISystemClass } from "../systems/System.ts";
 import { IComponent, ComponentConstructor } from "../components/IComponent.ts";
-import { ComponentRegistry } from "./registry/ComponentRegistry.ts";
 import { ArchetypeManager } from "../archetype/ArchetypeManager.ts";
 import { EntityComponentManager } from "../entity/EntityComponentManager.ts";
+import { Component } from "../components/Component.ts";
 export class ECS {
     public canvas!: HTMLCanvasElement;  // 挂载 Canvas
     public entities = new EntityManager();
     public components = new ComponentManager();
     private systems: ISystem[] = [];
-    public ComponentRegistry = ComponentRegistry;
     // 简单 Map：实体ID -> 组件名 -> 组件实例
     private entityComponents = new EntityComponentManager();
 
@@ -43,10 +42,8 @@ export class ECS {
     }
     addComponent(entityId: number, component: IComponent) {
         if (!this.hasEntity(entityId)) throw new Error(`Entity ${entityId} not exists`);
-        // 1️⃣ 检查组件是否注册
-        const name = Reflect.getMetadata("component:name", component.constructor);
-        if (!this.ComponentRegistry.has(name)) {
-            throw new Error(`Component "${name}" is not standard component!`);
+        if (!Component.isComponent(component)) {
+            throw new Error(`Component "${component.constructor.name}" is not standard component!`);
         }
         this.entityComponents.addComponent(entityId, component);
         const comps = this.entityComponents.getComponentsMap(entityId)!;

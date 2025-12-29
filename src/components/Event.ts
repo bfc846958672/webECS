@@ -1,4 +1,4 @@
-import { Component } from "../ecs/decorators/Component.ts";
+import { Component } from "./Component.ts";
 import { IComponent } from "./IComponent.ts";
 
 export type IEventType =
@@ -10,8 +10,7 @@ export type IEventType =
 export type IScreenEvent = MouseEvent | PointerEvent | WheelEvent | TouchEvent;
 export type EventCallback = (event: IScreenEvent, entityId: number) => boolean | void;
 
-@Component("Event")
-export class EventComponent implements IComponent {
+export class EventComponent extends Component implements IComponent {
     public events = new Map<IEventType, EventCallback[]>();
 
     /** 注册事件 */

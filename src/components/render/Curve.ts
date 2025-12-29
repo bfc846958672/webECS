@@ -1,9 +1,7 @@
-import { Component } from "../../ecs/decorators/Component";
 import { IComponent } from "../IComponent";
 import { RenderComponent } from "./RenderComponent";
 import { Engine } from "../../engine/Engine";
 
-@Component("Curve")
 export class Curve extends RenderComponent implements IComponent {
   start: [number, number] = [0, 0];
   cp1: [number, number] = [0, 0];

@@ -1,9 +1,7 @@
-import { Component as StandardComponent } from "../ecs/decorators/Component";
 import { IComponent } from "./IComponent.ts";
 import { Component } from "./Component.ts";
 import { mat3 } from "gl-matrix";
 import { Engine } from "../engine/Engine.ts";
-@StandardComponent('Transform')
 export class Transform extends Component implements IComponent {
   #x = 0;
   #y = 0;

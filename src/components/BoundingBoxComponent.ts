@@ -1,4 +1,4 @@
-import { Component } from "../ecs/decorators/Component";
+import { Component } from "./Component";
 import { IComponent } from "./IComponent";
 import { IAABB } from "../interface/AABB";
 
@@ -9,14 +9,15 @@ import { IAABB } from "../interface/AABB";
  * - childrenAABB: 所有子节点包围盒
  * - totalAABB: self + children
  */
-@Component("BoundingBoxComponent")
-export class BoundingBoxComponent implements IComponent {
+export class BoundingBoxComponent extends Component implements IComponent {
     // 当前节点自身图形包围盒
     selfAABB: IAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
     childrenAABB: IAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
     totalAABB: IAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
     dirty: boolean = true;
-    constructor() { }
+    constructor() {
+        super();
+    }
     reset() {
         this.selfAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
         this.childrenAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
@@ -28,7 +29,7 @@ export class BoundingBoxComponent implements IComponent {
         this.selfAABB.minY = aabb.minY;
         this.selfAABB.maxX = aabb.maxX;
         this.selfAABB.maxY = aabb.maxY;
-        this.dirty = true; 
+        this.dirty = true;
     }
 
     // 设置子节点 AABB
@@ -37,7 +38,7 @@ export class BoundingBoxComponent implements IComponent {
         this.childrenAABB.minY = aabb.minY;
         this.childrenAABB.maxX = aabb.maxX;
         this.childrenAABB.maxY = aabb.maxY;
-        this.dirty = true; 
+        this.dirty = true;
     }
 
     // 计算总包围盒（self + children）

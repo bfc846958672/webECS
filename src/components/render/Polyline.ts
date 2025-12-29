@@ -1,4 +1,3 @@
-import { Component } from "../../ecs/decorators/Component";
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
@@ -8,7 +7,6 @@ import { Engine } from "../../engine/Engine.ts";
  * 仅存储渲染数据，不包含绘制逻辑
  * 系统（RenderSystem）负责渲染
  */
-@Component("Polyline")
 export class Polyline extends RenderComponent implements IComponent {
   /** 顶点列表，例如 [{x:0, y:0}, {x:100, y:50}] */
   points: [number,number][] = [];
