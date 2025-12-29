@@ -1,8 +1,8 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Polyline } from "../../components/render/Polyline.ts";
-import { IProcess } from "../../interface/IRender.ts";
-import type { ISystem } from "../System.ts";
+import { IProcess } from "../../interface/System.ts";
+import type { ISystem } from "../../interface/System.ts";
 
 /**
  * 渲染器：负责绘制 Polyline 组件

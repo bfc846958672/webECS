@@ -2,7 +2,7 @@ import { vec2, mat3 } from "gl-matrix";
 import { ECS } from "../../ecs/ECS";
 import { Transform } from "../../components/Transform";
 import { Path } from "../../components/render/Path";
-import { IBoundingBoxStrategy } from "./AABB";
+import { IBoundingBoxStrategy } from "../../interface/AABB";
 
 export class PathBoundingBox implements IBoundingBoxStrategy {
     private offscreenCanvas: HTMLCanvasElement;

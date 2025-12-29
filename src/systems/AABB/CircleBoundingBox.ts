@@ -1,7 +1,7 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Circle } from "../../components/render/Circle.ts";
-import { IBoundingBoxStrategy } from "./AABB";
+import { IBoundingBoxStrategy } from "../../interface/AABB.ts";
 import { mat3, vec2 } from "gl-matrix";
 
 /**

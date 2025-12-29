@@ -2,7 +2,7 @@ import { vec2, mat3 } from "gl-matrix";
 import { ECS } from "../../ecs/ECS";
 import { Transform } from "../../components/Transform";
 import { Rect } from "../../components/render/Rect";
-import { IBoundingBoxStrategy } from "./AABB";
+import { IBoundingBoxStrategy } from "../../interface/AABB";
 
 /**
  * Rect 包围盒策略（支持圆角矩形）

@@ -1,6 +1,6 @@
-import { ISystem } from "./System.ts";
+import { ISystem } from "../interface/System.ts";
 import { SceneTree } from "../scene/SceneTree.ts";
-import { IProcess } from "../interface/IRender.ts";
+import { IProcess } from "../interface/System.ts";
 import { RectRenderer } from './render/RectRenderer.ts'
 import { CircleRenderer } from './render/CircleRenderer.ts'
 import { ImageRenderer } from './render/ImageRenderer.ts'

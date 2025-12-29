@@ -2,7 +2,7 @@ import { vec2, mat3 } from "gl-matrix";
 import { ECS } from "../../ecs/ECS";
 import { Transform } from "../../components/Transform";
 import { Polyline } from "../../components/render/Polyline";
-import { IBoundingBoxStrategy } from "./AABB";
+import { IBoundingBoxStrategy } from "../../interface/AABB";
 
 /**
  * Polyline 包围盒策略

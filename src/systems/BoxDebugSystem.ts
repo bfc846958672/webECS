@@ -1,6 +1,6 @@
-import { ISystem } from "./System.ts";
+import { ISystem } from "../interface/System.ts";
 import { SceneTree } from "../scene/SceneTree.ts";
-import { IProcess } from "../interface/IRender.ts";
+import { IProcess } from "../interface/System.ts";
 import { Engine } from "../engine/Engine.ts";
 import { IShareContext } from "../interface/System.ts";
 import { BoundingBoxComponent } from "../main.ts";

@@ -2,7 +2,7 @@ import { vec2, mat3 } from "gl-matrix";
 import { ECS } from "../../ecs/ECS";
 import { Transform } from "../../components/Transform";
 import { Curve } from "../../components/render/Curve";
-import { IBoundingBoxStrategy } from "./AABB";
+import { IBoundingBoxStrategy } from "../../interface/AABB";
 
 /**
  * Curve 包围盒策略

@@ -1,8 +1,8 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Path } from "../../components/render/Path.ts";
-import { IProcess } from "../../interface/IRender.ts";
-import type { ISystem } from "../System.ts";
+import { IProcess } from "../../interface/System.ts";
+import type { ISystem } from "../../interface/System.ts";
 
 /**
  * 渲染器：负责绘制 Path 组件（支持 moveTo/lineTo/曲线/arc/arcTo/ellipse）

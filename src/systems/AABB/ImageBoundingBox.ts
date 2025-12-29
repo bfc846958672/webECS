@@ -1,7 +1,7 @@
 import { ECS } from "../../ecs/ECS";
 import { Transform } from "../../components/Transform";
 import { Image } from "../../components/render/Image";
-import { IBoundingBoxStrategy } from "./AABB";
+import { IBoundingBoxStrategy } from "../../interface/AABB";
 import { mat3, vec2 } from "gl-matrix";
 
 /**

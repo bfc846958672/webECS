@@ -8,9 +8,15 @@ export class EntityComponentManager {
     private map = new Map<number, Map<IComponentClass, IComponent>>();
     // 新增：组件实例 ==> 实体映射
     private componentEntityMap = new Map<IComponent, number>();
-
     getComponentsMap(entityId: number): Map<IComponentClass, IComponent> | undefined {
         return this.map.get(entityId);
+    }
+    getRenderComponent(entityId: number): RenderComponent | undefined {
+        const renderClass = this.renderMap.get(entityId);
+        if (renderClass) {
+            return this.map.get(entityId)!.get(renderClass) as RenderComponent;
+        }
+        return undefined;
     }
     isRenderComponent(component: IComponent) {
         return component instanceof RenderComponent;
@@ -55,8 +61,8 @@ export class EntityComponentManager {
         const comps = this.map.get(entityId);
         if (!comps) return;
 
-        const comp = comps.get(componentClass);
-        if (comp) this.componentEntityMap.delete(comp); // 删除映射
+        const instance = comps.get(componentClass);
+        if (instance) this.componentEntityMap.delete(instance); // 删除映射
         comps.delete(componentClass);
 
         if (comps.size === 0) {

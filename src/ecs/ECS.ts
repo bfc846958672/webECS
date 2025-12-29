@@ -1,18 +1,15 @@
 import { EntityManager } from "../entity/EntityManager.ts";
-import { ComponentManager } from "./ComponentManager.ts";
-import type { ISystem, ISystemClass } from "../systems/System.ts";
+import type { ISystem, ISystemClass } from "../interface/System.ts";
 import { IComponent, ComponentConstructor } from "../components/IComponent.ts";
 import { ArchetypeManager } from "../archetype/ArchetypeManager.ts";
-import { EntityComponentManager } from "../entity/EntityComponentManager.ts";
+import { EntityComponentManager } from "./EntityComponentManager.ts";
 import { Component } from "../components/Component.ts";
 export class ECS {
     public canvas!: HTMLCanvasElement;  // 挂载 Canvas
     public entities = new EntityManager();
-    public components = new ComponentManager();
-    private systems: ISystem[] = [];
     // 简单 Map：实体ID -> 组件名 -> 组件实例
     private entityComponents = new EntityComponentManager();
-
+    private systems: ISystem[] = [];
     private archetypeManager = new ArchetypeManager();
 
     #system: Map<ISystemClass, ISystem> = new Map();
@@ -40,12 +37,12 @@ export class ECS {
     update(delta: number) {
         for (const sys of this.systems) sys.update(delta);
     }
-    addComponent(entityId: number, component: IComponent) {
+    addComponent(entityId: number, instance: IComponent) {
         if (!this.hasEntity(entityId)) throw new Error(`Entity ${entityId} not exists`);
-        if (!Component.isComponent(component)) {
-            throw new Error(`Component "${component.constructor.name}" is not standard component!`);
+        if (!Component.isComponent(instance)) {
+            throw new Error(`Component "${instance.constructor.name}" is not standard component!`);
         }
-        this.entityComponents.addComponent(entityId, component);
+        this.entityComponents.addComponent(entityId, instance);
         const comps = this.entityComponents.getComponentsMap(entityId)!;
         this.archetypeManager.migrateEntity(entityId, comps);
 
