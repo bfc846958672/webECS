@@ -1,5 +1,5 @@
 // EasyUI 库主入口
-import { Engine } from "./ecs/Engine.ts";
+import { Engine } from "./engine/Engine.ts";
 import * as Components from './components/render/index.ts';
 
 

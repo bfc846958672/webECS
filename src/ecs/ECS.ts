@@ -1,14 +1,12 @@
-import { EntityManager } from "./EntityManager.ts";
+import { EntityManager } from "../entity/EntityManager.ts";
 import { ComponentManager } from "./ComponentManager.ts";
-import type { ISystem, ISystemClass } from "./System.ts";
-import { IComponent, ComponentConstructor } from "./interface/IComponent.ts";
+import type { ISystem, ISystemClass } from "../systems/System.ts";
+import { IComponent, ComponentConstructor } from "../components/IComponent.ts";
 import { ComponentRegistry } from "./registry/ComponentRegistry.ts";
-import { ArchetypeManager } from "./ArchetypeManager.ts";
-import { EntityComponentManager } from "./EntityComponentManager.ts";
-import { ECSEvent } from "./ECSEvent.ts";
+import { ArchetypeManager } from "../archetype/ArchetypeManager.ts";
+import { EntityComponentManager } from "../entity/EntityComponentManager.ts";
 export class ECS {
     public canvas!: HTMLCanvasElement;  // 挂载 Canvas
-    public event = new ECSEvent();
     public entities = new EntityManager();
     public components = new ComponentManager();
     private systems: ISystem[] = [];
@@ -28,16 +26,15 @@ export class ECS {
         return this.#system.get(systemClass) as T;
     }
     hasEntity(entityId: number) {
-        return this.entities.hasEntity(entityId);
+        return this.entities.has(entityId);
     }
     createEntity() {
-        const entityId = this.entities.createEntity();
-        this.event.emit("create_entity", entityId);
+        const entityId = this.entities.create();
         return entityId;
     }
     removeEntity(entityId: number) {
         if (!this.hasEntity(entityId)) throw new Error(`Entity ${entityId} not exists`);
-        this.entities.removeEntity(entityId);
+        this.entities.remove(entityId);
         this.entityComponents.removeEntity(entityId);
         this.archetypeManager.removeEntity(entityId);
     }
@@ -49,13 +46,12 @@ export class ECS {
         // 1️⃣ 检查组件是否注册
         const name = Reflect.getMetadata("component:name", component.constructor);
         if (!this.ComponentRegistry.has(name)) {
-            throw new Error(`Component "${name}" is not registered!`);
+            throw new Error(`Component "${name}" is not standard component!`);
         }
         this.entityComponents.addComponent(entityId, component);
         const comps = this.entityComponents.getComponentsMap(entityId)!;
         this.archetypeManager.migrateEntity(entityId, comps);
 
-        this.event.emit("add_component", entityId, component);
     }
     removeComponent(entityId: number, componentClass: ComponentConstructor<IComponent>) {
         if (!this.hasEntity(entityId)) throw new Error(`Entity ${entityId} not exists`);
@@ -67,7 +63,6 @@ export class ECS {
         } else {
             this.archetypeManager.removeEntity(entityId);
         }
-        this.event.emit("remove_component", entityId, componentClass);
     }
 
 

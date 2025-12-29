@@ -1,7 +1,7 @@
 import { Component } from "../../ecs/decorators/Component";
-import { IComponent } from "../../ecs/interface/IComponent";
+import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../ecs/Engine.ts";
+import { Engine } from "../../engine/Engine.ts";
 
 /**
  * Circle（兼容椭圆与圆弧）

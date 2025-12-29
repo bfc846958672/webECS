@@ -1,5 +1,5 @@
-import { IComponent } from "../../ecs/interface/IComponent";
-import { Engine } from "../../ecs/Engine.ts";
+import { IComponent } from "../IComponent.ts";
+import { Engine } from "../../engine/Engine.ts";
 /**
  * 渲染组件，保证实体仅有一个渲染组件
  */

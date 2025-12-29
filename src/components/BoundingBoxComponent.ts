@@ -1,5 +1,5 @@
 import { Component } from "../ecs/decorators/Component";
-import { IComponent } from "../ecs/interface/IComponent";
+import { IComponent } from "./IComponent";
 import { IAABB } from "../interface/AABB";
 
 /**

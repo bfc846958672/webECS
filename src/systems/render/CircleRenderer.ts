@@ -1,8 +1,8 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Circle } from "../../components/render/Circle.ts";
-import { IProcess } from "../../ecs/interface/IRender.ts";
-import type { ISystem } from "../../ecs/System.ts";
+import { IProcess } from "../../interface/IRender.ts";
+import type { ISystem } from "../System.ts";
 
 /**
  * 渲染器：负责绘制 Circle 组件

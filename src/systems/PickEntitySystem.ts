@@ -1,7 +1,7 @@
 // import { RenderComponent } from "../components/render/RenderComponent.ts";
 import { IAABB } from "../interface/AABB.ts";
-import { SceneNode } from "../ecs/SceneTree.ts";
-import { ISystem } from "../ecs/System.ts";
+import { SceneNode } from "../scene/SceneTree.ts";
+import { ISystem } from "./System.ts";
 import { BoundingBoxComponent } from "../components/BoundingBoxComponent.ts";
 import { BoundingBoxProcess } from './AABB/aabbProcess.ts'
 import { RenderableHitProcess } from './AABB/hitprocess.ts'

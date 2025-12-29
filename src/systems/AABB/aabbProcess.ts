@@ -1,6 +1,6 @@
 import { ECS } from "../../ecs/ECS.ts";
-import { IProcess } from "../../ecs/interface/IRender.ts";
-import type { ISystem } from "../../ecs/System.ts";
+import { IProcess } from "../../interface/IRender.ts";
+import type { ISystem } from "../System.ts";
 import { IBoundingBoxStrategy } from "./AABB.ts";
 import { CircleBoundingBox } from "./CircleBoundingBox.ts";
 import { RectBoundingBox } from "./RectBoundingBox.ts";

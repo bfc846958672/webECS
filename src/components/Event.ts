@@ -1,5 +1,5 @@
 import { Component } from "../ecs/decorators/Component.ts";
-import { IComponent } from "../ecs/interface/IComponent.ts";
+import { IComponent } from "./IComponent.ts";
 
 export type IEventType =
     | "click" | "dblclick"

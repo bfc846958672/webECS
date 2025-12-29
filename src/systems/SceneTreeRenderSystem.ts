@@ -1,11 +1,11 @@
-import { ISystem } from "../ecs/System.ts";
-import { SceneTree } from "../ecs/SceneTree.ts";
-import { IProcess } from "../ecs/interface/IRender.ts";
+import { ISystem } from "./System.ts";
+import { SceneTree } from "../scene/SceneTree.ts";
+import { IProcess } from "../interface/IRender.ts";
 import { RectRenderer } from './render/RectRenderer.ts'
 import { CircleRenderer } from './render/CircleRenderer.ts'
 import { ImageRenderer } from './render/ImageRenderer.ts'
 import { TransformProcess } from './TransformProcess.ts'
-import { Engine } from "../ecs/Engine.ts";
+import { Engine } from "../engine/Engine.ts";
 import { BoundingBoxProcess } from './AABB/aabbProcess.ts'
 import { PathRenderer } from "./render/PathRenderer.ts";
 import { IShareContext } from "../interface/System.ts";

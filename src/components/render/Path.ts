@@ -1,7 +1,7 @@
 import { Component } from "../../ecs/decorators/Component.ts";
-import { IComponent } from "../../ecs/interface/IComponent.ts";
+import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../ecs/Engine.ts";
+import { Engine } from "../../engine/Engine.ts";
 
 /** 🧩 支持的路径命令 */
 export type IPathCommand =

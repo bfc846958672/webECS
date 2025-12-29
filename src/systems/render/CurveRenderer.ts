@@ -1,8 +1,8 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Curve } from "../../components/render/Curve.ts";
-import { IProcess } from "../../ecs/interface/IRender.ts";
-import type { ISystem } from "../../ecs/System.ts";
+import { IProcess } from "../../interface/IRender.ts";
+import type { ISystem } from "../System.ts";
 
 /**
  * 渲染器：负责绘制 Curve 组件（支持二次和三次贝塞尔曲线）

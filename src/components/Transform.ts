@@ -1,9 +1,10 @@
-import { Component } from "../ecs/decorators/Component";
-import { IComponent } from "../ecs/interface/IComponent";
+import { Component as StandardComponent } from "../ecs/decorators/Component";
+import { IComponent } from "./IComponent.ts";
+import { Component } from "./Component.ts";
 import { mat3 } from "gl-matrix";
-import { Engine } from "../ecs/Engine.ts";
-@Component('Transform')
-export class Transform implements IComponent {
+import { Engine } from "../engine/Engine.ts";
+@StandardComponent('Transform')
+export class Transform extends Component implements IComponent {
   #x = 0;
   #y = 0;
   #scaleX = 1;
@@ -19,6 +20,7 @@ export class Transform implements IComponent {
   dirty = true;
   #engine: Engine | null;
   constructor(engine: Engine | null, params: Partial<Transform> = {}) {
+    super();
     this.#engine = engine;
     this.#engine;
     const keys = ["x", "y", "scaleX", "scaleY", "rotation", "skewX", "skewY", "pivotX", "pivotY"] as const;
