@@ -4,7 +4,6 @@ import { SceneNode } from "../scene/SceneTree.ts";
 import { ISystem } from "../interface/System.ts";
 import { BoundingBoxComponent } from "../components/BoundingBoxComponent.ts";
 import { BoundingBoxProcess } from './AABB/aabbProcess.ts'
-import { RenderableHitProcess } from './AABB/hitprocess.ts'
 
 
 import { TransformProcess } from './TransformProcess.ts'
@@ -14,17 +13,15 @@ export class PickEntitySystem extends ISystem {
     eventEntities: number[] = [];
     bboxProcess!: BoundingBoxProcess;
     transformProcess!: TransformProcess;
-    RenderableHitProcess!: RenderableHitProcess;    
     protected onInit(): void {
         this.transformProcess = new TransformProcess();
         this.bboxProcess = new BoundingBoxProcess();
-        this.RenderableHitProcess = new RenderableHitProcess();
     }
     hitAABB(x: number, y: number, box: IAABB) {
         return x >= box.minX && y >= box.minY && x <= box.maxX && y <= box.maxY;
     }
     hitRenderable(x: number, y: number, entityId: number) {
-        return this.RenderableHitProcess.hit(this.ecs, entityId, x, y);
+        return this.bboxProcess.hit(this.ecs, entityId, x, y);
     }
     hitTree(x: number, y: number) {
         const tree = this.sceneTree;

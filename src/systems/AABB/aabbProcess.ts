@@ -2,15 +2,15 @@ import { ECS } from "../../ecs/ECS.ts";
 import { IProcess } from "../../interface/System.ts";
 import type { ISystem } from "../../interface/System.ts";
 import { IBoundingBoxStrategy } from "../../interface/AABB.ts";
-import { CircleBoundingBox } from "./CircleBoundingBox.ts";
-import { RectBoundingBox } from "./RectBoundingBox.ts";
-import { ImageBoundingBox } from "./ImageBoundingBox.ts";
-import { PolylineBoundingBox } from "./PolylineBoundingBox.ts";
-import { CurveBoundingBox } from "./CurveBoundingBox.ts";
+import { CircleGraphics } from "../graphics/CircleGraphics.ts";
+import { RectGraphics } from "../graphics/RectGraphics.ts";
+import { ImageGraphics } from "../graphics/ImageGraphics.ts";
+import { PolylineGraphics } from "../graphics/PolylineGraphics.ts";
+import { CurveGraphics } from "../graphics/CurveGraphics.ts";
 import { BoundingBoxComponent } from "../../components/BoundingBoxComponent.ts";
 import { IAABB } from "../../interface/AABB.ts";
 import { IShareContext } from "../../interface/System.ts";
-import { PathBoundingBox } from "./PathBoundingBox.ts";
+import { PathGraphics } from "../graphics/PathGraphics.ts";
 export class BoundingBoxProcess implements IProcess {
     match(_ecs: ECS, _entityId: number) {
         return true
@@ -20,12 +20,12 @@ export class BoundingBoxProcess implements IProcess {
     none: () => IAABB = () => ({ minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
     constructor() {
         this.strategies = [];
-        this.strategies.push(new CircleBoundingBox());
-        this.strategies.push(new RectBoundingBox());
-        this.strategies.push(new ImageBoundingBox());
-        this.strategies.push(new PolylineBoundingBox());
-        this.strategies.push(new CurveBoundingBox());
-        this.strategies.push(new PathBoundingBox());    
+        this.strategies.push(new CircleGraphics());
+        this.strategies.push(new RectGraphics());
+        this.strategies.push(new ImageGraphics());
+        this.strategies.push(new PolylineGraphics());
+        this.strategies.push(new CurveGraphics());
+        this.strategies.push(new PathGraphics());    
     }
     compute(ecs: ECS, entityId: number) {
         for (const s of this.strategies) {
@@ -65,5 +65,13 @@ export class BoundingBoxProcess implements IProcess {
         aabb.minY = Math.min(aabb.minY, bbox.minY);
         aabb.maxX = Math.max(aabb.maxX, bbox.maxX);
         aabb.maxY = Math.max(aabb.maxY, bbox.maxY);
+    }
+    hit(ecs: ECS, entityId: number, x: number, y: number) {
+        for (const s of this.strategies) {
+            if (s.match(ecs, entityId)) {
+                return s.hit(ecs, entityId, x, y);
+            }
+        }
+        return false
     }
 }

@@ -1,12 +1,12 @@
 import { ECS } from "../../ecs/ECS.ts";
 import type { ISystem, IProcess } from "../../interface/System.ts";
 import type { IRenderStrategy } from "../../interface/IRender.ts";
-import { CircleRenderer } from "./CircleRenderer.ts";
-import { RectRenderer } from "./RectRenderer.ts";
-import { ImageRenderer } from "./ImageRenderer.ts";
-import { PolylineRenderer } from "./PolylineRenderer.ts";
-import { CurveRenderer } from "./CurveRenderer.ts";
-import { PathRenderer } from "./PathRenderer.ts";
+import { CircleGraphics } from "../graphics/CircleGraphics.ts";
+import { RectGraphics } from "../graphics/RectGraphics.ts";
+import { ImageGraphics } from "../graphics/ImageGraphics.ts";
+import { PolylineGraphics } from "../graphics/PolylineGraphics.ts";
+import { CurveGraphics } from "../graphics/CurveGraphics.ts";
+import { PathGraphics } from "../graphics/PathGraphics.ts";
 import type { IShareContext } from "../../interface/System.ts";
 
 /**
@@ -21,12 +21,12 @@ export class RenderProcess implements IProcess<IShareContext, IShareContext> {
   private strategies: IRenderStrategy[] = [];
 
   constructor() {
-    this.strategies.push(new CircleRenderer());
-    this.strategies.push(new RectRenderer());
-    this.strategies.push(new ImageRenderer());
-    this.strategies.push(new PolylineRenderer());
-    this.strategies.push(new CurveRenderer());
-    this.strategies.push(new PathRenderer());
+    this.strategies.push(new CircleGraphics());
+    this.strategies.push(new RectGraphics());
+    this.strategies.push(new ImageGraphics());
+    this.strategies.push(new PolylineGraphics());
+    this.strategies.push(new CurveGraphics());
+    this.strategies.push(new PathGraphics());
   }
 
   private renderWithStrategy(system: ISystem, entityId: number) {
