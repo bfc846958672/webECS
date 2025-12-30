@@ -1,10 +1,10 @@
-import { ISystem } from "../interface/System.ts";
-import { SceneTree } from "../scene/SceneTree.ts";
-import { IProcess } from "../interface/System.ts";
-import { Engine } from "../engine/Engine.ts";
-import { IShareContext } from "../interface/System.ts";
-import { BoundingBoxComponent } from "../main.ts";
-import { IAABB } from "../interface/AABB.ts";
+import { ISystem } from "../../interface/System.ts";
+import { SceneTree } from "../../scene/SceneTree.ts";
+import { IProcess } from "../../interface/System.ts";
+import { Engine } from "../../engine/Engine.ts";
+import { IShareContext } from "../../interface/System.ts";
+import { BoundingBoxComponent } from "../../main.ts";
+import { IAABB } from "../../interface/AABB.ts";
 export class BoxDebugSystem extends ISystem {
 
     ctx!: CanvasRenderingContext2D;

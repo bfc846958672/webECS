@@ -1,9 +1,9 @@
-import { ECS } from "../ecs/ECS.ts";
-import { Transform } from "../components/Transform.ts";
-import { IProcess } from "../interface/System.ts";
+import { ECS } from "../../ecs/ECS.ts";
+import { Transform } from "../../components/Transform.ts";
+import { IProcess } from "../../interface/System.ts";
 import { mat3 } from "gl-matrix";
-import { BoundingBoxComponent } from "../components/BoundingBoxComponent.ts";
-import type { ISystem } from "../interface/System.ts";
+import { BoundingBoxComponent } from "../../components/BoundingBoxComponent.ts";
+import type { ISystem } from "../../interface/System.ts";
 
 const unit = mat3.create();
 export class TransformProcess implements IProcess<{ dirty: boolean }, { dirty: boolean }> {

@@ -2,11 +2,11 @@ import { ECS } from "../ecs/ECS.ts";
 import { Ticker } from "./Ticker.ts";
 import { SceneTree } from "../scene/SceneTree.ts";
 import { RootEntity } from "../entity/EntityRoot.ts";
-import { SceneTreeRenderSystem } from "../systems/SceneTreeRenderSystem.ts";
-import { PickEntitySystem } from "../systems/PickEntitySystem.ts";
+import { SceneTreeRenderSystem } from "../systems/systems/SceneTreeRenderSystem.ts";
+import { PickEntitySystem } from "../systems/systems/PickEntitySystem.ts";
 import { IEngine } from "./IEngine.ts";
-import { BoxDebugSystem } from "../systems/BoxDebugSystem.ts";
-import { EventSystem } from "../systems/EventSystem.ts";
+import { BoxDebugSystem } from "../systems/systems/BoxDebugSystem.ts";
+import { EventSystem } from "../systems/systems/EventSystem.ts";
 export class Engine implements IEngine {
     public boxDebug: boolean = false;
     public ecs: ECS;

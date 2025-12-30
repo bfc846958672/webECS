@@ -1,13 +1,13 @@
 // import { RenderComponent } from "../components/render/RenderComponent.ts";
-import { IAABB } from "../interface/AABB.ts";
-import { SceneNode } from "../scene/SceneTree.ts";
-import { ISystem } from "../interface/System.ts";
-import { BoundingBoxComponent } from "../components/BoundingBoxComponent.ts";
-import { BoundingBoxProcess } from './AABB/aabbProcess.ts'
+import { IAABB } from "../../interface/AABB.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
+import { ISystem } from "../../interface/System.ts";
+import { BoundingBoxComponent } from "../../components/BoundingBoxComponent.ts";
+import { BoundingBoxProcess } from '../processor/aabbProcess.ts'
 
 
-import { TransformProcess } from './TransformProcess.ts'
-import { IShareContext } from "../interface/System.ts";
+import { TransformProcess } from '../processor/TransformProcess.ts'
+import { IShareContext } from "../../interface/System.ts";
 export class PickEntitySystem extends ISystem {
     ctx!: CanvasRenderingContext2D;
     eventEntities: number[] = [];

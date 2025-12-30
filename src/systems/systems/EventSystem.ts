@@ -1,6 +1,6 @@
-import { ISystem } from "../interface/System.ts";
-import { EventComponent, IEventType, IScreenEvent } from "../components/Event.ts";
-import { SceneNode } from "../scene/SceneTree.ts";
+import { ISystem } from "../../interface/System.ts";
+import { EventComponent, IEventType, IScreenEvent } from "../../components/Event.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 import { PickEntitySystem } from "./PickEntitySystem.ts";
 /**
  * EventSystem：仅处理具有屏幕坐标的输入事件

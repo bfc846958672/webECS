@@ -1,11 +1,11 @@
-import { ISystem } from "../interface/System.ts";
-import { SceneTree } from "../scene/SceneTree.ts";
-import { IProcess } from "../interface/System.ts";
-import { TransformProcess } from './TransformProcess.ts'
-import { Engine } from "../engine/Engine.ts";
-import { BoundingBoxProcess } from './AABB/aabbProcess.ts'
-import { IShareContext } from "../interface/System.ts";
-import { RenderProcess } from "./render/renderProcess.ts";
+import { ISystem } from "../../interface/System.ts";
+import { SceneTree } from "../../scene/SceneTree.ts";
+import { IProcess } from "../../interface/System.ts";
+import { TransformProcess } from '../processor/TransformProcess.ts'
+import { Engine } from "../../engine/Engine.ts";
+import { BoundingBoxProcess } from '../processor/aabbProcess.ts'
+import { IShareContext } from "../../interface/System.ts";
+import { RenderProcess } from "../processor/renderProcess.ts";
 export class SceneTreeRenderSystem extends ISystem {
 
     ctx!: CanvasRenderingContext2D;
