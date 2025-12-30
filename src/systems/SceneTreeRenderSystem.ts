@@ -38,7 +38,6 @@ export class SceneTreeRenderSystem extends ISystem {
     }
     bboxProcess!: BoundingBoxProcess;
     update(): void {
-        console.log('渲染')
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         const map = new Map<number | null, IShareContext>();
         // 根节点的父节点的上下文

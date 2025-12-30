@@ -16,7 +16,7 @@ export default defineConfig({
     })
   ],
   server: {
-    open: '/example/start.html',
+    open: '/example/index.html',
     fs: {
       strict: false // 允许访问整个/example目录和test目录
     }
