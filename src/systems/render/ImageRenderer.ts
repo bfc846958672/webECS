@@ -1,19 +1,19 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Image } from "../../components/render/Image.ts";
-import { IProcess } from "../../interface/System.ts";
 import type { ISystem } from "../../interface/System.ts";
+import type { IRenderStrategy } from "../../interface/IRender.ts";
 
 /**
  * 渲染器：负责绘制 Image 组件
  */
-export class ImageRenderer implements IProcess {
+export class ImageRenderer implements IRenderStrategy {
 
   match(ecs: ECS, entityId: number) {
     return ecs.hasComponent(entityId, Image);
   }
 
-  exec(system: ISystem, entityId: number) {
+  render(system: ISystem, entityId: number) {
     const ecs = system.ecs;
     const ctx = ecs.canvas.getContext("2d")!;
 

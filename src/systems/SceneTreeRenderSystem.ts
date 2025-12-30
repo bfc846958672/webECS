@@ -1,16 +1,11 @@
 import { ISystem } from "../interface/System.ts";
 import { SceneTree } from "../scene/SceneTree.ts";
 import { IProcess } from "../interface/System.ts";
-import { RectRenderer } from './render/RectRenderer.ts'
-import { CircleRenderer } from './render/CircleRenderer.ts'
-import { ImageRenderer } from './render/ImageRenderer.ts'
 import { TransformProcess } from './TransformProcess.ts'
 import { Engine } from "../engine/Engine.ts";
 import { BoundingBoxProcess } from './AABB/aabbProcess.ts'
-import { PathRenderer } from "./render/PathRenderer.ts";
 import { IShareContext } from "../interface/System.ts";
-import { PolylineRenderer } from "./render/PolylineRenderer.ts";
-import { CurveRenderer } from "./render/CurveRenderer.ts";
+import { RenderProcess } from "./render/renderProcess.ts";
 export class SceneTreeRenderSystem extends ISystem {
 
     ctx!: CanvasRenderingContext2D;
@@ -24,19 +19,14 @@ export class SceneTreeRenderSystem extends ISystem {
         const ctx = canvas.getContext("2d");
         if (!ctx) throw new Error("Cannot get CanvasRenderingContext2D");
         this.ctx = ctx;
-
-        this.processes.push(
-            new TransformProcess(),
-            new RectRenderer(),
-            new CircleRenderer(),
-            new ImageRenderer(),
-            new PolylineRenderer(),
-            new CurveRenderer(),
-            new PathRenderer(),
-        );
+    
         this.bboxProcess = new BoundingBoxProcess();
+        this.transformProcess = new TransformProcess();
+        this.renderProcess = new RenderProcess();
     }
     bboxProcess!: BoundingBoxProcess;
+    transformProcess!: TransformProcess;
+    renderProcess!: RenderProcess;
     update(): void {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         const map = new Map<number | null, IShareContext>();
@@ -48,11 +38,9 @@ export class SceneTreeRenderSystem extends ISystem {
             if (!map.has(entityId)) map.set(entityId, {} as IShareContext);
             const context = map.get(entityId)!;
             const parentContext = map.get(parentEntityId)!;
-            for (const process of this.processes) {
-                if (process.match(this.ecs, entityId)) {
-                    process.exec(this, entityId, parentEntityId, context, parentContext);
-                }
-            }
+            this.transformProcess.exec(this, entityId, parentEntityId, context, parentContext);
+            this.renderProcess.exec(this, entityId);
+
         }
         for (let i = displayList.length - 1; i >= 0; i--) {
             const [entityId, parentEntityId] = displayList[i];

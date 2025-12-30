@@ -1,13 +1,13 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Path } from "../../components/render/Path.ts";
-import { IProcess } from "../../interface/System.ts";
 import type { ISystem } from "../../interface/System.ts";
+import type { IRenderStrategy } from "../../interface/IRender.ts";
 
 /**
  * 渲染器：负责绘制 Path 组件（支持 moveTo/lineTo/曲线/arc/arcTo/ellipse）
  */
-export class PathRenderer implements IProcess {
+export class PathRenderer implements IRenderStrategy {
     match(ecs: ECS, entityId: number) {
         return ecs.hasComponent(entityId, Path);
     }
@@ -15,7 +15,7 @@ export class PathRenderer implements IProcess {
     /**
      * 执行渲染逻辑
      */
-    exec(system: ISystem, entityId: number) {
+    render(system: ISystem, entityId: number) {
         const ecs = system.ecs;
         const ctx = ecs.canvas.getContext("2d")!;
         const transform = ecs.getComponent(entityId, Transform)!;

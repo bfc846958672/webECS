@@ -1,18 +1,18 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Polyline } from "../../components/render/Polyline.ts";
-import { IProcess } from "../../interface/System.ts";
 import type { ISystem } from "../../interface/System.ts";
+import type { IRenderStrategy } from "../../interface/IRender.ts";
 
 /**
  * 渲染器：负责绘制 Polyline 组件
  */
-export class PolylineRenderer implements IProcess {
+export class PolylineRenderer implements IRenderStrategy {
     match(ecs: ECS, entityId: number) {
         return ecs.hasComponent(entityId, Polyline);
     }
 
-    exec(system: ISystem, entityId: number) {
+    render(system: ISystem, entityId: number) {
         const ecs = system.ecs;
         const ctx = ecs.canvas.getContext("2d")!;
         const transform = ecs.getComponent(entityId, Transform)!;

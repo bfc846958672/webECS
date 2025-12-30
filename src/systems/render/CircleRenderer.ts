@@ -1,19 +1,19 @@
 import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Circle } from "../../components/render/Circle.ts";
-import { IProcess } from "../../interface/System.ts";
 import type { ISystem } from "../../interface/System.ts";
+import type { IRenderStrategy } from "../../interface/IRender.ts";
 
 /**
  * 渲染器：负责绘制 Circle 组件
  * Canvas API 原生渲染，startAngle/endAngle/clockwise 原样使用
  */
-export class CircleRenderer implements IProcess {
+export class CircleRenderer implements IRenderStrategy {
   match(ecs: ECS, entityId: number) {
     return ecs.hasComponent(entityId, Circle);
   }
 
-  exec(system: ISystem, entityId: number) {
+  render(system: ISystem, entityId: number) {
     const ecs = system.ecs;
     const ctx = ecs.canvas.getContext("2d")!;
     const transform = ecs.getComponent(entityId, Transform)!;
