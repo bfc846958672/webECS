@@ -8,25 +8,25 @@ import { PolylineGraphics } from "../graphics/PolylineGraphics.ts";
 import { CurveGraphics } from "../graphics/CurveGraphics.ts";
 import { PathGraphics } from "../graphics/PathGraphics.ts";
 import type { IShareContext } from "../../interface/System.ts";
-
+import type { IRenderContext } from "../../interface/IRender.ts";
 /**
  * 统一渲染进程：根据具体策略渲染图形
  * 与 AABB 的 BoundingBoxProcess 类似
  */
 export class RenderProcess implements IProcess<IShareContext, IShareContext> {
+
   match(_ecs: ECS, _entityId: number) {
     return true;
   }
-
   private strategies: IRenderStrategy[] = [];
 
-  constructor() {
-    this.strategies.push(new CircleGraphics());
-    this.strategies.push(new RectGraphics());
-    this.strategies.push(new ImageGraphics());
-    this.strategies.push(new PolylineGraphics());
-    this.strategies.push(new CurveGraphics());
-    this.strategies.push(new PathGraphics());
+  constructor(public renderContext: IRenderContext) {
+    this.strategies.push(new CircleGraphics(this.renderContext));
+    this.strategies.push(new RectGraphics(this.renderContext));
+    this.strategies.push(new ImageGraphics(this.renderContext));
+    this.strategies.push(new PolylineGraphics(this.renderContext));
+    this.strategies.push(new CurveGraphics(this.renderContext));
+    this.strategies.push(new PathGraphics(this.renderContext));
   }
 
   private renderWithStrategy(system: ISystem, entityId: number) {

@@ -1,4 +1,5 @@
 import { ECS } from "../ecs/ECS.ts";
+import { Camera, Renderer } from "../webgl/index.ts";
 import { Ticker } from "./Ticker.ts";
 import { SceneTree } from "../scene/SceneTree.ts";
 import { RootEntity } from "../entity/EntityRoot.ts";
@@ -7,21 +8,27 @@ import { PickEntitySystem } from "../system/systems/PickEntitySystem.ts";
 import { IEngine } from "./IEngine.ts";
 import { BoxDebugSystem } from "../system/systems/BoxDebugSystem.ts";
 import { EventSystem } from "../system/systems/EventSystem.ts";
+import type { IRenderContext } from "../interface/IRender.ts";
 export class Engine implements IEngine {
     public boxDebug: boolean = false;
     public ecs: ECS;
     private ticker: Ticker;
     public sceneTree: SceneTree;
     public rootEntity: RootEntity;
+    public renderContext: IRenderContext
     constructor(canvas: HTMLCanvasElement) {
         this.ecs = new ECS();
         this.ecs.canvas = canvas;
         this.rootEntity = new RootEntity(this);
         this.sceneTree = new SceneTree(this.rootEntity.entityId);
-
+        // webgl 相关
+        this.renderContext = {
+            camera: new Camera(undefined, { left: 0, right: canvas.width, bottom: canvas.height, top: 0, near: -1, far: 1, }),
+            renderer: new Renderer({ canvas, width: canvas.width, height: canvas.height, webgl: 2, alpha: false, depth: false, premultipliedAlpha: false, })
+        };
         // 注册系统
         this.ecs.addSystem(new SceneTreeRenderSystem(this, this.sceneTree));
-        this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));
+        // this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));
         this.ecs.addSystem(new PickEntitySystem(this, this.sceneTree));
         this.ecs.addSystem(new EventSystem(this, this.sceneTree));
         // 绑定 Ticker → ECS

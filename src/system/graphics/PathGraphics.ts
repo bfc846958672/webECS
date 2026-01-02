@@ -2,18 +2,18 @@ import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Path } from "../../components/render/Path.ts";
 import type { ISystem } from "../../interface/System.ts";
-import type { IRenderStrategy } from "../../interface/IRender.ts";
-import type { IBoundingBoxStrategy } from "../../interface/AABB.ts";
 import { vec2, mat3 } from "gl-matrix";
+import { Graphics, IRenderContext } from "../../interface/IRender.ts";
 
 /**
  * Path 图形模块：同时实现渲染与包围盒/命中检测
  */
-export class PathGraphics implements IRenderStrategy, IBoundingBoxStrategy {
+export class PathGraphics extends Graphics {
   private offscreenCanvas: HTMLCanvasElement;
   private offscreenCtx: CanvasRenderingContext2D;
 
-  constructor() {
+  constructor(public renderContext?: IRenderContext) {
+    super(renderContext);
     this.offscreenCanvas = document.createElement("canvas");
     this.offscreenCanvas.width = 1;
     this.offscreenCanvas.height = 1;

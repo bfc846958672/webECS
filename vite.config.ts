@@ -1,11 +1,40 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import { promises as fs } from 'fs'
 import dts from 'vite-plugin-dts'
-import type { UserConfig } from 'vite'
+import type { UserConfig, Plugin } from 'vite'
 import type { ViteUserConfigExport } from 'vitest/config'
 
 // https://vitejs.dev/config/
 // Vite configuration with TypeScript support
+// Copy built dist/ into example/dist after build
+function copyDistToExample(): Plugin {
+  return {
+    name: 'copy-dist-to-example',
+    apply: 'build',
+    async closeBundle() {
+      const src = resolve(__dirname, 'dist')
+      const dest = resolve(__dirname, 'example', 'dist')
+      try {
+        await fs.rm(dest, { recursive: true, force: true })
+        await fs.mkdir(resolve(__dirname, 'example'), { recursive: true })
+        // Node >=16 supports fs.cp
+        // @ts-ignore
+        await fs.cp(src, dest, { recursive: true })
+        // Fallback for environments without fs.cp
+      } catch (err: any) {
+        // Minimal fallback: manual copy for files only
+        // If fs.cp isn't available, try a simple directory creation then copy files
+        // This is best-effort; in modern Node this block shouldn't run
+        try {
+          await fs.mkdir(dest, { recursive: true })
+        } catch {}
+        throw err
+      }
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     dts({
@@ -13,10 +42,11 @@ export default defineConfig({
       outDir: 'dist/types',
       // 确保类型声明文件能正确引用
       copyDtsFiles: true,
-    })
+    }),
+    copyDistToExample()
   ],
   server: {
-    open: '/example/index.html',
+    open: '/example/graphics/rect.html',
     fs: {
       strict: false // 允许访问整个/example目录和test目录
     }

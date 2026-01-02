@@ -20,12 +20,10 @@ export class Ticker {
     if (this.running) return;
     this.running = true;
     this.lastTime = performance.now();
-    setInterval(() => {
       this.loop(performance.now());
-    }, 20);
   }
 
-  stop() {
+stop() {
     this.running = false;
   }
 

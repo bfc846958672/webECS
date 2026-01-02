@@ -14,21 +14,21 @@ export class SceneTreeRenderSystem extends ISystem {
     }
     processes: IProcess<{ dirty: boolean }, { dirty: boolean }>[] = [];
     protected onInit(): void {
-        const canvas = this.ecs.canvas;
-        if (!canvas) throw new Error("Canvas not set on ECS");
-        const ctx = canvas.getContext("2d");
-        if (!ctx) throw new Error("Cannot get CanvasRenderingContext2D");
-        this.ctx = ctx;
-    
+        // const canvas = this.ecs.canvas;
+        // if (!canvas) throw new Error("Canvas not set on ECS");
+        // const ctx = canvas.getContext("2d");
+        // if (!ctx) throw new Error("Cannot get CanvasRenderingContext2D");
+        // this.ctx = ctx;
+
         this.bboxProcess = new BoundingBoxProcess();
         this.transformProcess = new TransformProcess();
-        this.renderProcess = new RenderProcess();
+        this.renderProcess = new RenderProcess(this.engine.renderContext);
     }
     bboxProcess!: BoundingBoxProcess;
     transformProcess!: TransformProcess;
     renderProcess!: RenderProcess;
     update(): void {
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         const map = new Map<number | null, IShareContext>();
         // 根节点的父节点的上下文
         map.set(null, { dirty: false } as IShareContext);

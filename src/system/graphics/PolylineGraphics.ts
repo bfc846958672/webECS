@@ -2,14 +2,13 @@ import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Polyline } from "../../components/render/Polyline.ts";
 import type { ISystem } from "../../interface/System.ts";
-import type { IRenderStrategy } from "../../interface/IRender.ts";
-import type { IBoundingBoxStrategy } from "../../interface/AABB.ts";
 import { vec2, mat3 } from "gl-matrix";
+import { Graphics } from "../../interface/IRender.ts";
 
 /**
  * Polyline 图形模块：同时实现渲染与包围盒/命中检测
  */
-export class PolylineGraphics implements IRenderStrategy, IBoundingBoxStrategy {
+export class PolylineGraphics extends Graphics {
   match(ecs: ECS, entityId: number) {
     return ecs.hasComponent(entityId, Polyline);
   }

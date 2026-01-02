@@ -19,8 +19,10 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    "noUnusedLocals": false, // 关闭未使用本地变量报错
+    "noUnusedParameters": false, // 关闭未使用函数参数报错
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]

@@ -2,14 +2,13 @@ import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Image } from "../../components/render/Image.ts";
 import type { ISystem } from "../../interface/System.ts";
-import type { IRenderStrategy } from "../../interface/IRender.ts";
-import type { IBoundingBoxStrategy } from "../../interface/AABB.ts";
 import { mat3, vec2 } from "gl-matrix";
+import { Graphics } from "../../interface/IRender.ts";
 
 /**
  * Image 图形模块：同时实现渲染与包围盒计算
  */
-export class ImageGraphics implements IRenderStrategy, IBoundingBoxStrategy {
+export class ImageGraphics extends Graphics {
   match(ecs: ECS, entityId: number) {
     return ecs.hasComponent(entityId, Image);
   }

@@ -2,14 +2,13 @@ import { ECS } from "../../ecs/ECS.ts";
 import { Transform } from "../../components/Transform.ts";
 import { Curve } from "../../components/render/Curve.ts";
 import type { ISystem } from "../../interface/System.ts";
-import type { IRenderStrategy } from "../../interface/IRender.ts";
-import type { IBoundingBoxStrategy } from "../../interface/AABB.ts";
 import { vec2, mat3 } from "gl-matrix";
+import { Graphics } from "../../interface/IRender.ts";
 
 /**
  * Curve 图形模块：同时实现渲染与包围盒/命中检测
  */
-export class CurveGraphics implements IRenderStrategy, IBoundingBoxStrategy {
+export class CurveGraphics extends Graphics {
   match(ecs: ECS, entityId: number) {
     return ecs.hasComponent(entityId, Curve);
   }
