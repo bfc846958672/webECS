@@ -47,7 +47,10 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
     const fill = parseColorStyle(rect.fillStyle);
     const stroke = rect.strokeStyle ? parseColorStyle(rect.strokeStyle) : [0, 0, 0, 0];
 
-    const aRect = new Float32Array([transform.x || 0, transform.y || 0, rect.width || 0, rect.height || 0]);
+    // aRect.xy previously stored x/y translation, but translation/scale/skew/rotation
+    // are now handled by Transform.worldMatrix on GPU. Keep zw as local size (w/h).
+    const aRect = new Float32Array([0, 0, rect.width || 0, rect.height || 0]);
+    const aWorldMatrix = new Float32Array(transform.worldMatrix);
     const aColor = new Float32Array([fill[0], fill[1], fill[2], fill[3] * alpha]);
     const aStrokeColor = new Float32Array([stroke[0], stroke[1], stroke[2], stroke[3] * alpha]);
     const aLineWidth = new Float32Array([Math.max(0, Number(rect.lineWidth || 0))]);
@@ -59,6 +62,8 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
 
         // Per-instance: x, y, w, h in pixels (top-left origin)
         in vec4 aRect;
+        // Per-instance: 2D world transform matrix (column-major)
+        in mat3 aWorldMatrix;
         // Per-instance: RGBA (0..1)
         in vec4 aColor;
         // Per-instance: stroke RGBA (0..1)
@@ -69,27 +74,36 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
         uniform mat4 projectionMatrix;
         uniform mat4 viewMatrix;
 
-        out vec2 vLocal;
+        out vec2 vLocalPos;
         out vec2 vSize;
         out vec4 vColor;
         out vec4 vStrokeColor;
         out float vLineWidth;
 
         void main() {
-            vLocal = position;
             vSize = aRect.zw;
+            vec2 localPos = position * vSize;
+            vLocalPos = localPos;
             vColor = aColor;
             vStrokeColor = aStrokeColor;
             vLineWidth = aLineWidth;
-            vec2 worldPos = aRect.xy + position * aRect.zw;
-            gl_Position = projectionMatrix * viewMatrix * vec4(worldPos, 0.0, 1.0);
+
+            // Embed 2D affine mat3 into a 4x4 matrix to match the camera's mat4 pipeline.
+            // GLSL matrices are column-major: m[col][row]. Translation lives in aWorldMatrix[2].xy.
+            mat4 worldMatrix4 = mat4(
+                vec4(aWorldMatrix[0][0], aWorldMatrix[0][1], 0.0, 0.0),
+                vec4(aWorldMatrix[1][0], aWorldMatrix[1][1], 0.0, 0.0),
+                vec4(0.0, 0.0, 1.0, 0.0),
+                vec4(aWorldMatrix[2][0], aWorldMatrix[2][1], 0.0, 1.0)
+            );
+            gl_Position = projectionMatrix * viewMatrix * worldMatrix4 * vec4(localPos, 0.0, 1.0);
         }
     `;
 
     const fragment = `#version 300 es
         precision highp float;
 
-        in vec2 vLocal;
+        in vec2 vLocalPos;
         in vec2 vSize;
         in vec4 vColor;
         in vec4 vStrokeColor;
@@ -103,7 +117,7 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
 
         void main() {
             vec2 halfSize = max(0.5 * vSize - vec2(0.5), vec2(0.0));
-            vec2 p = (vLocal - 0.5) * vSize;
+            vec2 p = vLocalPos - 0.5 * vSize;
             float d = sdBox(p, halfSize);
 
             float aa = fwidth(d);
@@ -132,9 +146,6 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
         transparent: true,
         depthTest: false,
         depthWrite: false,
-        // cullFace: gl.BACK,
-        // frontFace: gl.CW,
-        // depthFunc: gl.LEQUAL,
     });
 
     const unitQuad = new Float32Array([
@@ -150,6 +161,7 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
     const geometry = new Geometry(gl, {
         position: { data: unitQuad, size: 2 },
         aRect: { data: aRect, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+        aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
         aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
         aStrokeColor: { data: aStrokeColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
         aLineWidth: { data: aLineWidth, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },

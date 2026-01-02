@@ -20,7 +20,6 @@ export class RectGraphics extends Graphics {
     const transform = ecs.getComponent(entityId, Transform)!;
     const rect = ecs.getComponent(entityId, Rect)!;
     if (!rect.render) return;
-    console.log({gl})
     renderSolidRects(gl, this.renderContext!.camera, transform, rect);
   }
 
