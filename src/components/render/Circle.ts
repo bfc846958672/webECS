@@ -22,8 +22,7 @@ export class Circle extends RenderComponent implements IComponent {
   lineWidth: number;
   /** 透明度 */
   alpha: number;
-  /** 椭圆旋转角度（弧度） */
-  rotation: number;
+
 
   /** 圆弧起始角度（弧度，0 = 3点钟方向） */
   startAngle: number;
@@ -41,7 +40,6 @@ export class Circle extends RenderComponent implements IComponent {
       strokeStyle,
       lineWidth = 0,
       alpha = 1.0,
-      rotation = 0,
       render = true,
       startAngle = 0,
       endAngle = Math.PI * 2,
@@ -55,7 +53,6 @@ export class Circle extends RenderComponent implements IComponent {
     this.strokeStyle = strokeStyle ?? "#c0392b";
     this.lineWidth = lineWidth;
     this.alpha = alpha;
-    this.rotation = rotation;
     this.render = render;
     this.startAngle = startAngle;
     this.endAngle = endAngle;

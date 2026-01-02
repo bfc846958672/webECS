@@ -46,7 +46,7 @@ export default defineConfig({
     copyDistToExample()
   ],
   server: {
-    open: '/example/graphics/rect.html',
+    open: '/example/graphics/circle.html',
     fs: {
       strict: false // 允许访问整个/example目录和test目录
     }
