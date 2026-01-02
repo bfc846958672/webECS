@@ -4,6 +4,7 @@ import { Rect } from "../../components/render/Rect.ts";
 import type { ISystem } from "../../interface/System.ts";
 import { vec2, mat3 } from "gl-matrix";
 import { renderSolidRects } from "./RectGraphics/Rect-solid.ts";
+import { renderRoundedRects } from "./RectGraphics/rect-rounded-sdf-pipeline.ts";
 import { Graphics } from "../../interface/IRender.ts";
 
 /**
@@ -20,7 +21,11 @@ export class RectGraphics extends Graphics {
     const transform = ecs.getComponent(entityId, Transform)!;
     const rect = ecs.getComponent(entityId, Rect)!;
     if (!rect.render) return;
-    renderSolidRects(gl, this.renderContext!.camera, transform, rect);
+    if (rect.radius > 0) {
+      renderRoundedRects(gl, this.renderContext!.camera, transform, rect);
+    } else {
+      renderSolidRects(gl, this.renderContext!.camera, transform, rect);
+    }
   }
 
   computeAABB(ecs: ECS, entityId: number) {
