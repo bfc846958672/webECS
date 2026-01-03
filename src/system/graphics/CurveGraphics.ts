@@ -4,6 +4,7 @@ import { Curve } from "../../components/render/Curve.ts";
 import type { ISystem } from "../../interface/System.ts";
 import { vec2, mat3 } from "gl-matrix";
 import { Graphics } from "../../interface/IRender.ts";
+import { renderCurve } from "./CurveGraphics/Curver-render.ts";
 
 /**
  * Curve 图形模块：同时实现渲染与包围盒/命中检测
@@ -15,29 +16,12 @@ export class CurveGraphics extends Graphics {
 
   render(system: ISystem, entityId: number) {
     const ecs = system.ecs;
-    const ctx = ecs.canvas.getContext("2d")!;
+    const gl = ecs.canvas.getContext("webgl2")!;
     const transform = ecs.getComponent(entityId, Transform)!;
     const curve = ecs.getComponent(entityId, Curve)!;
     if (!curve.render) return;
 
-    ctx.save();
-    ctx.globalAlpha = curve.alpha;
-    const m = transform.worldMatrix;
-    ctx.setTransform(m[0], m[1], m[3], m[4], m[6], m[7]);
-
-    ctx.beginPath();
-    ctx.moveTo(curve.start[0], curve.start[1]);
-    if (curve.cp2) {
-      ctx.bezierCurveTo(curve.cp1[0], curve.cp1[1], curve.cp2[0], curve.cp2[1], curve.end[0], curve.end[1]);
-    } else {
-      ctx.quadraticCurveTo(curve.cp1[0], curve.cp1[1], curve.end[0], curve.end[1]);
-    }
-    if (curve.strokeStyle && curve.lineWidth > 0) {
-      ctx.strokeStyle = curve.strokeStyle;
-      ctx.lineWidth = curve.lineWidth;
-      ctx.stroke();
-    }
-    ctx.restore();
+    renderCurve(gl, this.renderContext!.camera, transform, curve);
   }
 
   computeAABB(ecs: ECS, entityId: number) {

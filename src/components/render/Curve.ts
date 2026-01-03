@@ -12,6 +12,8 @@ export class Curve extends RenderComponent implements IComponent {
   lineWidth: number = 1;
   alpha: number = 1;
   render: boolean = true;
+  // 填充图形
+  fill: string | undefined;
 
   constructor(engine: Engine | null, opts: Partial<Curve> = {}) {
     super(engine);
@@ -23,5 +25,6 @@ export class Curve extends RenderComponent implements IComponent {
     this.lineWidth = opts.lineWidth || this.lineWidth;
     this.alpha = opts.alpha || this.alpha;
     this.render = opts.render || this.render;
+    this.fill = opts.fill || this.fill;
   }
 }
