@@ -28,7 +28,7 @@ export class Engine implements IEngine {
         };
         // 注册系统
         this.ecs.addSystem(new SceneTreeRenderSystem(this, this.sceneTree));
-        // this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));
+        this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));
         this.ecs.addSystem(new PickEntitySystem(this, this.sceneTree));
         this.ecs.addSystem(new EventSystem(this, this.sceneTree));
         // 绑定 Ticker → ECS

@@ -65,7 +65,6 @@ export class EventSystem extends ISystem {
 
         // 命中检测
         const entityId = this.ecs.getSystem(PickEntitySystem).pickEntityAt(x, y);
-        console.log("EventSystem hit entity:", entityId, " at ", x, y);
         if (entityId == null) return;
 
         this.propagateEvent(entityId, type, e);

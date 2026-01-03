@@ -25,7 +25,7 @@ export class BoundingBoxProcess implements IProcess {
         this.strategies.push(new ImageGraphics());
         this.strategies.push(new PolylineGraphics());
         this.strategies.push(new CurveGraphics());
-        this.strategies.push(new PathGraphics());    
+        this.strategies.push(new PathGraphics());
     }
     compute(ecs: ECS, entityId: number) {
         for (const s of this.strategies) {
@@ -42,23 +42,27 @@ export class BoundingBoxProcess implements IProcess {
             bbox = new BoundingBoxComponent();
             system.ecs.addComponent(entityId, bbox);
         }
-        if (!bbox.dirty) return;
-        const selfAABB = this.compute(system.ecs, entityId);
-        bbox.setSelf(selfAABB);
-        bbox.setChildren(context.childrenAABB || this.none());
-        bbox.updateTotalAABB();
-        if (parentEntityId !== null && parentContext !== null) {
-            let parentBBox = system.ecs.getComponent(parentEntityId!, BoundingBoxComponent);
-            if (!parentBBox) {
-                parentBBox = new BoundingBoxComponent();
-                system.ecs.addComponent(parentEntityId!, parentBBox);
-            }
-            if (!parentContext.childrenAABB) {
-                parentContext.childrenAABB = this.none();
-            }
-            this.merge(parentContext.childrenAABB, bbox.totalAABB);
-            parentBBox.dirty = true;
+        // 更新当前节点的包围盒
+        const dirty = bbox.dirty
+        if (dirty) {
+            const selfAABB = this.compute(system.ecs, entityId);
+            bbox.setSelf(selfAABB);
+            bbox.setChildren(context.childrenAABB || this.none());
+            bbox.updateTotalAABB();
         }
+
+        // 不确定兄弟节点是否包围盒更新，所以一定向父节点更新子节点包围盒
+        if (parentEntityId === null || parentContext === null) return;
+        let parentBBox = system.ecs.getComponent(parentEntityId!, BoundingBoxComponent);
+        if (!parentBBox) {
+            parentBBox = new BoundingBoxComponent();
+            system.ecs.addComponent(parentEntityId!, parentBBox);
+        }
+        if (!parentContext.childrenAABB) { parentContext.childrenAABB = this.none(); }
+        this.merge(parentContext.childrenAABB, bbox.totalAABB);
+
+        // 当前节点包围盒有更新，标记父节点包围盒脏
+        if (dirty) parentBBox.dirty = true;
     }
     merge(aabb: IAABB, bbox: IAABB) {
         aabb.minX = Math.min(aabb.minX, bbox.minX);
