@@ -26,6 +26,7 @@ export class Polyline extends RenderComponent implements IComponent {
   /** 透明度 */
   alpha: number;
 
+  lineJoin: "bevel" | "miter" | "round" = "miter";
   /** 是否参与渲染 */
   render: boolean = true;
 
@@ -39,6 +40,7 @@ export class Polyline extends RenderComponent implements IComponent {
       lineWidth = 1,
       alpha = 1.0,
       render = true,
+      lineJoin = "miter",
     }: Partial<Polyline> = {}
   ) {
     super(engine);
@@ -49,5 +51,6 @@ export class Polyline extends RenderComponent implements IComponent {
     this.lineWidth = lineWidth;
     this.alpha = alpha;
     this.render = render;
+    this.lineJoin = lineJoin;
   }
 }

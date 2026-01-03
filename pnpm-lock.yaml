@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      earcut:
+        specifier: ^3.0.2
+        version: 3.0.2
       gl-matrix:
         specifier: ^3.4.4
         version: 3.4.4
@@ -634,6 +637,9 @@ packages:
   diff@8.0.2:
     resolution: {integrity: sha512-sSuxWU5j5SR9QQji/o2qMvqRNYRDOcBTgsJ/DeCf4iSN4gW+gNMXM7wFIP+fdXZxoNiAnHUTGjCr+TSWXdRDKg==}
     engines: {node: '>=0.3.1'}
+
+  earcut@3.0.2:
+    resolution: {integrity: sha512-X7hshQbLyMJ/3RPhyObLARM2sNxxmRALLKx1+NVFFnQ9gKzmCrxm9+uLIAdBcvc8FNLpctqlQ2V6AE92Ol9UDQ==}
 
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
@@ -1690,6 +1696,8 @@ snapshots:
     optional: true
 
   diff@8.0.2: {}
+
+  earcut@3.0.2: {}
 
   end-of-stream@1.4.5:
     dependencies:

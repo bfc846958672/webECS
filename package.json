@@ -29,6 +29,7 @@
     "vitest": "^4.0.6"
   },
   "dependencies": {
+    "earcut": "^3.0.2",
     "gl-matrix": "^3.4.4",
     "reflect-metadata": "^0.2.2"
   }

@@ -4,6 +4,7 @@ import { Polyline } from "../../components/render/Polyline.ts";
 import type { ISystem } from "../../interface/System.ts";
 import { vec2, mat3 } from "gl-matrix";
 import { Graphics } from "../../interface/IRender.ts";
+import { renderPolyline } from "./PolylineGraphics/Polyline-render.ts";
 
 /**
  * Polyline 图形模块：同时实现渲染与包围盒/命中检测
@@ -15,38 +16,12 @@ export class PolylineGraphics extends Graphics {
 
   render(system: ISystem, entityId: number) {
     const ecs = system.ecs;
-    const ctx = ecs.canvas.getContext("2d")!;
+    const gl = ecs.canvas.getContext("webgl2")!;
     const transform = ecs.getComponent(entityId, Transform)!;
     const polyline = ecs.getComponent(entityId, Polyline)!;
     if (!polyline.render || polyline.points.length < 2) return;
 
-    ctx.save();
-    ctx.globalAlpha = polyline.alpha;
-
-    const m = transform.worldMatrix;
-    ctx.setTransform(m[0], m[1], m[3], m[4], m[6], m[7]);
-
-    ctx.beginPath();
-    const pts = polyline.points;
-    ctx.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length; i++) {
-      ctx.lineTo(pts[i][0], pts[i][1]);
-    }
-
-    if (polyline.closed) {
-      ctx.closePath();
-    }
-
-    if (polyline.closed && polyline.fillStyle) {
-      ctx.fillStyle = polyline.fillStyle;
-      ctx.fill();
-    }
-    if (polyline.strokeStyle && polyline.lineWidth > 0) {
-      ctx.strokeStyle = polyline.strokeStyle;
-      ctx.lineWidth = polyline.lineWidth;
-      ctx.stroke();
-    }
-    ctx.restore();
+    renderPolyline(gl, this.renderContext!.camera, transform, polyline);
   }
 
   computeAABB(ecs: ECS, entityId: number) {
