@@ -20,10 +20,14 @@ export class Ticker {
     if (this.running) return;
     this.running = true;
     this.lastTime = performance.now();
+    setInterval(() => {
       this.loop(performance.now());
+
+    }, 16); // 保持与 requestAnimationFrame 类似的频率
+    // this.loop(performance.now());
   }
 
-stop() {
+  stop() {
     this.running = false;
   }
 

@@ -4,6 +4,7 @@ import { Image } from "../../components/render/Image.ts";
 import type { ISystem } from "../../interface/System.ts";
 import { mat3, vec2 } from "gl-matrix";
 import { Graphics } from "../../interface/IRender.ts";
+import { renderImage } from "./ImageGraphics/image-render.ts";
 
 /**
  * Image 图形模块：同时实现渲染与包围盒计算
@@ -15,38 +16,14 @@ export class ImageGraphics extends Graphics {
 
   render(system: ISystem, entityId: number) {
     const ecs = system.ecs;
-    const ctx = ecs.canvas.getContext("2d")!;
+    const gl = ecs.canvas.getContext("webgl2")!;
 
     const transform = ecs.getComponent(entityId, Transform)!;
     const image = ecs.getComponent(entityId, Image)!;
     if (!image.render) return;
     if (!image.bitmap) return; // 没有纹理就不画
 
-    ctx.save();
-    ctx.globalAlpha = image.alpha;
-    const [clipX, clipY, clipW, clipH] = image.clip || [0, 0, image.bitmap.width, image.bitmap.height];
-    // 应用世界矩阵
-    const m = transform.worldMatrix;
-    ctx.setTransform(
-      m[0], // a = m00
-      m[1], // b = m10
-      m[3], // c = m01
-      m[4], // d = m11
-      m[6], // e = m20
-      m[7]  // f = m21
-    );
-    // 绘制图片，缩放到指定大小
-    ctx.drawImage(
-      image.bitmap,
-      clipX, clipY,
-      clipW, clipH,
-
-      0, 0,                       // 目标起点
-      image.width,                // 目标宽
-      image.height                // 目标高
-    );
-
-    ctx.restore();
+    renderImage(gl, this.renderContext!.camera, transform, image);
   }
 
   /** 计算图片的世界包围盒（考虑变换矩阵） */
