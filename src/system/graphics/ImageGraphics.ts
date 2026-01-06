@@ -4,7 +4,8 @@ import { Image } from "../../components/render/Image.ts";
 import type { ISystem } from "../../interface/System.ts";
 import { mat3, vec2 } from "gl-matrix";
 import { Graphics } from "../../interface/IRender.ts";
-import { renderImage } from "./ImageGraphics/image-render.ts";
+import { renderImage } from "./ImageGraphics/Image-render.ts";
+import { debug } from "console";
 
 /**
  * Image 图形模块：同时实现渲染与包围盒计算

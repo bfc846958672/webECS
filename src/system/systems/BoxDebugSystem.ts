@@ -136,7 +136,6 @@ export class BoxDebugSystem extends ISystem {
 
         const totalAABBs: IAABB[] = [];
         const selfAABBs: IAABB[] = [];
-        const childrenAABBs: IAABB[] = [];
 
         const displayList = this.sceneTree.displayList;
         // 逆序遍历：尽量让后渲染的框在上面（虽然线段没有 depth）
@@ -151,7 +150,7 @@ export class BoxDebugSystem extends ISystem {
 
         // 颜色/线宽：对齐旧 Canvas 调试风格
         drawAABBs(gl, camera, totalAABBs, '#ff0000', 1);
-        drawAABBs(gl, camera, selfAABBs, '#fff', 3);
+        drawAABBs(gl, camera, selfAABBs, '#010001', 3);
         // drawAABBs(gl, camera, childrenAABBs, 'green', 2);
     }
 }

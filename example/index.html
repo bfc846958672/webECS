@@ -193,6 +193,7 @@
                     <li class="submenu-item" onclick="showExample('image-graphics')">image 图片实例</li>
                     <li class="submenu-item" onclick="showExample('curve-graphics')">curve 曲线实例</li>
                     <li class="submenu-item" onclick="showExample('polyline-graphics')">polyline 折线实例</li>
+                    <li class="submenu-item" onclick="showExample('text-graphics')">text 文本实例</li>
                 </ul>
                 
                 <li class="menu-item parent" onclick="toggleSubmenu(this)">
@@ -373,7 +374,7 @@
                     <button class="open-new-tab" onclick="openInNewTab('graphics/rect.html')">在新标签页打开</button>
                 </div>
                 <div class="example-description">展示矩形的绘制和基本属性设置</div>
-                <iframe src="graphics/rect.html" class="example-iframe"></iframe>
+                <iframe src="graphics/rect.html" data-src="graphics/rect.html" class="example-iframe"></iframe>
             </div>
 
             <!-- circle 圆形实例 -->
@@ -383,7 +384,7 @@
                     <button class="open-new-tab" onclick="openInNewTab('graphics/circle.html')">在新标签页打开</button>
                 </div>
                 <div class="example-description">展示圆形/椭圆/圆弧，以及 Transform（旋转/缩放/斜切）效果</div>
-                <iframe src="graphics/circle.html" class="example-iframe"></iframe>
+                <iframe src="graphics/circle.html" data-src="graphics/circle.html" class="example-iframe"></iframe>
             </div>
 
             <!-- image 图片实例 -->
@@ -393,7 +394,7 @@
                     <button class="open-new-tab" onclick="openInNewTab('graphics/image.html')">在新标签页打开</button>
                 </div>
                 <div class="example-description">展示图片的原图/裁剪、Transform（旋转+pivot）、动态裁剪</div>
-                <iframe src="graphics/image.html" class="example-iframe"></iframe>
+                <iframe src="graphics/image.html" data-src="graphics/image.html" class="example-iframe"></iframe>
             </div>
 
             <!-- curve 曲线实例 -->
@@ -403,7 +404,7 @@
                     <button class="open-new-tab" onclick="openInNewTab('graphics/curve.html')">在新标签页打开</button>
                 </div>
                 <div class="example-description">展示二次/三次贝塞尔曲线的 fill + stroke、Transform 与动态曲线</div>
-                <iframe src="graphics/curve.html" class="example-iframe"></iframe>
+                <iframe src="graphics/curve.html" data-src="graphics/curve.html" class="example-iframe"></iframe>
             </div>
 
             <!-- polyline 折线实例 -->
@@ -413,7 +414,17 @@
                     <button class="open-new-tab" onclick="openInNewTab('graphics/polyline.html')">在新标签页打开</button>
                 </div>
                 <div class="example-description">展示开放/闭合 polyline、不同 lineJoin、填充与 Transform、动态折线</div>
-                <iframe src="graphics/polyline.html" class="example-iframe"></iframe>
+                <iframe src="graphics/polyline.html" data-src="graphics/polyline.html" class="example-iframe"></iframe>
+            </div>
+
+            <!-- text 文本实例 -->
+            <div id="text-graphics" class="example-content">
+                <div class="example-header">
+                    text 文本实例
+                    <button class="open-new-tab" onclick="openInNewTab('graphics/text.html')">在新标签页打开</button>
+                </div>
+                <div class="example-description">展示 MSDF 文本渲染、对齐/基线、Transform 与点击事件</div>
+                <iframe src="graphics/text.html" data-src="graphics/text.html" class="example-iframe"></iframe>
             </div>
         </div>
     </div>

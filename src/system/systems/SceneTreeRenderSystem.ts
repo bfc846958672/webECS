@@ -28,6 +28,9 @@ export class SceneTreeRenderSystem extends ISystem {
     transformProcess!: TransformProcess;
     renderProcess!: RenderProcess;
     update(): void {
+        const gl = this.engine.renderContext.renderer.gl as WebGL2RenderingContext;
+        gl.clearColor(1, 1, 1, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
         // this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         const map = new Map<number | null, IShareContext>();
         // 根节点的父节点的上下文
