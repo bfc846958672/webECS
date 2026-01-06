@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>image 图片示例（WebGL）</title>
+</head>
+
+<body>
+  <div id="app">
+    <div id="game-container">
+      <canvas id="game-canvas" width="1200" height="800" style="border:1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Engine, Components, loadImageBitmap } from '../../src/main.ts';
+
+    const canvas = document.getElementById('game-canvas');
+    const engine = new Engine(canvas);
+    engine.boxDebug = true;
+
+    function addImage({ x, y, rotation = 0, scaleX = 1, scaleY = 1, skewX = 0, skewY = 0, pivotX = 0, pivotY = 0 }, imageConfig, withEvent = true) {
+      const e = engine.ecs.createEntity();
+      const img = new Components.Image(engine, imageConfig);
+      const transform = new Components.Transform(engine, { x, y, rotation, scaleX, scaleY, skewX, skewY, pivotX, pivotY });
+
+      engine.ecs.addComponent(e, img);
+      engine.ecs.addComponent(e, transform);
+
+      let event = null;
+      if (withEvent) {
+        event = new Components.EventComponent(engine);
+        engine.ecs.addComponent(e, event);
+      }
+
+      engine.add(e);
+      return { e, img, transform, event };
+    }
+
+    async function main() {
+      // 资源路径：此页在 /example/graphics/ 下，assets 在 ../assets
+      const [cat, sheet, flower] = await Promise.all([
+        loadImageBitmap('../assets/cat.png'),
+        loadImageBitmap('../assets/spritesheet.png'),
+        loadImageBitmap('../assets/flower.png'),
+      ]);
+
+      // 1) 原图：直接绘制
+      addImage(
+        { x: 0, y: 0 },
+        {
+          bitmap: cat,
+          width: 200,
+          height: 200,
+          alpha: .5,
+        },
+        true
+      ).event.on('click', (_ev, id) => {
+        console.log('点击：原图(cat)', id);
+      });
+
+      // 2) 精灵图：clip 裁剪 + 放大
+      addImage(
+        { x: 200, y: 200 },
+        {
+          bitmap: sheet,
+          clip: [0, 0, 64, 64],
+          width: 200,
+          height: 200,
+          alpha: 0.95,
+        },
+        true
+      ).event.on('click', (_ev, id) => {
+        console.log('点击：裁剪(spritesheet)', id);
+      });
+
+      // 3) Transform：旋转 + pivot（围绕中心旋转）
+      {
+        const size = 200;
+        const { transform } = addImage(
+          { x: 400, y: 400,  pivotX: size / 2, pivotY: size / 2 },
+          {
+            bitmap: flower,
+            width: size,
+            height: size,
+            alpha: 1,
+          }
+        );
+          setTimeout(() => {
+            transform.rotation = -Math.PI / 8;
+      engine.stop();
+      engine.start();
+
+          },1000);
+        engine.ticker.add(() => {
+          const t = performance.now() * 0.001;
+        //   transform.rotation = t * 0.8;
+        });
+      }
+
+    //   // 4) 动态裁剪：在 spritesheet 上循环取帧
+    //   {
+    //     const frameW = 64;
+    //     const frameH = 64;
+    //     const cols = Math.max(1, Math.floor(sheet.width / frameW));
+    //     const rows = Math.max(1, Math.floor(sheet.height / frameH));
+    //     const total = cols * rows;
+
+    //     const { img, transform } = addImage(
+    //       { x: 470, y: 460, pivotX: 96, pivotY: 96 },
+    //       {
+    //         bitmap: sheet,
+    //         clip: [0, 0, frameW, frameH],
+    //         width: 192,
+    //         height: 192,
+    //         alpha: 1,
+    //       }
+    //     );
+
+    //     engine.ticker.add(() => {
+    //       const t = performance.now() * 0.001;
+    //       const idx = Math.floor(t * 8) % total;
+    //       const cx = (idx % cols) * frameW;
+    //       const cy = Math.floor(idx / cols) * frameH;
+    //       img.clip = [cx, cy, frameW, frameH];
+    //       transform.rotation = Math.sin(t * 1.2) * 0.08;
+    //     });
+    //   }
+
+      engine.start();
+    }
+
+    main();
+  </script>
+</body>
+
+</html>

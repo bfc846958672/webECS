@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>polyline 折线/多边形示例</title>
+</head>
+
+<body>
+  <div id="app">
+    <div id="game-container">
+      <canvas id="game-canvas" width="1200" height="800" style="border:1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Engine, Components } from '../../src/main.ts';
+
+    const canvas = document.getElementById('game-canvas');
+    const engine = new Engine(canvas);
+    engine.boxDebug = true;
+
+    function addPolyline({ x, y, rotation = 0, scaleX = 1, scaleY = 1, skewX = 0, skewY = 0 }, polylineConfig, withEvent = false) {
+      const e = engine.ecs.createEntity();
+      const polyline = new Components.Polyline(engine, polylineConfig);
+      const transform = new Components.Transform(engine, { x, y, rotation, scaleX, scaleY, skewX, skewY });
+
+      engine.ecs.addComponent(e, polyline);
+      engine.ecs.addComponent(e, transform);
+
+      let event = null;
+      if (withEvent) {
+        event = new Components.EventComponent(engine);
+        engine.ecs.addComponent(e, event);
+      }
+
+      engine.add(e);
+      return { e, polyline, transform, event };
+    }
+
+    // 1) 开放折线：miter（默认）+ 细线
+    addPolyline(
+      { x: 120, y: 140 },
+      {
+        points: [
+          [0, 0],
+          [120, 40],
+          [220, -20],
+          [320, 60],
+          [420, 0],
+        ],
+        closed: false,
+        strokeStyle: '#27ae60',
+        lineWidth: 16,
+        alpha: 1,
+        lineJoin: 'miter',
+      },
+      true
+    ).event.on('click', (_ev, id) => {
+      console.log('点击：开放折线(miter)', id);
+    });
+
+    // 2) 开放折线：bevel（对比尖角处理）
+    addPolyline(
+      { x: 120, y: 300 },
+      {
+        points: [
+          [0, 60],
+          [80, 0],
+          [160, 60],
+          [240, 0],
+          [320, 60],
+        ],
+        closed: false,
+        strokeStyle: '#2980b9',
+        lineWidth: 14,
+        alpha: 0.9,
+        lineJoin: 'bevel',
+      }
+    );
+
+    // 3) 开放折线：round（圆角连接）
+    addPolyline(
+      { x: 120, y: 520 },
+      {
+        points: [
+          [0, 0],
+          [90, -70],
+          [180, 0],
+          [270, -70],
+          [360, 0],
+        ],
+        closed: false,
+        strokeStyle: '#27ae60',
+        lineWidth: 16,
+        alpha: 0.95,
+        lineJoin: 'round',
+      }
+    );
+
+    // 4) 闭合多边形：stroke + fill（半透明）
+    addPolyline(
+      { x: 640, y: 180 },
+      {
+        points: [
+          [0, 0],
+          [180, 0],
+          [220, 120],
+          [110, 190],
+          [-20, 120],
+        ],
+        closed: true,
+        strokeStyle: '#8e44ad',
+        fillStyle: 'rgba(142, 68, 173, 0.25)',
+        lineWidth: 6,
+        alpha: 1,
+        lineJoin: 'miter',
+      },
+      true
+    ).event.on('click', (_ev, id) => {
+      console.log('点击：闭合多边形(fill+stroke)', id);
+    });
+
+    // 5) 闭合多边形：不写 fillStyle（会用 strokeStyle 自动填充）+ Transform 变换
+    addPolyline(
+      { x: 950, y: 210, rotation: Math.PI / 10, scaleX: 1.2, scaleY: 0.9, skewX: 0.35, skewY: 0 },
+      {
+        points: [
+          [0, 0],
+          [120, -30],
+          [220, 40],
+          [160, 150],
+          [40, 160],
+        ],
+        closed: true,
+        strokeStyle: '#f39c12',
+        lineWidth: 8,
+        alpha: 0.8,
+        lineJoin: 'round',
+      }
+    );
+
+    // // 6) 动态折线：点列随时间变化（波形）+ 线宽呼吸
+    // {
+    //   const baseX = 640;
+    //   const baseY = 520;
+    //   const pointCount = 28;
+    //   const spacing = 18;
+
+    //   const { polyline, transform } = addPolyline(
+    //     { x: baseX, y: baseY, rotation: 0 },
+    //     {
+    //       points: [],
+    //       closed: false,
+    //       strokeStyle: 'rgba(52, 152, 219, 0.95)',
+    //       lineWidth: 10,
+    //       alpha: 1,
+    //       lineJoin: 'round',
+    //     }
+    //   );
+
+    //   engine.ticker.add(() => {
+    //     const t = performance.now() * 0.001;
+    //     const pts = [];
+    //     for (let i = 0; i < pointCount; i++) {
+    //       const x = i * spacing;
+    //       const y = Math.sin(t * 2 + i * 0.45) * 34 + Math.cos(t * 1.2 + i * 0.18) * 10;
+    //       pts.push([x, y]);
+    //     }
+    //     polyline.points = pts;
+    //     polyline.lineWidth = 6 + (Math.sin(t * 2.2) * 0.5 + 0.5) * 10;
+    //     transform.rotation = Math.sin(t * 0.6) * 0.12;
+    //   });
+    // }
+
+    engine.start();
+  </script>
+</body>
+
+</html>

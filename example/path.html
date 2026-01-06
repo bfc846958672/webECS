@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Path 全命令测试</title>
+</head>
+
+<body>
+  <div id="app">
+    <h2>Path 全命令测试</h2>
+    <div id="game-container">
+      <canvas id="game-canvas" width="1200" height="800" style="border:1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { engine, bindEvent } from './utils.js';
+    import { PathApi } from './utils.js';
+
+    async function main() {
+      /** moveTo + lineTo 示例 */
+      const pathMoveLine = PathApi(
+        { x: 100, y: 100 },
+        {
+          commands: [
+            { type: "moveTo", x: 0, y: 0 },
+            { type: "lineTo", x: 100, y: 50 },
+            { type: "lineTo", x: 150, y: 0 },
+          ],
+          strokeStyle: "#e74c3c",
+          fillStyle: "red",
+          lineWidth: 3
+        }
+      );
+      bindEvent(pathMoveLine).on("click", () => console.log("点击 moveTo + lineTo"));
+
+      /** quadraticCurveTo 示例 */
+      const pathQuad = PathApi(
+        { x: 300, y: 100 },
+        {
+          commands: [
+            { type: "moveTo", x: 0, y: 0 },
+            { type: "quadraticCurveTo", cp: [80, -80], end: [160, 0] }
+          ],
+          strokeStyle: "#2980b9",
+          lineWidth: 3
+        }
+      );
+      bindEvent(pathQuad).on("click", () => console.log("点击 quadraticCurveTo"));
+
+      /** bezierCurveTo 示例 */
+      const pathBezier = PathApi(
+        { x: 550, y: 100 },
+        {
+          commands: [
+            { type: "moveTo", x: 0, y: 0 },
+            { type: "bezierCurveTo", cp1: [50, -80], cp2: [120, 80], end: [200, 0] }
+          ],
+          strokeStyle: "#27ae60",
+          lineWidth: 3
+        }
+      );
+      bindEvent(pathBezier).on("click", () => console.log("点击 bezierCurveTo"));
+
+      /** arc 示例 */
+      const pathArc = PathApi(
+        { x: 200, y: 300 },
+        {
+          commands: [
+            { type: "moveTo", x: 0, y: 0 },
+            { type: "arc", center: [50, 50], radius: 40, start: 0, end: Math.PI, counterClockwise: false }
+          ],
+          strokeStyle: "#f39c12",
+          lineWidth: 3
+        }
+      );
+      bindEvent(pathArc).on("click", () => console.log("点击 arc"));
+
+      /** arcTo 示例 */
+      const pathArcTo = PathApi(
+        { x: 400, y: 300 },
+        {
+          commands: [
+            { type: "moveTo", x: 0, y: 0 },
+            { type: "arcTo", cp1: [50, 0], cp2: [50, 50], radius: 40 },
+          ],
+          fillStyle: "green",
+          strokeStyle: "blue",
+          lineWidth: 3
+        }
+      );
+      bindEvent(pathArcTo).on("click", () => console.log("点击 arcTo"));
+
+      /** close 示例 */
+      const pathClose = PathApi(
+        { x: 600, y: 300 },
+        {
+          commands: [
+            { type: "moveTo", x: 0, y: 0 },
+            { type: "lineTo", x: 100, y: 0 },
+            { type: "lineTo", x: 50, y: 50 },
+          ],
+          strokeStyle: "#c0392b",
+          fillStyle: "rgba(192,57,43,0.3)",
+          lineWidth: 3
+        }
+      );
+      bindEvent(pathClose).on("click", () => console.log("点击 close"));
+
+      
+      // 加入 ECS 引擎
+      engine.add(pathMoveLine);
+      engine.add(pathQuad);
+      engine.add(pathBezier);
+      engine.add(pathArc);
+      engine.add(pathArcTo);
+      engine.add(pathClose);
+
+      engine.start();
+    }
+
+    main();
+  </script>
+</body>
+
+</html>

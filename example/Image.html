@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片渲染测试 - 原图 + 裁剪 + 旋转 + 点击</title>
+</head>
+
+<body>
+  <div id="app">
+    <h2>图片节点测试</h2>
+    <div id="game-container">
+      <img src="/example/assets/cat.png" width="130" alt="">
+      <img src="/example/assets/spritesheet.png" width="130" alt="">
+      <img src="/example/assets/flower.png" width="130" alt="">
+      <canvas id="game-canvas" width="1200" height="800" style="border: 1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { engine, bindEvent, Transform, loadImageBitmap, ImageApi } from './utils.js';
+
+    const canvas = document.getElementById("game-canvas");
+
+
+    const imageUrls = [
+      '/example/assets/cat.png',         // 普通图
+      '/example/assets/spritesheet.png', // 精灵图
+      '/example/assets/flower.png',      // 裁剪测试
+    ];
+
+    async function main() {
+      // 等待所有图片加载
+      const [cat, sheet, flower] = await Promise.all([
+        loadImageBitmap(imageUrls[0]),
+        loadImageBitmap(imageUrls[1]),
+        loadImageBitmap(imageUrls[2], [64, 64, 64, 64]) // 裁剪 64x64 区域
+      ]);
+      console.log(cat, sheet, flower);
+      // 原图
+      const img1 = ImageApi(
+        { x: 200, y: 150 },
+        { bitmap: cat, width: 200, height: 200 }
+      );
+      const e1 = bindEvent(img1);
+      e1.on('click', () => console.log("点击了猫图"));
+
+      // 裁剪图
+      const img2 = ImageApi(
+        { x: 500, y: 150 },
+        { bitmap: sheet, clip: [0, 0, 64, 64], width: 128, height: 128 }
+      );
+      const e2 = bindEvent(img2);
+      e2.on('click', () => console.log("点击了裁剪图"));
+
+      // 旋转图
+      const img3 = ImageApi(
+        { x: 850, y: 150, rotation: Math.PI / 4 },
+        { bitmap: flower, width: 150, height: 150 },
+
+      );
+      const e3 = bindEvent(img3);
+      e3.on('click', () => console.log("点击了旋转图"));
+
+      engine.add(img1);
+      engine.add(img2);
+      engine.add(img3);
+      // 启动引擎
+      engine.start();
+    }
+
+    main();
+  </script>
+</body>
+
+</html>

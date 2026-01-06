@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div id="game-container">
+            <canvas id="game-canvas" width="800" height="600" style="border: 1px solid #000;"></canvas>
+        </div>
+    </div>
+    <script type="module">
+        // 导入Engine和需要的组件
+        import { Engine, Components } from './dist/web-ecs.es.js';
+        const { Transform, Rect, Circle } = Components;
+        const canvas = document.getElementById("game-canvas");
+        const engine = new Engine(canvas);
+        const RectApi = (obj, con, rotate = null, pivot = null) => {
+            const rect = engine.ecs.createEntity();
+            const transform = new Transform( { x: 100, y: 0, ...obj });
+            const defaultRectConfig = { width: 200, height: 100, fillStyle: "#e74c3c", strokeStyle: "#000", lineWidth: 2, alpha: 0.9, ...con }
+            const rectComponent = new Rect(defaultRectConfig);
+            engine.ecs.addComponent(rect, rectComponent);
+            engine.ecs.addComponent(rect, transform);
+            if (rotate) { transform.rotation = rotate; }
+            if (pivot) {
+                transform.pivotX = pivot.x;
+                transform.pivotY = pivot.y;
+            }
+            return rect;
+        }
+        const rect1 = RectApi(
+            { x: 0, y: 0 },
+            { width: 300, height: 500, fillStyle: '#ccc' },
+            Math.PI,
+            { x: 300 / 2, y: 500 / 2 }
+        );
+        const rect2 = RectApi({ x: 100, y: 100 }, { fillStyle: "red" });
+        const rect3 = RectApi({ x: 100, y: 200 }, { fillStyle: "blue" });
+        engine.add(rect1);
+        engine.add(rect2, rect1);
+        engine.add(rect3, rect1);
+        setInterval(() => {
+            const t = engine.ecs.getComponent(rect2, Transform)
+            t.x += 10;
+        }, 500);
+        engine.start();
+    </script>
+</body>
+
+</html>

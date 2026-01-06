@@ -9,6 +9,7 @@ export * from './Image.ts';
 export * from './Polyline.ts';
 export * from './Curve.ts';
 export * from './Path.ts';
+export * from './Text.ts';
 
 
 

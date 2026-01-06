@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curve 渲染测试 - 二次/三次贝塞尔曲线 + 点击</title>
+</head>
+
+<body>
+  <div id="app">
+    <h2>Curve 节点测试</h2>
+    <div id="game-container">
+      <canvas id="game-canvas" width="1200" height="800" style="border: 1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { engine, bindEvent, Transform } from './utils.js';
+    import { CurveApi } from './utils.js';
+
+    const canvas = document.getElementById("game-canvas");
+
+    async function main() {
+
+      /** ✅ 二次贝塞尔曲线示例 */
+      const curve1 = CurveApi(
+        { x: 200, y: 150 },
+        {
+          start: [0, 0],
+          cp1: [100, -80],
+          end: [200, 0],
+          lineWidth: 4,
+          strokeStyle: "#e74c3c",
+        }
+      );
+      const e1 = bindEvent(curve1);
+      e1.on("click", () => console.log("点击了二次贝塞尔曲线"));
+
+      /** ✅ 三次贝塞尔曲线示例 */
+      const curve2 = CurveApi(
+        { x: 600, y: 200 },
+        {
+          start: [0, 0],
+          cp1: [80, -100],
+          cp2: [180, 100],
+          end: [250, 0],
+          lineWidth: 3,
+          strokeStyle: "#2980b9",
+        }
+      );
+      const e2 = bindEvent(curve2);
+      e2.on("click", () => console.log("点击了三次贝塞尔曲线"));
+
+      /** ✅ 旋转和缩放测试 */
+      const curve3 = CurveApi(
+        { x: 950, y: 300, rotation: Math.PI / 6, scaleX: 1.5, scaleY: 1.5 },
+        {
+          start: [0, 0],
+          cp1: [50, -80],
+          cp2: [120, 100],
+          end: [200, 0],
+          lineWidth: 3,
+          strokeStyle: "#27ae60",
+        }
+      );
+      const e3 = bindEvent(curve3);
+      e3.on("click", () => console.log("点击了旋转贝塞尔曲线"));
+
+      // 加入 ECS 引擎
+      engine.add(curve1);
+      engine.add(curve2);
+      engine.add(curve3);
+
+      // 启动引擎
+      engine.start();
+    }
+
+    main();
+  </script>
+</body>
+
+</html>

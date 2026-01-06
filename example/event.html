@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div id="game-container">
+            <canvas id="game-canvas" width="800" height="600" style="border: 1px solid #000;"></canvas>
+        </div>
+    </div>
+    <script type="module">
+        // 导入Engine和需要的组件
+        import { Engine, Components } from './dist/web-ecs.es.js';
+        const { Transform, Rect, Circle, EventComponent } = Components;
+        const canvas = document.getElementById("game-canvas");
+        const engine = new Engine(canvas);
+        const RectApi = (obj) => {
+            const defaultRectConfig = {
+                width: 100,
+                height: 100,
+                fillStyle: "#e74c3c",
+                strokeStyle: "#000",
+                lineWidth: 2,
+                alpha: 0.9
+            }
+            // 创建矩形实体
+            const rect = engine.ecs.createEntity();
+            // 添加 Transform 组件（位置 + 大小）
+            // Transform构造函数不是接收对象参数，而是直接接收x, y, width, height参数
+            const transform = new Transform(engine, { ...{ x: 100, y: 0 }, ...obj });
+            engine.ecs.addComponent(rect, transform);
+            // 添加 Rect 渲染组件（颜色、边框、透明度）
+            engine.ecs.addComponent(rect, new Rect(engine, { ...defaultRectConfig, ...obj }));
+
+            setTimeout(() => {
+                console.log('start');
+                const defaultCircleConfig = {
+                    fillStyle: "#3498db",
+                    strokeStyle: "#000",
+                    lineWidth: 12,
+                    radius: 50,
+                    alpha: 0.9
+                }
+                transform.x = 40;
+                engine.ecs.addComponent(rect, new Circle(engine,{
+                    ...defaultCircleConfig,
+                }));
+                engine.start();
+
+            }, 2000);
+            return rect;
+        }
+        const CircleApi = (obj) => {
+            const defaultCircleConfig = {
+                fillStyle: "#3498db",
+                strokeStyle: "#000",
+                lineWidth: 12,
+                radius: 50,
+                alpha: 0.9
+            }
+            // 创建圆实体
+            const circle = engine.ecs.createEntity();
+            // 添加 Transform 组件（位置 + 半径）
+            const t = new Transform(engine, {
+                ...{ x: 100, y: 300 },
+                ...obj
+            })
+            engine.ecs.addComponent(circle, t);
+            // 添加 Circle 渲染组件（颜色、边框、透明度）
+            engine.ecs.addComponent(circle, new Circle(engine, {
+                ...defaultCircleConfig,
+                
+            }));
+            return circle;
+        }
+        const rect = RectApi({ fillStyle: "#2ecc71" });
+        const circle1 = CircleApi({ x: 200, y: 300 });
+        const circle2 = CircleApi({ x: 100, y: 300 });
+        engine.add(circle2);
+        engine.add(circle1);
+        engine.add(rect, circle2);
+
+        // 添加事件组件
+        const eventComponent = new EventComponent();
+        engine.ecs.addComponent(rect, eventComponent);
+        // 注册点击事件
+        eventComponent.on("click", (event, entityId) => {
+            console.log(`点击了矩形实体 ${entityId}`);
+        });
+        engine.start();
+        
+    </script>
+</body>
+
+</html>
