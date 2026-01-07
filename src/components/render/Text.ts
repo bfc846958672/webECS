@@ -10,6 +10,13 @@ export class Text extends RenderComponent implements IComponent {
 	font: IFont;
 	text: string;
 	size: number;
+	/**
+	 * 用户指定的 inline 行高（用于 InlineLayoutBox 计算）
+	 * - undefined: 使用默认 1.4（类似 CSS 默认）
+	 * - number: 作为 font-size 的倍数（例如 1.2 表示 1.2 * fontSize）
+	 * - string: 必须是形如 "20px" 的像素字符串
+	 */
+	lineHeight?: number | string;
 	textAlign: CanvasTextAlign;
 	textBaseline: CanvasTextBaseline;
     debug: boolean = false;
@@ -17,6 +24,7 @@ export class Text extends RenderComponent implements IComponent {
 		font,
 		text = "",
 		size = 16,
+		lineHeight = undefined,
 		textAlign = "left",
 		textBaseline = "alphabetic",
         debug = false
@@ -25,6 +33,7 @@ export class Text extends RenderComponent implements IComponent {
 		this.font = font! ;
 		this.text = text || "";
 		this.size = size || 16;
+		this.lineHeight = lineHeight;
 		this.textAlign = textAlign;
 		this.textBaseline = textBaseline;
         this.debug = debug

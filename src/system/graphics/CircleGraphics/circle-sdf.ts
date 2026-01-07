@@ -145,13 +145,16 @@ export function renderCircle(gl: WebGL2RenderingContext, camera: Camera, transfo
         }
 
         float arcMask(vec2 p, float start, float end, float clockwise) {
-            float s = normAngle(start);
-            float e = normAngle(end);
-
-            float sweep = clockwise > 0.5 ? mod2pi(s - e) : mod2pi(e - s);
+            // Robust sweep computation:
+            // When end-start is exactly ±2π, normalizing angles collapses both to 0 and sweep becomes 0.
+            // Detect that case via the raw delta before normalization.
+            float delta = clockwise > 0.5 ? (start - end) : (end - start);
+            float sweep = mod2pi(delta);
+            if (sweep <= 1e-6 && abs(delta) > 1e-4) sweep = TWO_PI;
             if (sweep >= TWO_PI - 1e-4) return 1.0;
             if (sweep <= 1e-6) return 0.0;
 
+            float s = normAngle(start);
             float a = normAngle(atan(p.y, p.x));
             float dist = clockwise > 0.5 ? mod2pi(s - a) : mod2pi(a - s);
             return dist <= sweep ? 1.0 : 0.0;

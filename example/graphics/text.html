@@ -10,7 +10,7 @@
 <body>
   <div id="app">
     <div id="game-container">
-      <canvas id="game-canvas" width="1200" height="800" style="border:1px solid #000;"></canvas>
+      <canvas id="game-canvas" width="1500" height="800" style="border:1px solid #000;"></canvas>
     </div>
   </div>
 
@@ -20,7 +20,26 @@
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
-    engine.boxDebug = true;
+    // engine.boxDebug = true;
+
+    function addAnchorDot(
+      { x, y }
+     
+    ) {
+      const e = engine.ecs.createEntity();
+      const circle = new Components.Circle(engine, {
+        radius: 2,
+        fillStyle: 'rgba(1,0,0,0)',
+        strokeStyle: '#ff0000',
+        lineWidth: 2,
+      });
+      const transform = new Components.Transform(engine, { x, y });
+
+      engine.ecs.addComponent(e, circle);
+      engine.ecs.addComponent(e, transform);
+      engine.add(e);
+      return { e, circle, transform };
+    }
 
     function addText({ x, y, rotation = 0, scaleX = 1, scaleY = 1, skewX = 0, skewY = 0 }, textConfig, withEvent = false) {
       const e = engine.ecs.createEntity();
@@ -37,6 +56,7 @@
       }
 
       engine.add(e);
+      addAnchorDot({ x, y });
       return { e, text, transform, event };
     }
 
@@ -48,23 +68,39 @@
       const ifont = { font, images };
 
       // 1) 基本渲染：左上角
+      const p1 = { x: 60, y: 120 };
       addText(
-        { x: 60, y: 220 },
+        p1,
         {
           font: ifont,
           text: 'aA大地国际王户Hello',
-          size: 102,
+          size: 100,
           textAlign: 'left',
-          textBaseline: 'alphabetic',
+          textBaseline: 'top',
+          lineHeight: 2.5,
+        },
+        true
+      ).event.on('click', (_ev, id) => {
+        console.log('点击：Hello 文本', id);
+      });
+      addText(
+        {x: 60, y: 400},
+        {
+          font: ifont,
+          text: 'aA大地国际王户Hello',
+          size: 100,
+          textAlign: 'left',
+          textBaseline: 'bottom',
+          lineHeight: 2.5,
         },
         true
       ).event.on('click', (_ev, id) => {
         console.log('点击：Hello 文本', id);
       });
 
-      // // 2) 对齐演示：同一个锚点(600, 260)，分别 left/center/right
-      // const anchorX = 600;
-      // const baseY = 260;
+      // 2) 对齐演示：同一个锚点(600, 260)，分别 left/center/right
+      const anchorX = 600;
+      const baseY = 260;
 
       // addText(
       //   { x: anchorX, y: baseY },
@@ -74,7 +110,7 @@
       //     size: 32,
       //     textAlign: 'left',
       //     textBaseline: 'alphabetic',
-      //   }
+      //   }  
       // );
 
       // addText(
@@ -82,7 +118,7 @@
       //   {
       //     font: ifont,
       //     text: 'textAlign: center（锚点为中间）',
-      //     size: 32,
+      //     size: 52,
       //     textAlign: 'center',
       //     textBaseline: 'alphabetic',
       //   }
@@ -99,10 +135,10 @@
       //   }
       // );
 
-      // // 3) 基线演示：同一个锚点(220, 560)，top/middle/alphabetic/bottom
-      // const anchorX2 = 220;
-      // const anchorY2 = 560;
-      // const baselineText = 'Baseline 对齐';
+      // 3) 基线演示：同一个锚点(220, 560)，top/middle/alphabetic/bottom
+      const anchorX2 = 220;
+      const anchorY2 = 560;
+      const baselineText = 'Baseline 对齐';
 
       // addText(
       //   { x: anchorX2, y: anchorY2 },

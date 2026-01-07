@@ -3,7 +3,7 @@ import { Transform } from '../../../components/Transform';
 import { Text } from '../../../components/render/Text';
 import type { IFont } from '../../../interface/font';
 import type { IAABB } from '../../../interface/AABB';
-import { renderBaselineDebugLines, type DebugBaselineLine, type DebugRect } from './text-baseline-debug';
+import { renderBaselineDebugLines } from './text-baseline-debug';
 import { FontTextCalculator } from './FontTextCalculator';
 import { layoutSingleLineMsdf } from './MsdfTextLayout';
 
@@ -192,33 +192,6 @@ export function renderText(gl: WebGL2RenderingContext, camera: Camera, transform
     mesh.draw({ camera });
 
     if (textComp.debug) {
-        // 需求：渲染“字体设计盒”和“布局内联盒”，以及设计盒里的英文/中文基线。
-        const rects: DebugRect[] = [
-            // 设计盒（asc/desc）
-            {
-                minX: calc.designBox.minX,
-                minY: calc.designBox.minY,
-                maxX: calc.designBox.maxX,
-                maxY: calc.designBox.maxY,
-                color: [0, 0.8, 1, 1],
-            },
-            // 内联盒（asc + lineHeight）
-            {
-                minX: calc.inlineBox.minX,
-                minY: calc.inlineBox.minY,
-                maxX: calc.inlineBox.maxX,
-                maxY: calc.inlineBox.maxY,
-                color: [1, 0, 1, 1],
-            },
-        ];
-
-        const lines: DebugBaselineLine[] = [
-            // 英文基线：alphabetic
-            { y: calc.designBox.alphabeticBaselineY, color: [0, 0.6, 1, 1] },
-            // 中文基线：ideographic（使用 descender）
-            { y: calc.designBox.ideographicBaselineY, color: [1, 0.6, 0, 1] },
-        ];
-
-        renderBaselineDebugLines(gl, camera, transform, calc.width, anchorX, anchorY, lines, rects);
+        renderBaselineDebugLines(gl, camera, transform, calc, anchorX, anchorY);
     }
 }

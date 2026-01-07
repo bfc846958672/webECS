@@ -8,23 +8,39 @@ export class FontDesignBox {
         public minX: number,
         public minY: number,
         public maxX: number,
-        public maxY: number
+        public maxY: number,
+        private readonly ascender: number,
+        private readonly descender: number,
+        private readonly emSize: number,
+        private readonly scale: number
     ) {}
 
     static fromFont(font: FontData, width: number, scale: number): FontDesignBox {
         const asc = font.metrics?.ascender ?? 0;
         const desc = font.metrics?.descender ?? 0;
+        const emSize = font.metrics?.emSize ?? 1;
         const topY = -asc * scale;
         const bottomY = -desc * scale;
-        return new FontDesignBox(0, topY, width, bottomY);
+        const minY = Math.min(topY, bottomY);
+        const maxY = Math.max(topY, bottomY);
+        return new FontDesignBox(0, minY, width, maxY, asc, desc, emSize, scale);
     }
 
     get alphabeticBaselineY(): number {
         return 0;
     }
 
+    get middleY(): number {
+        // 约定：font.metrics.ascender/descender 是以 alphabetic baseline 为 0 的字体度量。
+        // middle = baseline + (|ascender| - |descender|) / 2
+        return -(this.ascender - this.descender) / 2 * this.scale;
+    }
+
     get ideographicBaselineY(): number {
-        // 这里把中文基线定位到 descender（更贴近字形盒下缘）
-        return this.maxY;
+        // 浏览器里 ideographic baseline 通常比 alphabetic baseline 略向下。
+        // 这里用工程近似：downOffset ≈ 0.12em。
+        // 注意：本引擎坐标为 y-down，所以“向下”是 +。
+        const fontSizePx = this.scale * this.emSize;
+        return this.alphabeticBaselineY + 0.1 * fontSizePx;
     }
 }
