@@ -9,8 +9,8 @@ export class Font {
     constructor() { }
 
     /**
-     * 方法1：加载 msdf json，并设置 this.font。
-     * 同时会把 json 的 pages[] 解析为绝对地址，写入 this.pageUrls。
+     * 方法1：加载 msdf-atlas json，并设置 this.font。
+     * 资源约定：贴图为与 json 同目录的 msdf.png。
      * @param fontUrl
      */
     async loadJson(fontUrl: string): Promise<IFont['font']> {
@@ -19,8 +19,7 @@ export class Font {
         this.font = font;
 
         const baseUrl = new URL(fontUrl, location.href);
-        const pages = Array.isArray(font?.pages) ? font.pages : [];
-        this.pageUrls = pages.map((p) => new URL(p, baseUrl).toString());
+        this.pageUrls = [new URL('msdf.png', baseUrl).toString()];
         return font;
     }
 

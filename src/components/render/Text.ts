@@ -1,7 +1,7 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
-import {IFont} from "../../interface/font.ts";
+import type { IFont } from "../../interface/font.ts";
 /**
  * 文本组件，仅存储渲染数据
  * 不包含绘制逻辑，系统负责渲染

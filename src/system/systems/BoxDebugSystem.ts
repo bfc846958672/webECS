@@ -150,7 +150,7 @@ export class BoxDebugSystem extends ISystem {
 
         // 颜色/线宽：对齐旧 Canvas 调试风格
         drawAABBs(gl, camera, totalAABBs, '#ff0000', 1);
-        drawAABBs(gl, camera, selfAABBs, '#010001', 3);
+        drawAABBs(gl, camera, selfAABBs, '#320bad', 3);
         // drawAABBs(gl, camera, childrenAABBs, 'green', 2);
     }
 }

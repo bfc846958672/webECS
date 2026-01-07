@@ -1,51 +1,49 @@
+export type MsdfFontJson = {
+    atlas: {
+        type: 'msdf' | 'sdf' | 'mtsdf' | string;
+        distanceRange: number;
+        distanceRangeMiddle?: number;
+        size: number;
+        width: number;
+        height: number;
+        yOrigin?: 'bottom' | 'top' | string;
+    };
+    metrics: {
+        emSize: number;
+        lineHeight: number;
+        ascender: number;
+        descender: number;
+        underlineY?: number;
+        underlineThickness?: number;
+    };
+    glyphs: Array<{
+        unicode: number;
+        advance: number;
+        planeBounds?: {
+            left: number;
+            bottom: number;
+            right: number;
+            top: number;
+        };
+        atlasBounds?: {
+            left: number;
+            bottom: number;
+            right: number;
+            top: number;
+        };
+    }>;
+    kerning?: Array<{
+        unicode1?: number;
+        unicode2?: number;
+        left?: number;
+        right?: number;
+        advance: number;
+    }>;
+};
+
 export interface IFont {
-    font: {
-        pages: string[];
-        chars: {
-            id: number;
-            index: number;
-            char: string;
-            width: number;
-            height: number;
-            xoffset: number;
-            yoffset: number;
-            xadvance: number;
-            chnl: number;
-            x: number;
-            y: number;
-            page: number;
-        }[];
-        info: {
-            face: string;
-            size: number;
-            bold: number;
-            italic: number;
-            charset: string[];
-            unicode: number;
-            stretchH: number;
-            smooth: number;
-            aa: number;
-            padding: number[];
-            spacing: number[];
-            outline: number;
-        };
-        common: {
-            lineHeight: number;
-            base: number;
-            scaleW: number;
-            scaleH: number;
-            pages: number;
-            packed: number;
-            alphaChnl: number;
-            redChnl: number;
-            greenChnl: number;
-            blueChnl: number;
-        };
-        distanceField: {
-            fieldType: string;
-            distanceRange: number;
-        };
-        kernings: never[];
-    }
+    /** 字体度量与字形信息（msdf-atlas 格式：atlas/metrics/glyphs/kerning） */
+    font: MsdfFontJson;
+    /** 与 font 对应的贴图（当前资源约定：与 json 同目录的 msdf.png） */
     images: HTMLImageElement[];
 }
