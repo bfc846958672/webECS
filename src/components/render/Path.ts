@@ -1,7 +1,7 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
 import { Engine } from "../../engine/Engine.ts";
-
+// todo 暂不支持
 /** 🧩 支持的路径命令 */
 export type IPathCommand =
   | { type: "moveTo"; x: number; y: number }

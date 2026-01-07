@@ -8,6 +8,8 @@ import { PolylineGraphics } from "../graphics/PolylineGraphics.ts";
 import { CurveGraphics } from "../graphics/CurveGraphics.ts";
 import { PathGraphics } from "../graphics/PathGraphics.ts";
 import { TextGraphics } from "../graphics/TextGraphics.ts";
+import { PointGraphics } from "../graphics/PointGraphics.ts";
+import { LineGraphics } from "../graphics/LineGraphics.ts";
 import type { IShareContext } from "../../interface/System.ts";
 import type { IRenderContext } from "../../interface/IRender.ts";
 /**
@@ -26,6 +28,8 @@ export class RenderProcess implements IProcess<IShareContext, IShareContext> {
     this.strategies.push(new RectGraphics(this.renderContext));
     this.strategies.push(new ImageGraphics(this.renderContext));
     this.strategies.push(new TextGraphics(this.renderContext));
+    this.strategies.push(new PointGraphics(this.renderContext));
+    this.strategies.push(new LineGraphics(this.renderContext));
     this.strategies.push(new PolylineGraphics(this.renderContext));
     this.strategies.push(new CurveGraphics(this.renderContext));
     this.strategies.push(new PathGraphics(this.renderContext));

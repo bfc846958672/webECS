@@ -12,6 +12,8 @@ import { IAABB } from "../../interface/AABB.ts";
 import { IShareContext } from "../../interface/System.ts";
 import { PathGraphics } from "../graphics/PathGraphics.ts";
 import { TextGraphics } from "../graphics/TextGraphics.ts";
+import { PointGraphics } from "../graphics/PointGraphics.ts";
+import { LineGraphics } from "../graphics/LineGraphics.ts";
 export class BoundingBoxProcess implements IProcess {
     match(_ecs: ECS, _entityId: number) {
         return true
@@ -25,6 +27,8 @@ export class BoundingBoxProcess implements IProcess {
         this.strategies.push(new RectGraphics());
         this.strategies.push(new ImageGraphics());
         this.strategies.push(new TextGraphics());
+        this.strategies.push(new PointGraphics());
+        this.strategies.push(new LineGraphics());
         this.strategies.push(new PolylineGraphics());
         this.strategies.push(new CurveGraphics());
         this.strategies.push(new PathGraphics());

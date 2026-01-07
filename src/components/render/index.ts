@@ -10,6 +10,8 @@ export * from './Polyline.ts';
 export * from './Curve.ts';
 export * from './Path.ts';
 export * from './Text.ts';
+export * from './Point.ts';
+export * from './Line.ts';
 
 
 
