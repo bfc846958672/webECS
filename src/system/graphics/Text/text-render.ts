@@ -3,6 +3,8 @@ import { Transform } from '../../../components/Transform';
 import { Text } from '../../../components/render/Text';
 import type { IFont } from '../../../interface/font';
 import type { IAABB } from '../../../interface/AABB';
+// todo 后期将debug相关功能抽离出去
+
 
 type BMFont = IFont['font'];
 type BMFontChar = BMFont['chars'][number];
