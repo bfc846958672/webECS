@@ -11,6 +11,10 @@ export class Text extends RenderComponent implements IComponent {
 	text: string;
 	size: number;
 	/**
+	 * 文本颜色：支持 '#rrggbb' / '#rrggbbaa' / 'rgba(r,g,b,a)' 或 [r,g,b,a]（0~1）
+	 */
+	color: string | number[];
+	/**
 	 * 用户指定的 inline 行高（用于 InlineLayoutBox 计算）
 	 * - undefined: 使用默认 1.4（类似 CSS 默认）
 	 * - number: 作为 font-size 的倍数（例如 1.2 表示 1.2 * fontSize）
@@ -24,6 +28,7 @@ export class Text extends RenderComponent implements IComponent {
 		font,
 		text = "",
 		size = 16,
+		color = "#000000",
 		lineHeight = undefined,
 		textAlign = "left",
 		textBaseline = "alphabetic",
@@ -33,6 +38,7 @@ export class Text extends RenderComponent implements IComponent {
 		this.font = font! ;
 		this.text = text || "";
 		this.size = size || 16;
+		this.color = color as any;
 		this.lineHeight = lineHeight;
 		this.textAlign = textAlign;
 		this.textBaseline = textBaseline;

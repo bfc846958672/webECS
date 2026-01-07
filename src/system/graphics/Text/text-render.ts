@@ -11,6 +11,42 @@ type FontData = IFont['font'];
 type TextAlign = CanvasTextAlign;
 type TextBaseline = CanvasTextBaseline;
 
+function clamp01(v: number): number {
+    return Math.max(0, Math.min(1, v));
+}
+
+function parseColorStyle(style: unknown): [number, number, number, number] {
+    if (Array.isArray(style)) {
+        const [r = 0, g = 0, b = 0, a = 1] = style as number[];
+        return [clamp01(Number(r)), clamp01(Number(g)), clamp01(Number(b)), clamp01(Number(a))];
+    }
+
+    if (typeof style !== 'string') return [0, 0, 0, 1];
+    const s = style.trim();
+
+    if (s.startsWith('#')) {
+        const hex = s.slice(1);
+        if (hex.length === 6 || hex.length === 8) {
+            const r = parseInt(hex.slice(0, 2), 16) / 255;
+            const g = parseInt(hex.slice(2, 4), 16) / 255;
+            const b = parseInt(hex.slice(4, 6), 16) / 255;
+            const a = hex.length === 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1;
+            return [clamp01(r), clamp01(g), clamp01(b), clamp01(a)];
+        }
+    }
+
+    const m = s.match(/^rgba\s*\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\)\s*$/i);
+    if (m) {
+        const r = clamp01(Number(m[1]) / 255);
+        const g = clamp01(Number(m[2]) / 255);
+        const b = clamp01(Number(m[3]) / 255);
+        const a = clamp01(Number(m[4]));
+        return [r, g, b, a];
+    }
+
+    return [0, 0, 0, 1];
+}
+
 
 function getLocalAnchorX(totalWidth: number, textAlign: TextAlign): number {
     const align = textAlign || 'left';
@@ -70,6 +106,8 @@ function createMsdfShaderSource(pages: number) {
 
         ${samplerUniforms}
 
+        uniform vec4 uColor;
+
         in vec2 vUv;
         in float vPage;
 
@@ -83,7 +121,7 @@ function createMsdfShaderSource(pages: number) {
             float d = fwidth(signedDist);
             float alpha = smoothstep(-d, d, signedDist);
             if (alpha < 0.01) discard;
-            fragColor = vec4(0.0, 0.0, 0.0, alpha);
+            fragColor = vec4(uColor.rgb, alpha * uColor.a);
         }
     `;
 
@@ -124,6 +162,7 @@ function getOrCreateProgram(gl: WebGL2RenderingContext, pages: number, textures:
     const { vertex, fragment } = createMsdfShaderSource(pages);
     const uniforms: Record<string, { value: any }> = {};
     for (let i = 0; i < pages; i++) uniforms[`tMap${i}`] = { value: textures[i] };
+    uniforms.uColor = { value: [0, 0, 0, 1] };
     const program = new Program(gl, {
         vertex,
         fragment,
@@ -166,6 +205,7 @@ export function renderText(gl: WebGL2RenderingContext, camera: Camera, transform
 
     const textures = calc.images.map((img) => getOrCreateTexture(gl, img));
     const program = getOrCreateProgram(gl, textures.length, textures);
+    if (program.uniforms.uColor) program.uniforms.uColor.value = parseColorStyle((textComp as any).color);
 
     // 对齐/基线：Text 不再有 x/y，位置由 Transform.worldMatrix 决定。
     // 这里仅把对齐/基线 anchor 偏移 bake 进顶点。
