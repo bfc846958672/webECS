@@ -47,3 +47,6 @@ export interface IFont {
     /** 与 font 对应的贴图（当前资源约定：与 json 同目录的 msdf.png） */
     images: HTMLImageElement[];
 }
+
+
+export type TextBaselineName = "alphabetic" | "bottom" | "ideographic" | "middle" | "top";

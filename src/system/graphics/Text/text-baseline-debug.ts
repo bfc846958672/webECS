@@ -56,6 +56,14 @@ export type DebugBaselineLine = {
     color: [number, number, number, number];
 };
 
+export type DebugRect = {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+    color: [number, number, number, number];
+};
+
 export function renderBaselineDebugLines(
     gl: WebGL2RenderingContext,
     camera: Camera,
@@ -64,18 +72,46 @@ export function renderBaselineDebugLines(
     anchorX: number,
     anchorY: number,
     lines: DebugBaselineLine[],
+    rects?: DebugRect[],
 ) {
-    if (!lines || lines.length === 0) return;
+    const hasLines = Array.isArray(lines) && lines.length > 0;
+    const hasRects = Array.isArray(rects) && rects.length > 0;
+    if (!hasLines && !hasRects) return;
 
     const x0 = -anchorX;
     const x1 = width - anchorX;
 
     const positions: number[] = [];
     const colors: number[] = [];
-    for (const l of lines) {
-        const y = l.y - anchorY;
-        positions.push(x0, y, x1, y);
-        colors.push(...l.color, ...l.color);
+
+    if (hasLines) {
+        for (const l of lines) {
+            const y = l.y - anchorY;
+            positions.push(x0, y, x1, y);
+            colors.push(...l.color, ...l.color);
+        }
+    }
+
+    if (hasRects && rects) {
+        for (const r of rects) {
+            const minX = r.minX - anchorX;
+            const maxX = r.maxX - anchorX;
+            const minY = r.minY - anchorY;
+            const maxY = r.maxY - anchorY;
+
+            // top
+            positions.push(minX, minY, maxX, minY);
+            colors.push(...r.color, ...r.color);
+            // right
+            positions.push(maxX, minY, maxX, maxY);
+            colors.push(...r.color, ...r.color);
+            // bottom
+            positions.push(maxX, maxY, minX, maxY);
+            colors.push(...r.color, ...r.color);
+            // left
+            positions.push(minX, maxY, minX, minY);
+            colors.push(...r.color, ...r.color);
+        }
     }
 
     const program = getOrCreateDebugLineProgram(gl);
