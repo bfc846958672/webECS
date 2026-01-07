@@ -82,14 +82,16 @@ export function renderBaselineDebugLines(
     const lines = [
         // 英文基线：alphabetic
         { y: calc.designBox.alphabeticBaselineY, color: [0, 0.6, 1, 1] as const },
+        // 设计盒 middle 线
+        { y: calc.designBox.middleY, color: [0, 0.8, 1, 0.5] as const },
         // 中文基线：ideographic（使用 descender）
         { y: calc.designBox.ideographicBaselineY, color: [1, 0.6, 0, 1] as const },
     ];
 
     const x0 = -anchorX;
     const textWidth = calc.width;
-    const baselineX0 = x0 + textWidth * 0.1;
-    const baselineX1 = x0 + textWidth * 0.9;
+    const baselineX0 = x0 + textWidth * 0.02;
+    const baselineX1 = x0 + textWidth * 0.98;
 
     const positions: number[] = [];
     const colors: number[] = [];

@@ -31,9 +31,9 @@ export class FontDesignBox {
     }
 
     get middleY(): number {
-        // 约定：font.metrics.ascender/descender 是以 alphabetic baseline 为 0 的字体度量。
-        // middle = baseline + (|ascender| - |descender|) / 2
-        return -(this.ascender - this.descender) / 2 * this.scale;
+        // （在常见字体数据里 descender<0，这等价于 baseline + (ascender - |descender|) / 2）
+        // 引擎本地坐标为 y-down，所以取负并乘 scale。
+        return -((this.ascender + this.descender) / 2) * this.scale;
     }
 
     get ideographicBaselineY(): number {
