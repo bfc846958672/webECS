@@ -24,7 +24,13 @@ export class Engine implements IEngine {
         // webgl 相关
         this.renderContext = {
             camera: new Camera(undefined, { left: 0, right: canvas.width, bottom: canvas.height, top: 0, near: -1, far: 1, }),
-            renderer: new Renderer({ canvas, width: canvas.width, height: canvas.height, webgl: 2, alpha: false, depth: false, premultipliedAlpha: false, })
+            renderer: new Renderer({
+                canvas, width: canvas.width,
+                height: canvas.height, webgl: 2, 
+                dpr: window.devicePixelRatio || 1,
+                alpha: false, depth: false,
+                premultipliedAlpha: false,
+            })
         };
         // 注册系统
         this.ecs.addSystem(new SceneTreeRenderSystem(this, this.sceneTree));

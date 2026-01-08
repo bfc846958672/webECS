@@ -49,10 +49,10 @@ function getOrCreatePointProgram(gl: WebGL2RenderingContext): Program {
         in vec2 position;
         in vec4 aColor;
         in mat3 aWorldMatrix;
+        in float aPointSize;
 
         uniform mat4 projectionMatrix;
         uniform mat4 viewMatrix;
-        uniform float uPointSize;
 
         out vec4 vColor;
 
@@ -64,7 +64,7 @@ function getOrCreatePointProgram(gl: WebGL2RenderingContext): Program {
                 vec4(0.0, 0.0, 1.0, 0.0),
                 vec4(aWorldMatrix[2][0], aWorldMatrix[2][1], 0.0, 1.0)
             );
-            gl_PointSize = uPointSize;
+            gl_PointSize = max(aPointSize, 0.0);
             gl_Position = projectionMatrix * viewMatrix * worldMatrix4 * vec4(position, 0.0, 1.0);
         }
     `;
@@ -87,9 +87,6 @@ function getOrCreatePointProgram(gl: WebGL2RenderingContext): Program {
         cullFace: 0 as any,
         depthTest: false,
         depthWrite: false,
-        uniforms: {
-            uPointSize: { value: 4 },
-        },
     });
 
     return pointProgram;
@@ -104,16 +101,17 @@ export function renderPoint(gl: WebGL2RenderingContext, camera: Camera, transfor
     const color: [number, number, number, number] = [rgba[0], rgba[1], rgba[2], rgba[3] * alpha];
 
     const program = getOrCreatePointProgram(gl);
-    program.uniforms.uPointSize.value = size;
 
     const aWorldMatrix = new Float32Array(transform.worldMatrix);
     const geometry = new Geometry(gl, {
         position: { data: new Float32Array([0, 0]), size: 2, usage: gl.DYNAMIC_DRAW },
         aColor: { data: new Float32Array(color), size: 4, usage: gl.DYNAMIC_DRAW },
         aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
+        aPointSize: { data: new Float32Array([size]), size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
     });
-    geometry.setInstancedCount(1);
+    // geometry.setInstancedCount(1);
 
     const mesh = new Mesh(gl, { geometry, program, mode: gl.POINTS, frustumCulled: false });
     mesh.draw({ camera });
+
 }

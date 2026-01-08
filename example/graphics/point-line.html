@@ -25,130 +25,130 @@
     {
       const e = engine.ecs.createEntity();
       const point = new Components.Point(engine, {
-        size: 14,
+        size: 80,
         fillStyle: '#e74c3c',
         alpha: 1,
       });
-      const transform = new Components.Transform(engine, { x: 160, y: 160 });
+      const transform = new Components.Transform(engine, { x: 40, y: 40 });
       engine.ecs.addComponent(e, point);
       engine.ecs.addComponent(e, transform);
       engine.add(e);
     }
 
-    // 2) 点块：透明度 + 不同大小
-    {
-      const e = engine.ecs.createEntity();
-      const point = new Components.Point(engine, {
-        size: 36,
-        fillStyle: 'rgba(52, 152, 219, 1)',
-        alpha: 0.45,
-      });
-      const transform = new Components.Transform(engine, { x: 520, y: 160 });
-      engine.ecs.addComponent(e, point);
-      engine.ecs.addComponent(e, transform);
-      engine.add(e);
-    }
+    // // 2) 点块：透明度 + 不同大小
+    // {
+    //   const e = engine.ecs.createEntity();
+    //   const point = new Components.Point(engine, {
+    //     size: 36,
+    //     fillStyle: 'rgba(52, 152, 219, 1)',
+    //     alpha: 0.45,
+    //   });
+    //   const transform = new Components.Transform(engine, { x: 520, y: 160 });
+    //   engine.ecs.addComponent(e, point);
+    //   engine.ecs.addComponent(e, transform);
+    //   engine.add(e);
+    // }
 
-    // 3) 线：两点线段
-    {
-      const e = engine.ecs.createEntity();
-      const line = new Components.Line(engine, {
-        points: [[-80, -40], [80, 40]],
-        strokeStyle: '#2ecc71',
-        alpha: 1,
-      });
-      const transform = new Components.Transform(engine, { x: 880, y: 160 });
-      engine.ecs.addComponent(e, line);
-      engine.ecs.addComponent(e, transform);
-      engine.add(e);
-    }
+    // // 3) 线：两点线段
+    // {
+    //   const e = engine.ecs.createEntity();
+    //   const line = new Components.Line(engine, {
+    //     points: [[-80, -40], [80, 40]],
+    //     strokeStyle: '#2ecc71',
+    //     alpha: 1,
+    //   });
+    //   const transform = new Components.Transform(engine, { x: 880, y: 160 });
+    //   engine.ecs.addComponent(e, line);
+    //   engine.ecs.addComponent(e, transform);
+    //   engine.add(e);
+    // }
 
-    // 4) 线：多段折线（gl.LINES 展开成线段对）
-    {
-      const e = engine.ecs.createEntity();
-      const line = new Components.Line(engine, {
-        points: [[-140, 0], [-70, -60], [0, 0], [70, 60], [140, 0]],
-        strokeStyle: '#9b59b6',
-        alpha: 0.9,
-      });
-      const transform = new Components.Transform(engine, { x: 160, y: 440 });
-      engine.ecs.addComponent(e, line);
-      engine.ecs.addComponent(e, transform);
-      engine.add(e);
-    }
+    // // 4) 线：多段折线（gl.LINES 展开成线段对）
+    // {
+    //   const e = engine.ecs.createEntity();
+    //   const line = new Components.Line(engine, {
+    //     points: [[-140, 0], [-70, -60], [0, 0], [70, 60], [140, 0]],
+    //     strokeStyle: '#9b59b6',
+    //     alpha: 0.9,
+    //   });
+    //   const transform = new Components.Transform(engine, { x: 160, y: 440 });
+    //   engine.ecs.addComponent(e, line);
+    //   engine.ecs.addComponent(e, transform);
+    //   engine.add(e);
+    // }
 
-    // 5) Transform 变换：旋转 + 缩放（验证 worldMatrix attribute 管线）
-    {
-      const e1 = engine.ecs.createEntity();
-      const p = new Components.Point(engine, {
-        size: 18,
-        fillStyle: '#f1c40f',
-        alpha: 1,
-      });
-      const t = new Components.Transform(engine, {
-        x: 520,
-        y: 440,
-        rotation: Math.PI / 8,
-        scaleX: 1.4,
-        scaleY: 0.8,
-        skewX: 0.25,
-        skewY: 0.0,
-      });
-      engine.ecs.addComponent(e1, p);
-      engine.ecs.addComponent(e1, t);
-      engine.add(e1);
+    // // 5) Transform 变换：旋转 + 缩放（验证 worldMatrix attribute 管线）
+    // {
+    //   const e1 = engine.ecs.createEntity();
+    //   const p = new Components.Point(engine, {
+    //     size: 18,
+    //     fillStyle: '#f1c40f',
+    //     alpha: 1,
+    //   });
+    //   const t = new Components.Transform(engine, {
+    //     x: 520,
+    //     y: 440,
+    //     rotation: Math.PI / 8,
+    //     scaleX: 1.4,
+    //     scaleY: 0.8,
+    //     skewX: 0.25,
+    //     skewY: 0.0,
+    //   });
+    //   engine.ecs.addComponent(e1, p);
+    //   engine.ecs.addComponent(e1, t);
+    //   engine.add(e1);
 
-      const e2 = engine.ecs.createEntity();
-      const line = new Components.Line(engine, {
-        points: [[-120, 0], [0, -60], [120, 0]],
-        strokeStyle: '#34495e',
-        alpha: 1,
-      });
-      engine.ecs.addComponent(e2, line);
-      engine.ecs.addComponent(e2, t);
-      engine.add(e2);
-    }
+    //   const e2 = engine.ecs.createEntity();
+    //   const line = new Components.Line(engine, {
+    //     points: [[-120, 0], [0, -60], [120, 0]],
+    //     strokeStyle: '#34495e',
+    //     alpha: 1,
+    //   });
+    //   engine.ecs.addComponent(e2, line);
+    //   engine.ecs.addComponent(e2, t);
+    //   engine.add(e2);
+    // }
 
-    // 6) 动态示例：点位置/折线形状随时间变化
-    {
-      const ePoint = engine.ecs.createEntity();
-      const point = new Components.Point(engine, {
-        size: 20,
-        fillStyle: '#000000',
-        alpha: 1,
-      });
-      const pt = new Components.Transform(engine, { x: 880, y: 440 });
-      engine.ecs.addComponent(ePoint, point);
-      engine.ecs.addComponent(ePoint, pt);
-      engine.add(ePoint);
+    // // 6) 动态示例：点位置/折线形状随时间变化
+    // {
+    //   const ePoint = engine.ecs.createEntity();
+    //   const point = new Components.Point(engine, {
+    //     size: 20,
+    //     fillStyle: '#000000',
+    //     alpha: 1,
+    //   });
+    //   const pt = new Components.Transform(engine, { x: 880, y: 440 });
+    //   engine.ecs.addComponent(ePoint, point);
+    //   engine.ecs.addComponent(ePoint, pt);
+    //   engine.add(ePoint);
 
-      const eLine = engine.ecs.createEntity();
-      const line = new Components.Line(engine, {
-        points: [[-120, 0], [-40, 0], [40, 0], [120, 0]],
-        strokeStyle: '#e67e22',
-        alpha: 1,
-      });
-      const lt = new Components.Transform(engine, { x: 880, y: 560 });
-      engine.ecs.addComponent(eLine, line);
-      engine.ecs.addComponent(eLine, lt);
-      engine.add(eLine);
+    //   const eLine = engine.ecs.createEntity();
+    //   const line = new Components.Line(engine, {
+    //     points: [[-120, 0], [-40, 0], [40, 0], [120, 0]],
+    //     strokeStyle: '#e67e22',
+    //     alpha: 1,
+    //   });
+    //   const lt = new Components.Transform(engine, { x: 880, y: 560 });
+    //   engine.ecs.addComponent(eLine, line);
+    //   engine.ecs.addComponent(eLine, lt);
+    //   engine.add(eLine);
 
-      engine.ticker.add(() => {
-        const t = performance.now() * 0.001;
+    //   engine.ticker.add(() => {
+    //     const t = performance.now() * 0.001;
 
-        // 点做圆周运动
-        pt.x = 880 + Math.cos(t) * 120;
-        pt.y = 440 + Math.sin(t) * 70;
+    //     // 点做圆周运动
+    //     pt.x = 880 + Math.cos(t) * 120;
+    //     pt.y = 440 + Math.sin(t) * 70;
 
-        // 折线中间点上下波动
-        line.points = [
-          [-120, 0],
-          [-40, Math.sin(t * 2.0) * 30],
-          [40, Math.cos(t * 1.7) * 30],
-          [120, 0],
-        ];
-      });
-    }
+    //     // 折线中间点上下波动
+    //     line.points = [
+    //       [-120, 0],
+    //       [-40, Math.sin(t * 2.0) * 30],
+    //       [40, Math.cos(t * 1.7) * 30],
+    //       [120, 0],
+    //     ];
+    //   });
+    // }
 
     engine.start();
   </script>
