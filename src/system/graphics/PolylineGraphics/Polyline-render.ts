@@ -3,68 +3,20 @@ import { Geometry, Program, Mesh, Camera } from '../../../webgl/index';
 import { Transform } from '../../../components/Transform';
 import { Polyline } from '../../../components/render/Polyline';
 import { parseColorStyle } from '../../../utils/color';
-
-type Vec2 = [number, number];
-
-function sub(a: Vec2, b: Vec2): Vec2 {
-	return [a[0] - b[0], a[1] - b[1]];
-}
-
-function add(a: Vec2, b: Vec2): Vec2 {
-	return [a[0] + b[0], a[1] + b[1]];
-}
-
-function mul(a: Vec2, s: number): Vec2 {
-	return [a[0] * s, a[1] * s];
-}
-
-function len(a: Vec2): number {
-	return Math.hypot(a[0], a[1]);
-}
-
-function normalize(a: Vec2): Vec2 {
-	const l = len(a);
-	if (l < 1e-6) return [0, 0];
-	return [a[0] / l, a[1] / l];
-}
-
-function perp(a: Vec2): Vec2 {
-	return [-a[1], a[0]];
-}
-
-function dot(a: Vec2, b: Vec2): number {
-	return a[0] * b[0] + a[1] * b[1];
-}
-
-function cross(a: Vec2, b: Vec2): number {
-	return a[0] * b[1] - a[1] * b[0];
-}
-
-function intersectLines(p: Vec2, r: Vec2, q: Vec2, s: Vec2): Vec2 | null {
-	const denom = cross(r, s);
-	if (Math.abs(denom) < 1e-6) return null;
-	const qp = sub(q, p);
-	const t = cross(qp, s) / denom;
-	if (!Number.isFinite(t)) return null;
-	return add(p, mul(r, t));
-}
-
-function nearlyEqualPoint(a: Vec2, b: Vec2): boolean {
-	return Math.abs(a[0] - b[0]) < 1e-6 && Math.abs(a[1] - b[1]) < 1e-6;
-}
+import { vec2, type Vec2 } from '../../../utils/vec2';
 
 function sanitizeStrokePoints(points: Vec2[], closed: boolean): Vec2[] {
 	let pts = points;
-	if (closed && pts.length >= 2 && nearlyEqualPoint(pts[0], pts[pts.length - 1])) {
+	if (closed && pts.length >= 2 && vec2.nearlyEqual(pts[0], pts[pts.length - 1])) {
 		pts = pts.slice(0, -1);
 	}
 	if (pts.length < 2) return pts;
 
 	const out: Vec2[] = [];
 	for (const p of pts) {
-		if (out.length === 0 || !nearlyEqualPoint(out[out.length - 1], p)) out.push(p);
+		if (out.length === 0 || !vec2.nearlyEqual(out[out.length - 1], p)) out.push(p);
 	}
-	if (closed && out.length >= 2 && nearlyEqualPoint(out[0], out[out.length - 1])) out.pop();
+	if (closed && out.length >= 2 && vec2.nearlyEqual(out[0], out[out.length - 1])) out.pop();
 	return out;
 }
 
@@ -83,37 +35,37 @@ function buildStrokeMeshMiter(points: Vec2[], closed: boolean, lineWidth: number
 		let dirNext: Vec2;
 
 		if (closed) {
-			dirPrev = normalize(sub(getPoint(i), getPoint(i - 1)));
-			dirNext = normalize(sub(getPoint(i + 1), getPoint(i)));
+			dirPrev = vec2.normalize(vec2.sub(getPoint(i), getPoint(i - 1)));
+			dirNext = vec2.normalize(vec2.sub(getPoint(i + 1), getPoint(i)));
 		} else {
 			if (i === 0) {
-				dirPrev = normalize(sub(points[1], points[0]));
+				dirPrev = vec2.normalize(vec2.sub(points[1], points[0]));
 				dirNext = dirPrev;
 			} else if (i === n - 1) {
-				dirPrev = normalize(sub(points[n - 1], points[n - 2]));
+				dirPrev = vec2.normalize(vec2.sub(points[n - 1], points[n - 2]));
 				dirNext = dirPrev;
 			} else {
-				dirPrev = normalize(sub(points[i], points[i - 1]));
-				dirNext = normalize(sub(points[i + 1], points[i]));
+				dirPrev = vec2.normalize(vec2.sub(points[i], points[i - 1]));
+				dirNext = vec2.normalize(vec2.sub(points[i + 1], points[i]));
 			}
 		}
 
-		const nPrev = perp(dirPrev);
-		const nNext = perp(dirNext);
+		const nPrev = vec2.perp(dirPrev);
+		const nNext = vec2.perp(dirNext);
 
-		let offset = mul(nNext, halfW);
-		const miter = normalize(add(nPrev, nNext));
-		const denom = dot(miter, nNext);
+		let offset = vec2.mul(nNext, halfW);
+		const miter = vec2.normalize(vec2.add(nPrev, nNext));
+		const denom = vec2.dot(miter, nNext);
 		if (Math.abs(denom) > 1e-6) {
 			const miterLen = halfW / denom;
 			if (Number.isFinite(miterLen) && Math.abs(miterLen) <= miterLimit * halfW) {
-				offset = mul(miter, miterLen);
+				offset = vec2.mul(miter, miterLen);
 			}
 		}
 
 		const p = points[i];
-		const lpt = add(p, offset);
-		const rpt = sub(p, offset);
+		const lpt = vec2.add(p, offset);
+		const rpt = vec2.sub(p, offset);
 		leftRight.push(lpt[0], lpt[1], rpt[0], rpt[1]);
 	}
 
@@ -157,8 +109,8 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 	for (let i = 0; i < segCount; i++) {
 		const p0 = points[i];
 		const p1 = points[(i + 1) % n];
-		const d = sub(p1, p0);
-		const l = len(d);
+		const d = vec2.sub(p1, p0);
+		const l = vec2.len(d);
 		segDir.push(l < eps ? [1, 0] : ([d[0] / l, d[1] / l] as Vec2));
 	}
 
@@ -181,13 +133,13 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 		if (!closed) {
 			if (i === 0) {
 				const dir = segDir[0];
-				const nn = perp(dir);
-				return { left: add(p, mul(nn, halfW)), right: sub(p, mul(nn, halfW)) };
+				const nn = vec2.perp(dir);
+				return { left: vec2.add(p, vec2.mul(nn, halfW)), right: vec2.sub(p, vec2.mul(nn, halfW)) };
 			}
 			if (i === n - 1) {
 				const dir = segDir[segCount - 1];
-				const nn = perp(dir);
-				return { left: add(p, mul(nn, halfW)), right: sub(p, mul(nn, halfW)) };
+				const nn = vec2.perp(dir);
+				return { left: vec2.add(p, vec2.mul(nn, halfW)), right: vec2.sub(p, vec2.mul(nn, halfW)) };
 			}
 		}
 
@@ -195,26 +147,26 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 		const nextSeg = closed ? i % segCount : i;
 		const dirPrev = segDir[prevSeg];
 		const dirNext = segDir[nextSeg];
-		const nPrev = perp(dirPrev);
-		const nNext = perp(dirNext);
-		const turn = cross(dirPrev, dirNext);
+		const nPrev = vec2.perp(dirPrev);
+		const nNext = vec2.perp(dirNext);
+		const turn = vec2.cross(dirPrev, dirNext);
 
 		if (Math.abs(turn) < 1e-8) {
-			return { left: add(p, mul(nNext, halfW)), right: sub(p, mul(nNext, halfW)) };
+			return { left: vec2.add(p, vec2.mul(nNext, halfW)), right: vec2.sub(p, vec2.mul(nNext, halfW)) };
 		}
 
 		const outerIsLeft = turn > 0;
 		outerIsLeftAt[i] = outerIsLeft;
-		const outerPrev = outerIsLeft ? add(p, mul(nPrev, halfW)) : sub(p, mul(nPrev, halfW));
-		const outerNext = outerIsLeft ? add(p, mul(nNext, halfW)) : sub(p, mul(nNext, halfW));
+		const outerPrev = outerIsLeft ? vec2.add(p, vec2.mul(nPrev, halfW)) : vec2.sub(p, vec2.mul(nPrev, halfW));
+		const outerNext = outerIsLeft ? vec2.add(p, vec2.mul(nNext, halfW)) : vec2.sub(p, vec2.mul(nNext, halfW));
 
-		const innerPrev = outerIsLeft ? sub(p, mul(nPrev, halfW)) : add(p, mul(nPrev, halfW));
-		const innerNext = outerIsLeft ? sub(p, mul(nNext, halfW)) : add(p, mul(nNext, halfW));
-		let inner = intersectLines(innerPrev, dirPrev, innerNext, dirNext);
+		const innerPrev = outerIsLeft ? vec2.sub(p, vec2.mul(nPrev, halfW)) : vec2.add(p, vec2.mul(nPrev, halfW));
+		const innerNext = outerIsLeft ? vec2.sub(p, vec2.mul(nNext, halfW)) : vec2.add(p, vec2.mul(nNext, halfW));
+		let inner = vec2.intersectLines(innerPrev, dirPrev, innerNext, dirNext);
 		if (!inner) {
 			inner = innerNext;
 		} else {
-			const d = len(sub(inner, p));
+			const d = vec2.len(vec2.sub(inner, p));
 			if (!Number.isFinite(d) || d > miterLimit * halfW) inner = innerNext;
 		}
 
@@ -243,9 +195,9 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 		let sLeft: Vec2;
 		let sRight: Vec2;
 		if (!closed && s === 0) {
-			const nn = perp(segDir[0]);
-			sLeft = add(p0, mul(nn, halfW));
-			sRight = sub(p0, mul(nn, halfW));
+			const nn = vec2.perp(segDir[0]);
+			sLeft = vec2.add(p0, vec2.mul(nn, halfW));
+			sRight = vec2.sub(p0, vec2.mul(nn, halfW));
 		} else {
 			// for joins, computeJoinAtPoint returned outerNext on the outer side
 			sLeft = joinData[i0].left;
@@ -256,9 +208,9 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 		let eLeft: Vec2;
 		let eRight: Vec2;
 		if (!closed && s === segCount - 1) {
-			const nn = perp(segDir[segCount - 1]);
-			eLeft = add(p1, mul(nn, halfW));
-			eRight = sub(p1, mul(nn, halfW));
+			const nn = vec2.perp(segDir[segCount - 1]);
+			eLeft = vec2.add(p1, vec2.mul(nn, halfW));
+			eRight = vec2.sub(p1, vec2.mul(nn, halfW));
 		} else {
 			const jd = joinData[i1];
 			// jd.left/jd.right is for the outgoing segment; for the incoming segment we need to use outerPrev on outer side.
@@ -266,16 +218,16 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 			const nextSeg = closed ? i1 % segCount : i1;
 			const dirPrev = segDir[prevSeg];
 			const dirNext = segDir[nextSeg];
-			const nPrev = perp(dirPrev);
-			const nNext = perp(dirNext);
-			const turn = cross(dirPrev, dirNext);
+			const nPrev = vec2.perp(dirPrev);
+			const nNext = vec2.perp(dirNext);
+			const turn = vec2.cross(dirPrev, dirNext);
 			if (Math.abs(turn) < 1e-8) {
-				const nn = perp(segDir[s]);
-				eLeft = add(p1, mul(nn, halfW));
-				eRight = sub(p1, mul(nn, halfW));
+				const nn = vec2.perp(segDir[s]);
+				eLeft = vec2.add(p1, vec2.mul(nn, halfW));
+				eRight = vec2.sub(p1, vec2.mul(nn, halfW));
 			} else {
 				const outerIsLeft = turn > 0;
-				const outerPrev = outerIsLeft ? add(p1, mul(nPrev, halfW)) : sub(p1, mul(nPrev, halfW));
+				const outerPrev = outerIsLeft ? vec2.add(p1, vec2.mul(nPrev, halfW)) : vec2.sub(p1, vec2.mul(nPrev, halfW));
 				const inner = jd.inner as Vec2;
 				if (outerIsLeft) {
 					eLeft = outerPrev;
@@ -307,7 +259,7 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 		const p = points[i];
 		const dirPrev = segDir[prevSeg];
 		const dirNext = segDir[nextSeg];
-		const turn = cross(dirPrev, dirNext);
+		const turn = vec2.cross(dirPrev, dirNext);
 		if (Math.abs(turn) < 1e-8) continue;
 		const outerIsLeft = turn > 0;
 
@@ -323,8 +275,8 @@ function buildStrokeMeshBevelOrRound(points: Vec2[], closed: boolean, lineWidth:
 		}
 
 		// round
-		const v0 = sub([positionsArr[outerPrevIdx * 2], positionsArr[outerPrevIdx * 2 + 1]], p);
-		const v1 = sub([positionsArr[outerNextIdx * 2], positionsArr[outerNextIdx * 2 + 1]], p);
+		const v0 = vec2.sub([positionsArr[outerPrevIdx * 2], positionsArr[outerPrevIdx * 2 + 1]], p);
+		const v1 = vec2.sub([positionsArr[outerNextIdx * 2], positionsArr[outerNextIdx * 2 + 1]], p);
 		let a0 = Math.atan2(v0[1], v0[0]);
 		let a1 = Math.atan2(v1[1], v1[0]);
 		let delta = a1 - a0;
@@ -370,7 +322,7 @@ function buildFillMesh(points: Vec2[]) {
 
 	// earcut expects a flat array, without duplicate end point
 	let pts = points;
-	if (points.length >= 2 && nearlyEqualPoint(points[0], points[points.length - 1])) {
+	if (points.length >= 2 && vec2.nearlyEqual(points[0], points[points.length - 1])) {
 		pts = points.slice(0, -1);
 	}
 	if (pts.length < 3) return null;

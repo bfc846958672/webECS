@@ -3,48 +3,13 @@ import { Geometry, Mesh, Program, Camera } from '../../../webgl/index';
 import { Transform } from '../../../components/Transform';
 import { Curve } from '../../../components/render/Curve';
 import { clamp01, parseColorStyle } from '../../../utils/color';
-
-type Vec2 = [number, number];
-
-function sub(a: Vec2, b: Vec2): Vec2 {
-	return [a[0] - b[0], a[1] - b[1]];
-}
-
-function add(a: Vec2, b: Vec2): Vec2 {
-	return [a[0] + b[0], a[1] + b[1]];
-}
-
-function mul(a: Vec2, s: number): Vec2 {
-	return [a[0] * s, a[1] * s];
-}
-
-function len(a: Vec2): number {
-	return Math.hypot(a[0], a[1]);
-}
-
-function normalize(a: Vec2): Vec2 {
-	const l = len(a);
-	if (l < 1e-6) return [0, 0];
-	return [a[0] / l, a[1] / l];
-}
-
-function perp(a: Vec2): Vec2 {
-	return [-a[1], a[0]];
-}
-
-function dot(a: Vec2, b: Vec2): number {
-	return a[0] * b[0] + a[1] * b[1];
-}
-
-function nearlyEqualPoint(a: Vec2, b: Vec2): boolean {
-	return Math.abs(a[0] - b[0]) < 1e-6 && Math.abs(a[1] - b[1]) < 1e-6;
-}
+import { vec2, type Vec2 } from '../../../utils/vec2';
 
 function sanitizePoints(points: Vec2[]): Vec2[] {
 	if (points.length < 2) return points;
 	const out: Vec2[] = [];
 	for (const p of points) {
-		if (out.length === 0 || !nearlyEqualPoint(out[out.length - 1], p)) out.push(p);
+		if (out.length === 0 || !vec2.nearlyEqual(out[out.length - 1], p)) out.push(p);
 	}
 	return out;
 }
@@ -104,32 +69,32 @@ function buildStrokeMeshMiter(points: Vec2[], lineWidth: number) {
 		let dirNext: Vec2;
 
 		if (i === 0) {
-			dirPrev = normalize(sub(points[1], points[0]));
+			dirPrev = vec2.normalize(vec2.sub(points[1], points[0]));
 			dirNext = dirPrev;
 		} else if (i === n - 1) {
-			dirPrev = normalize(sub(points[n - 1], points[n - 2]));
+			dirPrev = vec2.normalize(vec2.sub(points[n - 1], points[n - 2]));
 			dirNext = dirPrev;
 		} else {
-			dirPrev = normalize(sub(points[i], points[i - 1]));
-			dirNext = normalize(sub(points[i + 1], points[i]));
+			dirPrev = vec2.normalize(vec2.sub(points[i], points[i - 1]));
+			dirNext = vec2.normalize(vec2.sub(points[i + 1], points[i]));
 		}
 
-		const nPrev = perp(dirPrev);
-		const nNext = perp(dirNext);
+		const nPrev = vec2.perp(dirPrev);
+		const nNext = vec2.perp(dirNext);
 
-		let offset = mul(nNext, halfW);
-		const miter = normalize(add(nPrev, nNext));
-		const denom = dot(miter, nNext);
+		let offset = vec2.mul(nNext, halfW);
+		const miter = vec2.normalize(vec2.add(nPrev, nNext));
+		const denom = vec2.dot(miter, nNext);
 		if (Math.abs(denom) > 1e-6) {
 			const miterLen = halfW / denom;
 			if (Number.isFinite(miterLen) && Math.abs(miterLen) <= miterLimit * halfW) {
-				offset = mul(miter, miterLen);
+				offset = vec2.mul(miter, miterLen);
 			}
 		}
 
 		const p = points[i];
-		const lpt = add(p, offset);
-		const rpt = sub(p, offset);
+		const lpt = vec2.add(p, offset);
+		const rpt = vec2.sub(p, offset);
 		leftRight.push(lpt[0], lpt[1], rpt[0], rpt[1]);
 	}
 

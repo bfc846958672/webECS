@@ -60,7 +60,25 @@
     ).event.on('click', (_ev, id) => {
       console.log('点击：开放折线(miter)', id);
     });
-
+    addPolyline(
+      { x: 120, y: 140 },
+      {
+        points: [
+          [0, 0],
+          [0, 40],
+          [44, 44],
+          [44, 0],
+        ],
+        closed: true,
+        strokeStyle: '#27ae60',
+        lineWidth: 16,
+        alpha: 1,
+        lineJoin: 'miter',
+      },
+      true
+    ).event.on('click', (_ev, id) => {
+      console.log('点击：开放折线(miter)', id);
+    });
     // 2) 开放折线：bevel（对比尖角处理）
     // addPolyline(
     //   { x: 120, y: 300 },
