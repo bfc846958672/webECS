@@ -41,7 +41,7 @@
 
     // 1) 开放折线：miter（默认）+ 细线
     addPolyline(
-      { x: 120, y: 140 },
+      { x: 420, y: 440 },
       {
         points: [
           [0, 0],
@@ -62,84 +62,84 @@
     });
 
     // 2) 开放折线：bevel（对比尖角处理）
-    addPolyline(
-      { x: 120, y: 300 },
-      {
-        points: [
-          [0, 60],
-          [80, 0],
-          [160, 60],
-          [240, 0],
-          [320, 60],
-        ],
-        closed: false,
-        strokeStyle: '#2980b9',
-        lineWidth: 14,
-        alpha: 0.9,
-        lineJoin: 'bevel',
-      }
-    );
+    // addPolyline(
+    //   { x: 120, y: 300 },
+    //   {
+    //     points: [
+    //       [0, 60],
+    //       [80, 0],
+    //       [160, 60],
+    //       [240, 0],
+    //       [320, 60],
+    //     ],
+    //     closed: false,
+    //     strokeStyle: '#2980b9',
+    //     lineWidth: 14,
+    //     alpha: 0.9,
+    //     lineJoin: 'bevel',
+    //   }
+    // );
 
-    // 3) 开放折线：round（圆角连接）
-    addPolyline(
-      { x: 120, y: 520 },
-      {
-        points: [
-          [0, 0],
-          [90, -70],
-          [180, 0],
-          [270, -70],
-          [360, 0],
-        ],
-        closed: false,
-        strokeStyle: '#27ae60',
-        lineWidth: 16,
-        alpha: 0.95,
-        lineJoin: 'round',
-      }
-    );
+    // // 3) 开放折线：round（圆角连接）
+    // addPolyline(
+    //   { x: 120, y: 520 },
+    //   {
+    //     points: [
+    //       [0, 0],
+    //       [90, -70],
+    //       [180, 0],
+    //       [270, -70],
+    //       [360, 0],
+    //     ],
+    //     closed: false,
+    //     strokeStyle: '#27ae60',
+    //     lineWidth: 16,
+    //     alpha: 0.95,
+    //     lineJoin: 'round',
+    //   }
+    // );
 
-    // 4) 闭合多边形：stroke + fill（半透明）
-    addPolyline(
-      { x: 640, y: 180 },
-      {
-        points: [
-          [0, 0],
-          [180, 0],
-          [220, 120],
-          [110, 190],
-          [-20, 120],
-        ],
-        closed: true,
-        strokeStyle: '#8e44ad',
-        fillStyle: 'rgba(142, 68, 173, 0.25)',
-        lineWidth: 6,
-        alpha: 1,
-        lineJoin: 'miter',
-      },
-      true
-    ).event.on('click', (_ev, id) => {
-      console.log('点击：闭合多边形(fill+stroke)', id);
-    });
+    // // 4) 闭合多边形：stroke + fill（半透明）
+    // addPolyline(
+    //   { x: 640, y: 180 },
+    //   {
+    //     points: [
+    //       [0, 0],
+    //       [180, 0],
+    //       [220, 120],
+    //       [110, 190],
+    //       [-20, 120],
+    //     ],
+    //     closed: true,
+    //     strokeStyle: '#8e44ad',
+    //     fillStyle: 'rgba(142, 68, 173, 0.25)',
+    //     lineWidth: 6,
+    //     alpha: 1,
+    //     lineJoin: 'miter',
+    //   },
+    //   true
+    // ).event.on('click', (_ev, id) => {
+    //   console.log('点击：闭合多边形(fill+stroke)', id);
+    // });
 
-    // 5) 闭合多边形：不写 fillStyle（会用 strokeStyle 自动填充）+ Transform 变换
-    addPolyline(
-      { x: 950, y: 210, rotation: Math.PI / 10, scaleX: 1.2, scaleY: 0.9, skewX: 0.35, skewY: 0 },
-      {
-        points: [
-          [0, 0],
-          [120, -30],
-          [220, 40],
-          [160, 150],
-          [40, 160],
-        ],
-        closed: true,
-        strokeStyle: '#f39c12',
-        lineWidth: 8,
-        alpha: 0.8,
-        lineJoin: 'round',
-      }
-    );
+    // // 5) 闭合多边形：不写 fillStyle（会用 strokeStyle 自动填充）+ Transform 变换
+    // addPolyline(
+    //   { x: 950, y: 210, rotation: Math.PI / 10, scaleX: 1.2, scaleY: 0.9, skewX: 0.35, skewY: 0 },
+    //   {
+    //     points: [
+    //       [0, 0],
+    //       [120, -30],
+    //       [220, 40],
+    //       [160, 150],
+    //       [40, 160],
+    //     ],
+    //     closed: true,
+    //     strokeStyle: '#f39c12',
+    //     lineWidth: 8,
+    //     alpha: 0.8,
+    //     lineJoin: 'round',
+    //   }
+    // );
 
     // // 6) 动态折线：点列随时间变化（波形）+ 线宽呼吸
     // {

@@ -2,42 +2,7 @@ import earcut from 'earcut';
 import { Geometry, Program, Mesh, Camera } from '../../../webgl/index';
 import { Transform } from '../../../components/Transform';
 import { Polyline } from '../../../components/render/Polyline';
-
-function clamp01(v: number): number {
-	return Math.max(0, Math.min(1, v));
-}
-
-function parseColorStyle(style: string | number[] | undefined): [number, number, number, number] {
-	if (!style) return [1, 1, 1, 1];
-	if (Array.isArray(style)) {
-		const [r = 1, g = 1, b = 1, a = 1] = style;
-		return [clamp01(r), clamp01(g), clamp01(b), clamp01(a)];
-	}
-
-	if (typeof style !== 'string') return [1, 1, 1, 1];
-	const s = style.trim();
-
-	if (s.startsWith('#')) {
-		const hex = s.slice(1);
-		if (hex.length === 6 || hex.length === 8) {
-			const r = parseInt(hex.slice(0, 2), 16) / 255;
-			const g = parseInt(hex.slice(2, 4), 16) / 255;
-			const b = parseInt(hex.slice(4, 6), 16) / 255;
-			const a = hex.length === 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1;
-			return [r, g, b, a];
-		}
-	}
-
-	const m = s.match(/^rgba\s*\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\)\s*$/i);
-	if (m) {
-		const r = clamp01(Number(m[1]) / 255);
-		const g = clamp01(Number(m[2]) / 255);
-		const b = clamp01(Number(m[3]) / 255);
-		const a = clamp01(Number(m[4]));
-		return [r, g, b, a];
-	}
-	return [1, 1, 1, 1];
-}
+import { parseColorStyle } from '../../../utils/color';
 
 type Vec2 = [number, number];
 

@@ -1,46 +1,7 @@
 import { Geometry, Program, Mesh, Camera } from '../../../webgl/index';
 import { Circle } from '../../../components/render/Circle';
 import { Transform } from '../../../components/Transform';
-
-function clamp01(v: number): number {
-    return Math.max(0, Math.min(1, v));
-}
-
-function parseColorStyle(style: string | number[]): [number, number, number, number] {
-    // 支持：
-    // - [r,g,b,a] (0..1)
-    // - "#RRGGBB" / "#RRGGBBAA"
-    // - "rgba(r,g,b,a)" 其中 r/g/b 0..255, a 0..1
-    if (Array.isArray(style)) {
-        const [r = 1, g = 1, b = 1, a = 1] = style;
-        return [clamp01(r), clamp01(g), clamp01(b), clamp01(a)];
-    }
-
-    if (typeof style !== 'string') return [1, 1, 1, 1];
-    const s = style.trim();
-
-    if (s.startsWith('#')) {
-        const hex = s.slice(1);
-        if (hex.length === 6 || hex.length === 8) {
-            const r = parseInt(hex.slice(0, 2), 16) / 255;
-            const g = parseInt(hex.slice(2, 4), 16) / 255;
-            const b = parseInt(hex.slice(4, 6), 16) / 255;
-            const a = hex.length === 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1;
-            return [r, g, b, a];
-        }
-    }
-
-    const m = s.match(/^rgba\s*\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\)\s*$/i);
-    if (m) {
-        const r = clamp01(Number(m[1]) / 255);
-        const g = clamp01(Number(m[2]) / 255);
-        const b = clamp01(Number(m[3]) / 255);
-        const a = clamp01(Number(m[4]));
-        return [r, g, b, a];
-    }
-
-    return [1, 1, 1, 1];
-}
+import { parseColorStyle } from '../../../utils/color';
 
 // 单个 Circle/椭圆/圆弧（扇形裁剪）渲染。
 // 约定：Transform.worldMatrix 为 3x3 仿射矩阵（包含平移/缩放/旋转/斜切）。

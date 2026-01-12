@@ -1,12 +1,9 @@
 import { Geometry, Mesh, Program, Camera, Texture } from '../../../webgl/index';
 import { Transform } from '../../../components/Transform';
 import { Image } from '../../../components/render/Image';
+import { clamp01 } from '../../../utils/color';
 
 const textureCache = new WeakMap<ImageBitmap, Texture>();
-
-function clamp01(v: number): number {
-	return Math.max(0, Math.min(1, v));
-}
 
 function getOrCreateTexture(gl: WebGL2RenderingContext, bitmap: ImageBitmap): Texture {
 	const cached = textureCache.get(bitmap);
