@@ -48,17 +48,17 @@
           [120, 40],
           [220, -20],
           [320, 60],
-          [420, 0],
+          [290, -20],
         ],
         closed: false,
         strokeStyle: '#27ae60',
         lineWidth: 16,
         alpha: 1,
-        lineJoin: 'miter',
+        lineJoin: 'bevel',
       },
       true
     ).event.on('click', (_ev, id) => {
-      console.log('点击：开放折线(miter)', id);
+      console.log('点击：开放折线(bevel)', id);
     });
     addPolyline(
       { x: 120, y: 140 },
@@ -67,13 +67,12 @@
           [0, 0],
           [0, 40],
           [44, 44],
-          [44, 0],
         ],
         closed: true,
         strokeStyle: '#27ae60',
         lineWidth: 16,
         alpha: 1,
-        lineJoin: 'miter',
+        lineJoin: 'bevel',
       },
       true
     ).event.on('click', (_ev, id) => {
