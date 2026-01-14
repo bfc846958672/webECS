@@ -35,21 +35,22 @@ export function renderPolylineStroke(
 ) {
 	if (lineWidth <= 0) return;
 	if (points.length < 2) return;
-
+	// debugger;
 	const pts = sanitizeStrokePoints(points, closed);
 	if (pts.length < 2) return;
 
-	if (lineJoin === 'default') {
+	if (pts.length == 2 || lineJoin === 'default') {
 		buildStrokeMeshDefault(gl, camera, aWorldMatrix, pts, strokeColor, alpha, lineWidth, closed);
-		return;
 	}
-	if (lineJoin === 'miter') {
+	else if (lineJoin === 'miter') {
 		buildStrokeMeshMiter(gl, camera, aWorldMatrix, pts, strokeColor, alpha, lineWidth, closed);
-		return;
 	}
-	if (lineJoin === 'bevel') {
+	else if (lineJoin === 'bevel') {
+		// buildStrokeMeshDefault(gl, camera, aWorldMatrix, pts, strokeColor, alpha, lineWidth, closed);
+
 		buildStrokeMeshBevel(gl, camera, aWorldMatrix, pts, strokeColor, alpha, lineWidth, closed);
-		return;
 	}
-	buildStrokeMeshRound(gl, camera, aWorldMatrix, pts, strokeColor, alpha, lineWidth, closed);
+	else if (lineJoin === 'round') {
+		buildStrokeMeshRound(gl, camera, aWorldMatrix, pts, strokeColor, alpha, lineWidth, closed);
+	}
 }

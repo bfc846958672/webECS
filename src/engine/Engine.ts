@@ -29,6 +29,7 @@ export class Engine implements IEngine {
                 height: canvas.height, webgl: 2, 
                 dpr: window.devicePixelRatio || 1,
                 alpha: false, depth: false,
+                antialias: true,
                 premultipliedAlpha: false,
             })
         };
