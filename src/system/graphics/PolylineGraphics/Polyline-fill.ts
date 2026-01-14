@@ -3,6 +3,60 @@ import { Geometry, Mesh, Program, Camera } from '../../../webgl/index';
 import type { RGBA } from '../../../utils/color';
 import { vec2, type Vec2 } from '../../../utils/vec2';
 
+let polylineFillProgram: Program | null = null;
+
+function getOrCreatePolylineFillProgram(gl: WebGL2RenderingContext): Program {
+	if (polylineFillProgram) return polylineFillProgram;
+
+	const vertex = `#version 300 es
+		precision highp float;
+
+		in vec2 position;
+		in mat3 aWorldMatrix;
+		in vec4 aColor;
+
+		uniform mat4 projectionMatrix;
+		uniform mat4 viewMatrix;
+
+		out vec4 vColor;
+
+		void main() {
+			vColor = aColor;
+
+			mat4 worldMatrix4 = mat4(
+				vec4(aWorldMatrix[0][0], aWorldMatrix[0][1], 0.0, 0.0),
+				vec4(aWorldMatrix[1][0], aWorldMatrix[1][1], 0.0, 0.0),
+				vec4(0.0, 0.0, 1.0, 0.0),
+				vec4(aWorldMatrix[2][0], aWorldMatrix[2][1], 0.0, 1.0)
+			);
+
+			gl_Position = projectionMatrix * viewMatrix * worldMatrix4 * vec4(position, 0.0, 1.0);
+		}
+	`;
+
+	const fragment = `#version 300 es
+		precision highp float;
+
+		in vec4 vColor;
+		out vec4 fragColor;
+
+		void main() {
+			fragColor = vColor;
+		}
+	`;
+
+	polylineFillProgram = new Program(gl, {
+		vertex,
+		fragment,
+		transparent: true,
+		cullFace: gl.NONE,
+		depthTest: false,
+		depthWrite: false,
+	});
+
+	return polylineFillProgram;
+}
+
 function buildFillMesh(points: Vec2[]) {
 	if (points.length < 3) return null;
 
@@ -31,7 +85,6 @@ function buildFillMesh(points: Vec2[]) {
 export function renderPolylineFill(
 	gl: WebGL2RenderingContext,
 	camera: Camera,
-	program: Program,
 	aWorldMatrix: Float32Array,
 	points: Vec2[],
 	fillColor: RGBA,
@@ -43,6 +96,7 @@ export function renderPolylineFill(
 	if (!fillMesh) return;
 
 	const aColor = new Float32Array([fillColor[0], fillColor[1], fillColor[2], fillColor[3] * alpha]);
+	const program = getOrCreatePolylineFillProgram(gl);
 	const geometry = new Geometry(gl, {
 		position: { data: fillMesh.positions, size: 2, usage: gl.DYNAMIC_DRAW },
 		aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
