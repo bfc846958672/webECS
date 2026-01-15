@@ -53,7 +53,7 @@
         strokeStyle: '#27ae60',
         lineWidth: 16,
         alpha: 1,
-        lineJoin: 'round',
+        lineJoin: 'miter',
       },
       true
     ).event.on('click', (_ev, id) => {
@@ -66,12 +66,13 @@
           [0, 0],
           [0, 100],
           [100, 100],
+          [50, 80],
         ],
         closed: true,
         strokeStyle: '#27ae60',
-        lineWidth: 16,
+        lineWidth: 10,
         alpha: 1,
-        lineJoin: 'round',
+        lineJoin: 'miter',
       },
       true
     ).event.on('click', (_ev, id) => {
