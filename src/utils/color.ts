@@ -28,6 +28,18 @@ function parseColorStyleImpl(style: unknown, defaultColor: RGBA, arrayDefault: R
 
 	if (s.startsWith('#')) {
 		const hex = s.slice(1);
+		if (hex.length === 3 || hex.length === 4) {
+			// #rgb or #rgba
+			const rHex = hex[0] + hex[0];
+			const gHex = hex[1] + hex[1];
+			const bHex = hex[2] + hex[2];
+			const aHex = hex.length === 4 ? hex[3] + hex[3] : 'ff';
+			const r = parseInt(rHex, 16) / 255;
+			const g = parseInt(gHex, 16) / 255;
+			const b = parseInt(bHex, 16) / 255;
+			const a = parseInt(aHex, 16) / 255;
+			return [clamp01(r), clamp01(g), clamp01(b), clamp01(a)];
+		}
 		if (hex.length === 6 || hex.length === 8) {
 			const r = parseInt(hex.slice(0, 2), 16) / 255;
 			const g = parseInt(hex.slice(2, 4), 16) / 255;

@@ -18,7 +18,6 @@ export function renderPolyline(gl: WebGL2RenderingContext, camera: Camera, trans
 	const lineWidth = Math.max(0, Number(polyline.lineWidth || 0));
 
 	const aWorldMatrix = new Float32Array(transform.worldMatrix);
-
 	// Fill: only when fillStyle is explicitly set (not null/undefined)
 	if (fill && pts.length >= 3) {
 		renderPolylineFill(gl, camera, aWorldMatrix, pts, fill, alpha);
