@@ -38,7 +38,9 @@ export const vec2 = {
 	nearlyEqual(a: Vec2, b: Vec2, eps = 1e-6): boolean {
 		return Math.abs(a[0] - b[0]) < eps && Math.abs(a[1] - b[1]) < eps;
 	},
-
+	length(v: Vec2): number {
+		return Math.hypot(v[0], v[1]);
+	},
 	/** Intersect infinite lines: p + t*r and q + u*s */
 	intersectLines(p: Vec2, r: Vec2, q: Vec2, s: Vec2): Vec2 | null {
 		const denom = vec2.cross(r, s);
@@ -47,5 +49,11 @@ export const vec2 = {
 		const t = vec2.cross(qp, s) / denom;
 		if (!Number.isFinite(t)) return null;
 		return vec2.add(p, vec2.mul(r, t));
+	},
+	rightNormal(v: Vec2): Vec2 {
+		return [v[1], -v[0]];
+	},
+	leftNormal(v: Vec2): Vec2 {
+		return [-v[1], v[0]];
 	},
 };
