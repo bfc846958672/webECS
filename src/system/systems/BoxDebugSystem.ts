@@ -3,7 +3,7 @@ import { SceneTree } from "../../scene/SceneTree.ts";
 import { IProcess } from "../../interface/System.ts";
 import { Engine } from "../../engine/Engine.ts";
 import { IShareContext } from "../../interface/System.ts";
-import { BoundingBoxComponent } from "../../main.ts";
+import { BoundingBoxComponent } from "../../components/BoundingBoxComponent.ts";
 import { IAABB } from "../../interface/AABB.ts";
 import { Geometry, Mesh, Program } from "../../webgl/index.ts";
 import { parseColorStyle } from "../../utils/color.ts";

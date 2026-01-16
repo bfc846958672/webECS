@@ -15,9 +15,7 @@
   },
   "scripts": {
     "html": "vite",
-    "build:vite": "vite build",
-    "build": "npm run build:vite",
-    "test": "vitest ",
+    "build": "vite build",
     "dev": "tsc --noEmit --watch"
   },
   "devDependencies": {
@@ -26,6 +24,7 @@
     "typescript": "~5.9.3",
     "vite": "^7.1.7",
     "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-static-copy": "^3.1.4",
     "vitest": "^4.0.6"
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-import { Engine, Components, loadImageBitmap, Polyline } from './dist/web-ecs.es.js';
+import { Engine, Components, loadImageBitmap, Polyline } from '../src/main.ts';
 const { Transform, Rect, Circle, EventComponent, Image, Curve, Path } = Components;
 const canvas = document.getElementById("game-canvas");
 export { Transform }
