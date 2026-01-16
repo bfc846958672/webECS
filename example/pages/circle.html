@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Circle</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+
+<body>
+  <canvas id="game-canvas" width="1200" height="800"></canvas>
+
+  <script type="module">
+    import { Engine, Components } from '../dist/web-ecs.es.js';
+
+    const canvas = document.getElementById('game-canvas');
+    const engine = new Engine(canvas);
+
+    // 1) 标准圆
+    {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Circle(engine, {
+        radius: 70,
+        fillStyle: '#2ecc71',
+        strokeStyle: '#145a32',
+        lineWidth: 6,
+      }));
+      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 180, y: 180 }));
+      engine.add(e);
+    }
+
+    // 2) 椭圆
+    {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Circle(engine, {
+        radius: 110,
+        radiusY: 55,
+        fillStyle: '#3498db',
+        strokeStyle: '#1b4f72',
+        lineWidth: 4,
+      }));
+      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 560, y: 180 }));
+      engine.add(e);
+    }
+
+    // 3) 圆弧
+    {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Circle(engine, {
+        radius: 90,
+        fillStyle: 'rgba(231, 76, 60, 0.85)',
+        strokeStyle: '#922b21',
+        lineWidth: 3,
+        startAngle: 0,
+        endAngle: Math.PI * 1.5,
+        clockwise: true,
+      }));
+      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 920, y: 180 }));
+      engine.add(e);
+    }
+
+    engine.start();
+  </script>
+</body>
+
+</html>

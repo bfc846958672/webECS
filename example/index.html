@@ -1,513 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin: 10px 0;
-            padding: 0 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        /* 左侧菜单样式 */
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-        
-        .menu {
-            list-style-type: none;
-        }
-        
-        .menu-item {
-            padding: 15px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #34495e;
-            transition: background-color 0.3s;
-        }
-        
-        .menu-item:hover {
-            background-color: #34495e;
-        }
-        
-        .menu-item.active {
-            background-color: #3498db;
-        }
-        
-        .menu-item.parent {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .menu-item.parent::after {
-            content: '▼';
-            font-size: 10px;
-            transition: transform 0.3s;
-        }
-        
-        .menu-item.parent.expanded::after {
-            transform: rotate(180deg);
-        }
-        
-        .submenu {
-            list-style-type: none;
-            background-color: #34495e;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        
-        .submenu.open {
-            max-height: 500px;
-            transition: max-height 0.5s ease-in;
-        }
-        
-        .submenu-item {
-            padding: 12px 20px 12px 40px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-        }
-        
-        .submenu-item:hover {
-            background-color: #3498db;
-        }
-        
-        .submenu-item.active {
-            background-color: #2980b9;
-            font-weight: bold;
-        }
-        
-        /* 右侧内容区域 */
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .example-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .example-header {
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .example-description {
-            padding: 10px 20px;
-            background-color: #f8f9fa;
-            font-size: 14px;
-            color: #666;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .example-iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-        }
-        
-        .open-new-tab {
-            padding: 5px 10px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background-color 0.3s;
-        }
-        
-        .open-new-tab:hover {
-            background-color: #27ae60;
-        }
-        
-        /* 初始隐藏所有示例 */
-        .example-content {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .example-content.active {
-            display: flex;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>webECS Examples</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; height: 100vh; display: flex; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .sidebar { width: 260px; border-right: 1px solid #e5e7eb; padding: 12px; overflow: auto; }
+    .title { font-weight: 700; margin: 4px 0 12px; }
+    .menu { list-style: none; padding: 0; margin: 0; }
+    .menu button {
+      width: 100%; text-align: left; padding: 10px 12px; margin: 4px 0;
+      border: 1px solid #e5e7eb; background: #fff; border-radius: 8px; cursor: pointer;
+    }
+    .menu button.active { border-color: #2563eb; }
+    .content { flex: 1; display: flex; flex-direction: column; }
+    .topbar { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #374151; }
+    iframe { flex: 1; width: 100%; border: 0; }
+  </style>
 </head>
+
 <body>
-    
-    
-    <div class="container">
-        <!-- 左侧菜单 -->
-        <div class="sidebar">
-            <ul class="menu">
-                <li class="menu-item parent active" onclick="toggleSubmenu(this)">
-                    图形实例
-                </li>
-                <ul class="submenu open" id="graphics-submenu">
-                    <li class="submenu-item active" onclick="showExample('rect')">rect 矩形实例</li>
-                    <li class="submenu-item" onclick="showExample('circle')">circle 圆形实例</li>
-                    <li class="submenu-item" onclick="showExample('image-graphics')">image 图片实例</li>
-                    <li class="submenu-item" onclick="showExample('curve-graphics')">curve 曲线实例</li>
-                    <li class="submenu-item" onclick="showExample('polyline-graphics')">polyline 折线实例</li>
-                    <li class="submenu-item" onclick="showExample('text-graphics')">text 文本实例</li>
-                </ul>
-                
-                <li class="menu-item parent" onclick="toggleSubmenu(this)">
-                    渲染示例
-                </li>
-                <ul class="submenu" id="rendering-submenu">
-                    <li class="submenu-item" onclick="showExample('Image')">图片渲染测试</li>
-                    <li class="submenu-item" onclick="showExample('curve')">曲线渲染测试</li>
-                    <li class="submenu-item" onclick="showExample('path')">路径渲染测试</li>
-                    <li class="submenu-item" onclick="showExample('polyline')">折线渲染测试</li>
-                </ul>
-                
-                <li class="menu-item parent" onclick="toggleSubmenu(this)">
-                    交互示例
-                </li>
-                <ul class="submenu" id="interaction-submenu">
-                    <li class="submenu-item" onclick="showExample('event-test')">事件测试</li>
-                    <li class="submenu-item" onclick="showExample('event')">事件处理</li>
-                </ul>
-                
-                <li class="menu-item parent" onclick="toggleSubmenu(this)">
-                    结构示例
-                </li>
-                <ul class="submenu" id="structure-submenu">
-                    <li class="submenu-item" onclick="showExample('bbox')">包围盒测试</li>
-                    <li class="submenu-item" onclick="showExample('tree-box')">树形结构测试</li>
-                </ul>
-                
-                <li class="menu-item parent" onclick="toggleSubmenu(this)">
-                    高级示例
-                </li>
-                <ul class="submenu" id="advanced-submenu">
-                    <li class="submenu-item" onclick="showExample('dynamic-node')">动态节点</li>
-                    <li class="submenu-item" onclick="showExample('loop-add')">循环添加</li>
-                    <li class="submenu-item" onclick="showExample('rotation')">旋转测试</li>
-                    <li class="submenu-item" onclick="showExample('timout')">超时测试</li>
-                    <li class="submenu-item" onclick="showExample('start')">启动测试</li>
-                </ul>
-            </ul>
-        </div>
-        
-        <!-- 右侧内容区域 -->
-        <div class="content">
-            <!-- 图片渲染测试 -->
-            <div id="Image" class="example-content">
-                <div class="example-header">
-                    图片渲染测试
-                    <button class="open-new-tab" onclick="openInNewTab('Image.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示图片渲染，包括原图、裁剪和旋转效果</div>
-                <iframe src="Image.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 曲线渲染测试 -->
-            <div id="curve" class="example-content">
-                <div class="example-header">
-                    曲线渲染测试
-                    <button class="open-new-tab" onclick="openInNewTab('curve.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示二次和三次贝塞尔曲线的渲染</div>
-                <iframe src="curve.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 路径渲染测试 -->
-            <div id="path" class="example-content">
-                <div class="example-header">
-                    路径渲染测试
-                    <button class="open-new-tab" onclick="openInNewTab('path.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示各种路径命令，包括移动、线条、曲线和弧线</div>
-                <iframe src="path.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 折线渲染测试 -->
-            <div id="polyline" class="example-content">
-                <div class="example-header">
-                    折线渲染测试
-                    <button class="open-new-tab" onclick="openInNewTab('polyline.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示开放和闭合折线的渲染</div>
-                <iframe src="polyline.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 事件测试 -->
-            <div id="event-test" class="example-content">
-                <div class="example-header">
-                    事件测试
-                    <button class="open-new-tab" onclick="openInNewTab('event-test.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示点击事件和事件冒泡</div>
-                <iframe src="event-test.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 事件处理 -->
-            <div id="event" class="example-content">
-                <div class="example-header">
-                    事件处理
-                    <button class="open-new-tab" onclick="openInNewTab('event.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示基本的事件处理机制</div>
-                <iframe src="event.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 包围盒测试 -->
-            <div id="bbox" class="example-content">
-                <div class="example-header">
-                    包围盒测试
-                    <button class="open-new-tab" onclick="openInNewTab('bbox.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示实体包围盒的计算和渲染</div>
-                <iframe src="bbox.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 树形结构测试 -->
-            <div id="tree-box" class="example-content">
-                <div class="example-header">
-                    树形结构测试
-                    <button class="open-new-tab" onclick="openInNewTab('tree-box.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示实体之间的父子关系和树形结构</div>
-                <iframe src="tree-box.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 动态节点 -->
-            <div id="dynamic-node" class="example-content">
-                <div class="example-header">
-                    动态节点
-                    <button class="open-new-tab" onclick="openInNewTab('dynamic_node.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示动态添加节点的功能</div>
-                <iframe src="dynamic_node.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 循环添加 -->
-            <div id="loop-add" class="example-content">
-                <div class="example-header">
-                    循环添加
-                    <button class="open-new-tab" onclick="openInNewTab('loop-add.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示循环动态添加节点的效果</div>
-                <iframe src="loop-add.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 旋转测试 -->
-            <div id="rotation" class="example-content">
-                <div class="example-header">
-                    旋转测试
-                    <button class="open-new-tab" onclick="openInNewTab('rotation.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示节点的旋转和动态更新</div>
-                <iframe src="rotation.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 超时测试 -->
-            <div id="timout" class="example-content">
-                <div class="example-header">
-                    超时测试
-                    <button class="open-new-tab" onclick="openInNewTab('timout.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示定时器和延迟执行</div>
-                <iframe src="timout.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- 启动测试 -->
-            <div id="start" class="example-content">
-                <div class="example-header">
-                    启动测试
-                    <button class="open-new-tab" onclick="openInNewTab('start.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示引擎启动和动画效果</div>
-                <iframe src="start.html" class="example-iframe"></iframe>
-            </div>
-            
-            <!-- rect 矩形实例 -->
-            <div id="rect" class="example-content active">
-                <div class="example-header">
-                    rect 矩形实例
-                    <button class="open-new-tab" onclick="openInNewTab('graphics/rect.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示矩形的绘制和基本属性设置</div>
-                <iframe src="graphics/rect.html" data-src="graphics/rect.html" class="example-iframe"></iframe>
-            </div>
+  <aside class="sidebar">
+    <div class="title">webECS 示例</div>
+    <ul class="menu" id="menu"></ul>
+  </aside>
 
-            <!-- circle 圆形实例 -->
-            <div id="circle" class="example-content">
-                <div class="example-header">
-                    circle 圆形实例
-                    <button class="open-new-tab" onclick="openInNewTab('graphics/circle.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示圆形/椭圆/圆弧，以及 Transform（旋转/缩放/斜切）效果</div>
-                <iframe src="graphics/circle.html" data-src="graphics/circle.html" class="example-iframe"></iframe>
-            </div>
+  <main class="content">
+    <div class="topbar" id="current"></div>
+    <iframe id="frame" title="example"></iframe>
+  </main>
 
-            <!-- image 图片实例 -->
-            <div id="image-graphics" class="example-content">
-                <div class="example-header">
-                    image 图片实例
-                    <button class="open-new-tab" onclick="openInNewTab('graphics/image.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示图片的原图/裁剪、Transform（旋转+pivot）、动态裁剪</div>
-                <iframe src="graphics/image.html" data-src="graphics/image.html" class="example-iframe"></iframe>
-            </div>
+  <script>
+    const pages = [
+      { key: 'circle', label: 'Circle（圆 / 椭圆 / 圆弧）', src: './pages/circle.html' },
+      { key: 'rect', label: 'Rect（矩形）', src: './pages/rect.html' },
+      { key: 'line', label: 'Line（线段）', src: './pages/line.html' },
+      { key: 'point', label: 'Point（点）', src: './pages/point.html' },
+      { key: 'polyline', label: 'Polyline（折线/多边形）', src: './pages/polyline.html' },
+      { key: 'curve', label: 'Curve（贝塞尔曲线）', src: './pages/curve.html' },
+      { key: 'image', label: 'Image（图片）', src: './pages/image.html' },
+      { key: 'text', label: 'Text（MSDF 文本）', src: './pages/text.html' },
+    ];
 
-            <!-- curve 曲线实例 -->
-            <div id="curve-graphics" class="example-content">
-                <div class="example-header">
-                    curve 曲线实例
-                    <button class="open-new-tab" onclick="openInNewTab('graphics/curve.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示二次/三次贝塞尔曲线的 fill + stroke、Transform 与动态曲线</div>
-                <iframe src="graphics/curve.html" data-src="graphics/curve.html" class="example-iframe"></iframe>
-            </div>
+    const menu = document.getElementById('menu');
+    const frame = document.getElementById('frame');
+    const current = document.getElementById('current');
 
-            <!-- polyline 折线实例 -->
-            <div id="polyline-graphics" class="example-content">
-                <div class="example-header">
-                    polyline 折线实例
-                    <button class="open-new-tab" onclick="openInNewTab('graphics/polyline.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示开放/闭合 polyline、不同 lineJoin、填充与 Transform、动态折线</div>
-                <iframe src="graphics/polyline.html" data-src="graphics/polyline.html" class="example-iframe"></iframe>
-            </div>
+    function setActive(key) {
+      const page = pages.find(p => p.key === key) || pages[0];
+      frame.src = page.src;
+      current.textContent = page.label;
+      for (const btn of menu.querySelectorAll('button')) {
+        btn.classList.toggle('active', btn.dataset.key === page.key);
+      }
+      history.replaceState(null, '', `#${page.key}`);
+    }
 
-            <!-- text 文本实例 -->
-            <div id="text-graphics" class="example-content">
-                <div class="example-header">
-                    text 文本实例
-                    <button class="open-new-tab" onclick="openInNewTab('graphics/text.html')">在新标签页打开</button>
-                </div>
-                <div class="example-description">展示 MSDF 文本渲染、对齐/基线、Transform 与点击事件</div>
-                <iframe src="graphics/text.html" data-src="graphics/text.html" class="example-iframe"></iframe>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        // 切换子菜单展开/折叠
-        function toggleSubmenu(item) {
-            item.classList.toggle('expanded');
-            const submenu = item.nextElementSibling;
-            if (submenu && submenu.classList.contains('submenu')) {
-                submenu.classList.toggle('open');
-            }
-        }
-        
-        // 显示示例（懒加载 iframe）
-        function showExample(exampleId) {
-            // 隐藏所有示例并清空其它 iframe 的 src
-            const allExamples = document.querySelectorAll('.example-content');
-            allExamples.forEach(example => {
-                if (example.id !== exampleId) {
-                    const otherIframe = example.querySelector('.example-iframe');
-                    if (otherIframe) otherIframe.removeAttribute('src');
-                }
-                example.classList.remove('active');
-            });
+    for (const p of pages) {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.textContent = p.label;
+      btn.dataset.key = p.key;
+      btn.addEventListener('click', () => setActive(p.key));
+      li.appendChild(btn);
+      menu.appendChild(li);
+    }
 
-            // 移除所有菜单项的活动状态
-            const allMenuItems = document.querySelectorAll('.menu-item, .submenu-item');
-            allMenuItems.forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // 显示选中的示例，并在首次点击时设置 iframe 的 src
-            const selectedExample = document.getElementById(exampleId);
-            if (selectedExample) {
-                selectedExample.classList.add('active');
-                const iframe = selectedExample.querySelector('.example-iframe');
-                if (iframe) {
-                    const currentSrc = iframe.getAttribute('src');
-                    const dataSrc = iframe.getAttribute('data-src') || iframe.getAttribute('src');
-                    if (!currentSrc && dataSrc) {
-                        iframe.setAttribute('src', dataSrc);
-                    }
-                }
-            }
-
-            // 设置对应的子菜单项为活动状态
-            const submenuItems = document.querySelectorAll('.submenu-item');
-            submenuItems.forEach(item => {
-                if (item.getAttribute('onclick') === "showExample('" + exampleId + "')") {
-                    item.classList.add('active');
-
-                    // 设置父菜单项为活动状态
-                    const parentMenuItem = item.closest('.submenu').previousElementSibling;
-                    if (parentMenuItem && parentMenuItem.classList.contains('menu-item')) {
-                        parentMenuItem.classList.add('active');
-                        // 确保父菜单已展开
-                        if (!parentMenuItem.classList.contains('expanded')) {
-                            toggleSubmenu(parentMenuItem);
-                        }
-                    }
-                }
-            });
-        }
-
-        // 页面加载后，转换所有 iframe 的 src 为 data-src，并移除默认激活项
-        document.addEventListener('DOMContentLoaded', () => {
-            const iframes = document.querySelectorAll('.example-iframe');
-            iframes.forEach(iframe => {
-                const src = iframe.getAttribute('src');
-                if (src) {
-                    iframe.setAttribute('data-src', src);
-                    iframe.removeAttribute('src');
-                }
-            });
-            document.querySelectorAll('.example-content.active').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.submenu-item.active').forEach(el => el.classList.remove('active'));
-        });
-        
-        // 在新标签页打开
-        function openInNewTab(url) {
-            window.open(url, '_blank');
-        }
-    </script>
+    const initial = (location.hash || '').slice(1);
+    setActive(initial);
+  </script>
 </body>
+
 </html>

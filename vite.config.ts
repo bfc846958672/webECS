@@ -23,11 +23,11 @@ export default defineConfig({
     // 2) dist/** -> example/dist
     // dest is relative to build.outDir (dist), so "../example/dist" writes to example/dist
     viteStaticCopy({
-      targets: [{ src: 'dist/**', dest: '../example/dist' }],
+      targets: [{ src: 'dist', dest: '../example' }],
     }),
   ],
   server: {
-    open: '/example/graphics/polyline.html',
+    open: '/example/index.html',
     fs: {
       strict: false // 允许访问整个/example目录和test目录
     }

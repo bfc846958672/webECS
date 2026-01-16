@@ -11,3 +11,5 @@ export { Components }; // 作为命名空间导出所有组件
 export { Engine };
 
 export { loadImageBitmap } from './utils/fetchImage.ts';
+
+export { Font } from './utils/font.ts';

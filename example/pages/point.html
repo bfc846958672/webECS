@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Point</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+
+<body>
+  <canvas id="game-canvas" width="1200" height="800"></canvas>
+
+  <script type="module">
+    import { Engine, Components } from '../dist/web-ecs.es.js';
+
+    const canvas = document.getElementById('game-canvas');
+    const engine = new Engine(canvas);
+
+    // 三个点实体
+    const points = [
+      { x: 200, y: 180, size: 10, fillStyle: '#ef4444' },
+      { x: 520, y: 300, size: 16, fillStyle: '#22c55e' },
+      { x: 860, y: 220, size: 12, fillStyle: '#3b82f6' },
+    ];
+
+    for (const p of points) {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Point(engine, {
+        size: p.size,
+        fillStyle: p.fillStyle,
+      }));
+      engine.ecs.addComponent(e, new Components.Transform(engine, { x: p.x, y: p.y }));
+      engine.add(e);
+    }
+
+    engine.start();
+  </script>
+</body>
+
+</html>
