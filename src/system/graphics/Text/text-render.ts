@@ -32,6 +32,7 @@ function createMsdfShaderSource(pages: number) {
 
         in vec2 uv;
         in vec3 position;
+        in vec4 color;
         in float page;
         in mat3 aWorldMatrix;
 
@@ -40,10 +41,12 @@ function createMsdfShaderSource(pages: number) {
 
         out vec2 vUv;
         out float vPage;
+        out vec4 vColor;
 
         void main() {
             vUv = uv;
             vPage = page;
+            vColor = color;
             mat4 worldMatrix4 = mat4(
                 vec4(aWorldMatrix[0][0], aWorldMatrix[0][1], 0.0, 0.0),
                 vec4(aWorldMatrix[1][0], aWorldMatrix[1][1], 0.0, 0.0),
@@ -71,10 +74,9 @@ function createMsdfShaderSource(pages: number) {
 
         ${samplerUniforms}
 
-        uniform vec4 uColor;
-
         in vec2 vUv;
         in float vPage;
+        in vec4 vColor;
 
         out vec4 fragColor;
 
@@ -86,7 +88,7 @@ function createMsdfShaderSource(pages: number) {
             float d = fwidth(signedDist);
             float alpha = smoothstep(-d, d, signedDist);
             if (alpha < 0.01) discard;
-            fragColor = vec4(uColor.rgb, alpha * uColor.a);
+            fragColor = vec4(vColor.rgb, alpha * vColor.a);
         }
     `;
 
@@ -127,7 +129,6 @@ function getOrCreateProgram(gl: WebGL2RenderingContext, pages: number, textures:
     const { vertex, fragment } = createMsdfShaderSource(pages);
     const uniforms: Record<string, { value: any }> = {};
     for (let i = 0; i < pages; i++) uniforms[`tMap${i}`] = { value: textures[i] };
-    uniforms.uColor = { value: [0, 0, 0, 1] };
     const program = new Program(gl, {
         vertex,
         fragment,
@@ -170,8 +171,8 @@ export function renderText(gl: WebGL2RenderingContext, camera: Camera, transform
 
     const textures = calc.images.map((img) => getOrCreateTexture(gl, img));
     const program = getOrCreateProgram(gl, textures.length, textures);
-        if (program.uniforms.uColor)
-            program.uniforms.uColor.value = parseColorStyleBlack((textComp as any).color);
+
+    const rgba = parseColorStyleBlack((textComp as any).color);
 
     // 对齐/基线：Text 不再有 x/y，位置由 Transform.worldMatrix 决定。
     // 这里仅把对齐/基线 anchor 偏移 bake 进顶点。
@@ -183,10 +184,21 @@ export function renderText(gl: WebGL2RenderingContext, camera: Camera, transform
     const layout = layoutSingleLineMsdf(calc, offsetX, offsetY);
     if (layout.glyphCount <= 0) return;
 
+    const vertexCount = layout.buffers.position.length / 3;
+    const colorBuffer = new Float32Array(vertexCount * 4);
+    for (let i = 0; i < vertexCount; i++) {
+        const base = i * 4;
+        colorBuffer[base + 0] = rgba[0];
+        colorBuffer[base + 1] = rgba[1];
+        colorBuffer[base + 2] = rgba[2];
+        colorBuffer[base + 3] = rgba[3];
+    }
+
     const aWorldMatrix = new Float32Array(transform.worldMatrix);
     const geometry = new Geometry(gl, {
         position: { size: 3, data: layout.buffers.position },
         uv: { size: 2, data: layout.buffers.uv },
+        color: { size: 4, data: colorBuffer },
         page: { size: 1, data: layout.buffers.page },
         aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
         index: { data: layout.buffers.index },

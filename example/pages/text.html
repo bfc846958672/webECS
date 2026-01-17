@@ -1,51 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text (MSDF)</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Text (MSDF)</title>
-  <style>
-    body { margin: 0; }
-    canvas { display: block; width: 100vw; height: 100vh; }
-  </style>
-</head>
+  <body>
+    <canvas id="game-canvas" width="1500" height="800"></canvas>
 
-<body>
-  <canvas id="game-canvas" width="1500" height="800"></canvas>
+    <script type="module">
+      import { Engine, Components, Font } from "../dist/web-ecs.es.js";
 
-  <script type="module">
-    import { Engine, Components, Font } from '../dist/web-ecs.es.js';
+      const canvas = document.getElementById("game-canvas");
+      const engine = new Engine(canvas);
 
-    const canvas = document.getElementById('game-canvas');
-    const engine = new Engine(canvas);
+      async function main() {
+        // 字体资源来自：example/dist/font/output/
+        // json 文件名目前是 mdsf.json，贴图约定为同目录 msdf.png
+        const fontLoader = new Font();
+        const { font, images } = await fontLoader.init(
+          "../dist/font/output/atlas.json",
+          ["../dist/font/output/atlas.png"]
+        );
+        const ifont = { font, images };
 
-    async function main() {
-      // 字体资源来自：example/dist/font/output/
-      // json 文件名目前是 mdsf.json，贴图约定为同目录 msdf.png
-      const fontLoader = new Font();
-      const { font, images } = await fontLoader.init('../dist/font/output/mdsf.json');
-      const ifont = { font, images };
+        const e = engine.ecs.createEntity();
+        engine.ecs.addComponent(
+          e,
+          new Components.Text(engine, {
+            font: ifont,
+            text: "webECS MSDF Text: Hello 你好 123",
+            size: 96,
+            color: "#ff6600",
+            textAlign: "left",
+            textBaseline: "top",
+            lineHeight: 1.2,
+            debug: true,
+          })
+        );
+        engine.ecs.addComponent(
+          e,
+          new Components.Transform(engine, { x: 80, y: 120 })
+        );
+        engine.add(e);
 
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Text(engine, {
-        font: ifont,
-        text: 'webECS MSDF Text: Hello 你好 123',
-        size: 96,
-        color: '#ff6600',
-        textAlign: 'left',
-        textBaseline: 'top',
-        lineHeight: 1.2,
-        debug: true,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 80, y: 120 }));
-      engine.add(e);
+        engine.start();
+      }
 
-      engine.start();
-    }
-
-    main();
-  </script>
-</body>
-
+      main();
+    </script>
+  </body>
 </html>

@@ -25,9 +25,12 @@ export default defineConfig({
     }),
     // 1) font -> dist/font
     viteStaticCopy({
+      hook: 'writeBundle',
       targets: [{ src: 'font', dest: '' }],
     }),
     viteStaticCopy({
+      hook: 'closeBundle',
+      // Copy all built files (including nested folders) into example/dist
       targets: [{ src: 'dist', dest: '../example' }],
     }),
   ],

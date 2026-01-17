@@ -53,8 +53,8 @@ export const ALL_CHINESE_CHARS = Array.from(new Set(
     rawChineseChars.replace(/[\r\n\s]/g, '') + 
     rawExtendedChars.replace(/[\r\n\s]/g, '') + 
     ENGLISH_CHARS + 
-    NUMBER_CHARS + 
-    PUNCTUATION_CHARS
+    NUMBER_CHARS 
+    // PUNCTUATION_CHARS
 )).join('');
 
 // 导出单个字符集（可选，用于调试，确保移除所有回车换行）

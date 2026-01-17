@@ -10,36 +10,36 @@ export class Font {
 
     /**
      * 方法1：加载 msdf-atlas json，并设置 this.font。
-     * 资源约定：贴图为与 json 同目录的 msdf.png。
+     * 资源约定：贴图为与 json 同目录的 atlas.png。
      * @param fontUrl
      */
     async loadJson(fontUrl: string): Promise<IFont['font']> {
         if (!fontUrl) throw new Error('Font.loadJson: fontUrl is required');
         const font = (await (await fetch(fontUrl)).json()) as IFont['font'];
         this.font = font;
-
-        const baseUrl = new URL(fontUrl, location.href);
-        this.pageUrls = [new URL('msdf.png', baseUrl).toString()];
         return font;
     }
 
     /**
      * 方法2：加载图片，并设置 this.images
-     * @param pageUrls 图片地址数组（通常来自 loadJson 后的 this.pageUrls）
+     * @param imageUrls 图片地址数组（通常来自 loadJson 后的 this.pageUrls）
      */
-    async loadImages(pageUrls: string[]): Promise<HTMLImageElement[]> {
-        if (!Array.isArray(pageUrls) || pageUrls.length === 0) throw new Error('Font.loadImages: pageUrls must be a non-empty array');
-        this.images = await Promise.all(pageUrls.map((src) => this._loadImage(src)));
+    async loadImages(imageUrls: string[]): Promise<HTMLImageElement[]> {
+        this.pageUrls = imageUrls;
+        if (!Array.isArray(imageUrls) || imageUrls.length === 0) throw new Error('Font.loadImages: imageUrls must be a non-empty array');
+        this.images = await Promise.all(imageUrls.map((src) => this._loadImage(src)));
         return this.images;
     }
 
     /**
-     * 一键初始化：先 loadJson(fontUrl)，再按解析出的 this.pageUrls 加载图片。
      * @param fontUrl
+     * @param imageUrls 
      */
-    async init(fontUrl: string): Promise<{ font: IFont['font']; images: HTMLImageElement[] }> {
-        await this.loadJson(fontUrl);
-        await this.loadImages(this.pageUrls);
+    async init(fontUrl: string, imageUrls: string[]): Promise<{ font: IFont['font']; images: HTMLImageElement[] }> {
+        await Promise.all([
+            this.loadJson(fontUrl),
+            this.loadImages(imageUrls),
+        ])
         return { font: this.font!, images: this.images };
     }
 
