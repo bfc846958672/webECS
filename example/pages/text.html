@@ -40,18 +40,17 @@
           e,
           new Components.Text(engine, {
             font: ifont,
-            text: "webECS MSDF Text: Hello 你好 123",
-            size: 96,
+            text: " Hello 你好webECS MSDF Text: Hello 你好 123",
+            size: 56,
             color: "#ff6600",
             textAlign: "left",
             textBaseline: "top",
-            lineHeight: 1.2,
             debug: true,
           })
         );
         engine.ecs.addComponent(
           e,
-          new Components.Transform(engine, { x: 80, y: 120 })
+          new Components.Transform(engine, { x: 80, y: 120, scaleX: 2, scaleY: 2 })
         );
         engine.add(e);
 

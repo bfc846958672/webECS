@@ -46,15 +46,15 @@ const rawExtendedChars = `啊阿埃挨哎唉哀皑癌蔼矮艾碍爱隘鞍氨安
 // 英文字母、数字和特殊字符（包括空格）
 const ENGLISH_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const NUMBER_CHARS = '0123456789';
-const PUNCTUATION_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?"\' `~，。；：‘’“”！？【】（）—…￥±×÷ ';
+const PUNCTUATION_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?\\\"\' `~，。；：‘’“”！？【】（）—…￥±×÷ \\';
 
 // 合并所有字符并去重（明确移除回车换行和所有空白字符）
 export const ALL_CHINESE_CHARS = Array.from(new Set(
     rawChineseChars.replace(/[\r\n\s]/g, '') + 
     rawExtendedChars.replace(/[\r\n\s]/g, '') + 
     ENGLISH_CHARS + 
-    NUMBER_CHARS 
-    // PUNCTUATION_CHARS
+    NUMBER_CHARS +
+    PUNCTUATION_CHARS
 )).join('');
 
 // 导出单个字符集（可选，用于调试，确保移除所有回车换行）
