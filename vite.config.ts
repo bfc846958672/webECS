@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
+import deletePlugin from 'rollup-plugin-delete'
 import type { UserConfig } from 'vite'
 import type { ViteUserConfigExport } from 'vitest/config'
 
@@ -10,6 +11,12 @@ import type { ViteUserConfigExport } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
+    deletePlugin({
+      targets: ['dist', 'example/dist'],
+      runOnce: true,
+      hook: 'buildStart',
+      verbose: false,
+    }),
     dts({
       // 生成类型声明文件
       outDir: 'dist/types',
@@ -18,10 +25,8 @@ export default defineConfig({
     }),
     // 1) font -> dist/font
     viteStaticCopy({
-      targets: [{ src: 'font/**', dest: 'font' }],
+      targets: [{ src: 'font', dest: '' }],
     }),
-    // 2) dist/** -> example/dist
-    // dest is relative to build.outDir (dist), so "../example/dist" writes to example/dist
     viteStaticCopy({
       targets: [{ src: 'dist', dest: '../example' }],
     }),
