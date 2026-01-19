@@ -1,3 +1,5 @@
+import { set } from "../webgl/math/functions/Vec3Func";
+
 export class Ticker {
   private lastTime = 0;
   private running = false;
@@ -20,7 +22,7 @@ export class Ticker {
     if (this.running) return;
     this.running = true;
     this.lastTime = performance.now();
-    this.loop(performance.now());
+    this.loop(this.lastTime);
   }
 
   stop() {
@@ -30,8 +32,8 @@ export class Ticker {
   private loop(now: number) {
     if (!this.running) return;
     const dt = (now - this.lastTime) / 1000; // 秒为单位
+    // const fps = dt > 0 ? 1 / dt : 0;
     this.lastTime = now;
-
     for (const cb of this.callbacks) {
       cb(dt);
     }

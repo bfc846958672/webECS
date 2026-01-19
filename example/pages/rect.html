@@ -6,18 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rect</title>
   <style>
-    body { margin: 0; }
-    canvas { display: block; width: 100vw; height: 100vh; }
+    body { margin: 0; display: flex; flex-direction: column; height: 100vh; }
+    #container { position: relative; flex: 1; border: 1px solid #ccc; }
+    canvas { display: block; width: 100%; height: 100%; }
+    #controls { padding: 10px; border-top: 1px solid #ccc; }
+    button { margin: 0 5px; padding: 5px 10px; }
   </style>
 </head>
 
 <body>
-  <canvas id="game-canvas" width="1200" height="800"></canvas>
+  <div id="container">
+    <canvas id="game-canvas"></canvas>
+  </div>
+  <!-- <div id="controls">
+    <button id="btn-800x600">Resize to 800x600</button>
+    <button id="btn-1200x800">Resize to 1200x800</button>
+    <button id="btn-canvas">canvas Resize to 800</button>
+  </div> -->
 
   <script type="module">
     import { Engine, Draw } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
+    const container = document.getElementById('container');
     console.log(canvas.width, canvas.height);
     const engine = new Engine(canvas);
 
@@ -47,6 +58,21 @@
       });
     }
 
+    // // 按钮事件：动态调整 container 尺寸
+    // document.getElementById('btn-800x600').addEventListener('click', () => {
+    //   container.style.width = '800px';
+    //   container.style.height = '600px';
+    // });
+
+    // document.getElementById('btn-1200x800').addEventListener('click', () => {
+    //   container.style.width = '1200px';
+    //   container.style.height = '800px';
+    // });
+    // const  canvas1 = document.getElementById('game-canvas');
+    // document.querySelector('#btn-canvas').addEventListener('click', () => {
+    //   canvas1.setAttribute('width', '800');
+    //   canvas1.setAttribute('height', '800');
+    // });
     engine.start();
   </script>
 </body>

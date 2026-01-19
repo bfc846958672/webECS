@@ -9,7 +9,8 @@ import { IEngine } from "./IEngine.ts";
 import { BoxDebugSystem } from "../system/systems/BoxDebugSystem.ts";
 import { EventSystem } from "../system/systems/EventSystem.ts";
 import type { IRenderContext } from "../interface/IRender.ts";
-import { bindEngineResize } from "./resize.ts";
+import { bindEngineResize, resizeEngineToCanvas } from "./resize.ts";
+import { PostRenderQueue, PreRenderQueue } from "../system/systems/RenderQueue.ts";
 export class Engine implements IEngine {
     public boxDebug: boolean = false;
     public ecs: ECS;
@@ -17,7 +18,7 @@ export class Engine implements IEngine {
     public sceneTree: SceneTree;
     public rootEntity: RootEntity;
     public renderContext: IRenderContext
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, options: { autoResize?: boolean } = {autoResize: true}) {
         this.ecs = new ECS();
         this.ecs.canvas = canvas;
         this.rootEntity = new RootEntity(this);
@@ -36,12 +37,14 @@ export class Engine implements IEngine {
         };
 
         // 自动同步 canvas/CSS 尺寸变化到 renderer + camera
-        bindEngineResize(this, { canvas });
+        if (options.autoResize) bindEngineResize(this);
         // 注册系统
+        this.ecs.addSystem(new PreRenderQueue(this, this.sceneTree));
         this.ecs.addSystem(new SceneTreeRenderSystem(this, this.sceneTree));
         this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));
         this.ecs.addSystem(new PickEntitySystem(this, this.sceneTree));
         this.ecs.addSystem(new EventSystem(this, this.sceneTree));
+        this.ecs.addSystem(new PostRenderQueue(this, this.sceneTree));
         // 绑定 Ticker → ECS
         this.ticker = new Ticker();
         this.ticker.add((dt) => this.ecs.update(dt));
@@ -111,5 +114,9 @@ export class Engine implements IEngine {
     clear() {
         this.sceneTree.clear();
         // 通知系统清空场景树
+    }
+    resize (size: {width: number, height: number}) {
+        const that = this;
+        this.ecs.getSystem(PreRenderQueue).once(() => { resizeEngineToCanvas(that, size); })
     }
 }
