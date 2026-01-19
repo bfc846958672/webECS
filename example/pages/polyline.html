@@ -15,15 +15,16 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Draw } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
 
+    const draw = new Draw(engine);
+
     // 折线
     {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Polyline({
+      draw.polyline({ x: 160, y: 180 }, {
         points: [
           [0, 0],
           [200, 60],
@@ -34,15 +35,12 @@
         closed: false,
         strokeStyle: '#111827',
         lineWidth: 4,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: 160, y: 180 }));
-      engine.add(e);
+      });
     }
 
     // 闭合多边形（填充）
     {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Polyline({
+      draw.polyline({ x: 760, y: 260 }, {
         points: [
           [0, 0],
           [180, 30],
@@ -53,9 +51,7 @@
         fillStyle: 'rgba(59, 130, 246, 0.25)',
         strokeStyle: '#3b82f6',
         lineWidth: 3,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: 760, y: 260 }));
-      engine.add(e);
+      });
     }
 
     engine.start();

@@ -15,10 +15,12 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Draw } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
+
+    const draw = new Draw(engine);
 
     // 三个点实体
     const points = [
@@ -28,13 +30,7 @@
     ];
 
     for (const p of points) {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Point({
-        size: p.size,
-        fillStyle: p.fillStyle,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: p.x, y: p.y }));
-      engine.add(e);
+      draw.point({ x: p.x, y: p.y }, { size: p.size, fillStyle: p.fillStyle });
     }
 
     engine.start();

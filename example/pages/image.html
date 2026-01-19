@@ -15,22 +15,20 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components, loadImageBitmap } from '../dist/web-ecs.es.js';
+    import { Engine, Draw, loadImageBitmap } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
 
+    const draw = new Draw(engine);
+
     async function main() {
       const bitmap = await loadImageBitmap('../assets/cat.png');
 
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Image({
-        bitmap,
-        width: 320,
-        height: 320,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: 280, y: 240, rotation: Math.PI / 18 }));
-      engine.add(e);
+      draw.image(
+        { x: 280, y: 240, rotation: Math.PI / 18 },
+        { bitmap, width: 320, height: 320 }
+      );
 
       engine.start();
     }

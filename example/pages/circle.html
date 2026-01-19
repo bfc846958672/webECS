@@ -15,42 +15,37 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Draw } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
 
+    const draw = new Draw(engine);
+
     // 1) 标准圆
     {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Circle({
+      draw.circle({ x: 180, y: 180 }, {
         radius: 70,
         fillStyle: '#2ecc71',
         strokeStyle: '#145a32',
         lineWidth: 6,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: 180, y: 180 }));
-      engine.add(e);
+      });
     }
 
     // 2) 椭圆
     {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Circle({
+      draw.circle({ x: 560, y: 180 }, {
         radius: 110,
         radiusY: 55,
         fillStyle: '#3498db',
         strokeStyle: '#1b4f72',
         lineWidth: 4,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: 560, y: 180 }));
-      engine.add(e);
+      });
     }
 
     // 3) 圆弧
     {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Circle({
+      draw.circle({ x: 920, y: 180 }, {
         radius: 90,
         fillStyle: 'rgba(231, 76, 60, 0.85)',
         strokeStyle: '#922b21',
@@ -58,9 +53,7 @@
         startAngle: 0,
         endAngle: Math.PI * 1.5,
         clockwise: true,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x: 920, y: 180 }));
-      engine.add(e);
+      });
     }
 
     engine.start();

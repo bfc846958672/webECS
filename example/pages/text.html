@@ -20,10 +20,12 @@
     <canvas id="game-canvas" width="1500" height="800"></canvas>
 
     <script type="module">
-      import { Engine, Components, Font } from "../dist/web-ecs.es.js";
+      import { Engine, Draw, Font } from "../dist/web-ecs.es.js";
 
       const canvas = document.getElementById("game-canvas");
       const engine = new Engine(canvas);
+
+      const draw = new Draw(engine);
 
       async function main() {
         // 字体资源来自：example/dist/font/output/
@@ -34,10 +36,9 @@
         );
         const ifont = { font, images };
 
-        const e = engine.ecs.createEntity();
-        engine.ecs.addComponent(
-          e,
-          new Components.Text({
+        draw.text(
+          { x: 80, y: 120, scaleX: 2, scaleY: 2 },
+          {
             font: ifont,
             text: " Hello 你好webECS MSDF Text: Hello 你好 123",
             size: 56,
@@ -45,13 +46,8 @@
             textAlign: "left",
             textBaseline: "top",
             debug: true,
-          })
+          }
         );
-        engine.ecs.addComponent(
-          e,
-          new Components.Transform({ x: 80, y: 120, scaleX: 2, scaleY: 2 })
-        );
-        engine.add(e);
 
         engine.start();
       }

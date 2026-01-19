@@ -13,3 +13,5 @@ export { Engine };
 export { loadImageBitmap } from './utils/fetchImage.ts';
 
 export { Font } from './utils/font.ts';
+
+export { Draw } from './draw/index.ts';

@@ -15,33 +15,33 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Draw } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
+
+    // 让 canvas 内部坐标与 CSS 像素一致，保证拾取/事件坐标不飘
+    function resizeCanvasToViewport() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvasToViewport();
+    window.addEventListener('resize', resizeCanvasToViewport);
+
     const engine = new Engine(canvas);
+    const draw = new Draw(engine);
 
-    // 一些可拖拽图形（通过 EventComponent 接收事件）
-    function addRect(x, y, w, h, fillStyle) {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Rect({ width: w, height: h, fillStyle, strokeStyle: '#111827', lineWidth: 3 }));
-      engine.ecs.addComponent(e, new Components.Transform({ x, y }));
-      engine.ecs.addComponent(e, new Components.EventComponent());
-      engine.add(e);
-      return e;
-    }
-
-    function addCircle(x, y, r, fillStyle) {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Circle({ radius: r, fillStyle, strokeStyle: '#111827', lineWidth: 3 }));
-      engine.ecs.addComponent(e, new Components.Transform({ x, y }));
-      engine.ecs.addComponent(e, new Components.EventComponent());
-      engine.add(e);
-      return e;
-    }
-
-    function addPolyline(x, y, fillStyle) {
-      const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Polyline({
+    // 一些可拖拽图形（通过 draw 返回的 instance.event 接收事件）
+    const rect = draw.rect(
+      { x: 120, y: 120 },
+      { width: 240, height: 140, fillStyle: 'rgba(59, 130, 246, 0.35)', strokeStyle: '#111827', lineWidth: 3 }
+    );
+    const circle = draw.circle(
+      { x: 560, y: 200 },
+      { radius: 80, fillStyle: 'rgba(34, 197, 94, 0.35)', strokeStyle: '#111827', lineWidth: 3 }
+    );
+    const polyline = draw.polyline(
+      { x: 820, y: 260 },
+      {
         points: [
           [0, 0],
           [160, 40],
@@ -49,25 +49,13 @@
           [60, 220],
         ],
         closed: true,
-        fillStyle,
+        fillStyle: 'rgba(239, 68, 68, 0.25)',
         strokeStyle: '#111827',
         lineWidth: 3,
-      }));
-      engine.ecs.addComponent(e, new Components.Transform({ x, y }));
-      engine.ecs.addComponent(e, new Components.EventComponent());
-      engine.add(e);
-      return e;
-    }
+      }
+    );
 
-    const rectId = addRect(120, 120, 240, 140, 'rgba(59, 130, 246, 0.35)');
-    const circleId = addCircle(560, 200, 80, 'rgba(34, 197, 94, 0.35)');
-    const polyId = addPolyline(820, 260, 'rgba(239, 68, 68, 0.25)');
-
-    /** @type {number | null} */
-    let draggingEntityId = null;
-    let activePointerId = null;
-    let offsetX = 0;
-    let offsetY = 0;
+    let dragging = null;
 
     function toCanvasXY(e) {
       const rect = canvas.getBoundingClientRect();
@@ -86,47 +74,51 @@
       };
     }
 
-    function bindDrag(entityId) {
-      const ev = engine.ecs.getComponent(entityId, Components.EventComponent);
-      const transform = engine.ecs.getComponent(entityId, Components.Transform);
-      if (!ev || !transform) return;
-
-      ev.on('pointerdown', (e) => {
+    function bindDrag(instance) {
+      instance.event.on('pointerdown', (e) => {
         e.preventDefault?.();
+
+        // 尝试设置 pointer capture，确保 pointermove/up 会持续发给 canvas
+        if ('pointerId' in e && typeof canvas.setPointerCapture === 'function') {
+          try { canvas.setPointerCapture(e.pointerId); } catch {}
+        }
+
         const { x, y } = toCanvasXY(e);
-        draggingEntityId = entityId;
-        activePointerId = ('pointerId' in e) ? e.pointerId : 0;
-        offsetX = x - transform.x;
-        offsetY = y - transform.y;
-      });
-
-      // EventSystem 已实现捕获：按下后 move/up 仍会发回当前实体
-      ev.on('pointermove', (e) => {
-        if (draggingEntityId !== entityId) return;
-        if (activePointerId != null && ('pointerId' in e) && e.pointerId !== activePointerId) return;
-        e.preventDefault?.();
-        const { x, y } = toCanvasXY(e);
-        transform.x = x - offsetX;
-        transform.y = y - offsetY;
-      });
-
-      ev.on('pointerup', (e) => {
-        if (draggingEntityId !== entityId) return;
-        if (activePointerId != null && ('pointerId' in e) && e.pointerId !== activePointerId) return;
-        draggingEntityId = null;
-        activePointerId = null;
-      });
-
-      ev.on('pointercancel', () => {
-        if (draggingEntityId !== entityId) return;
-        draggingEntityId = null;
-        activePointerId = null;
+        dragging = {
+          id: instance.id,
+          pointerId: ('pointerId' in e) ? e.pointerId : null,
+          transform: instance.transform,
+          offsetX: x - instance.transform.x,
+          offsetY: y - instance.transform.y,
+        };
       });
     }
 
-    bindDrag(rectId);
-    bindDrag(circleId);
-    bindDrag(polyId);
+    bindDrag(rect);
+    bindDrag(circle);
+    bindDrag(polyline);
+
+    // 用全局 pointermove/up 做拖拽，不依赖 EventSystem 的“捕获”
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      if (dragging.pointerId != null && e.pointerId !== dragging.pointerId) return;
+      e.preventDefault();
+      const { x, y } = toCanvasXY(e);
+      dragging.transform.x = x - dragging.offsetX;
+      dragging.transform.y = y - dragging.offsetY;
+    }, { passive: false });
+
+    canvas.addEventListener('pointerup', (e) => {
+      if (!dragging) return;
+      if (dragging.pointerId != null && e.pointerId !== dragging.pointerId) return;
+      dragging = null;
+    });
+
+    canvas.addEventListener('pointercancel', (e) => {
+      if (!dragging) return;
+      if (dragging.pointerId != null && e.pointerId !== dragging.pointerId) return;
+      dragging = null;
+    });
 
     engine.start();
   </script>
