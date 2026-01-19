@@ -20,17 +20,17 @@
     <canvas id="game-canvas" width="1500" height="800"></canvas>
 
     <script type="module">
-      import { Engine, Components, Font } from "/src/main.ts";
+      import { Engine, Components, Font } from "../dist/web-ecs.es.js";
 
       const canvas = document.getElementById("game-canvas");
       const engine = new Engine(canvas);
 
       async function main() {
-        // 字体资源来自：/font/output/
+        // 字体资源来自：example/dist/font/output/
         const fontLoader = new Font();
         const { font, images } = await fontLoader.init(
-          "/font/output/atlas.json",
-          ["/font/output/atlas.png"]
+          "../dist/font/output/atlas.json",
+          ["../dist/font/output/atlas.png"]
         );
         const ifont = { font, images };
 

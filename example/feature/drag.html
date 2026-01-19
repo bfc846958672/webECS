@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drag</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  </style>
+</head>
+
+<body>
+  <canvas id="game-canvas" width="1200" height="800"></canvas>
+
+  <script type="module">
+    import { Engine, Components } from '../dist/web-ecs.es.js';
+
+    const canvas = document.getElementById('game-canvas');
+    const engine = new Engine(canvas);
+
+    // 一些可拖拽图形（通过 EventComponent 接收事件）
+    function addRect(x, y, w, h, fillStyle) {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Rect({ width: w, height: h, fillStyle, strokeStyle: '#111827', lineWidth: 3 }));
+      engine.ecs.addComponent(e, new Components.Transform({ x, y }));
+      engine.ecs.addComponent(e, new Components.EventComponent());
+      engine.add(e);
+      return e;
+    }
+
+    function addCircle(x, y, r, fillStyle) {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Circle({ radius: r, fillStyle, strokeStyle: '#111827', lineWidth: 3 }));
+      engine.ecs.addComponent(e, new Components.Transform({ x, y }));
+      engine.ecs.addComponent(e, new Components.EventComponent());
+      engine.add(e);
+      return e;
+    }
+
+    function addPolyline(x, y, fillStyle) {
+      const e = engine.ecs.createEntity();
+      engine.ecs.addComponent(e, new Components.Polyline({
+        points: [
+          [0, 0],
+          [160, 40],
+          [200, 160],
+          [60, 220],
+        ],
+        closed: true,
+        fillStyle,
+        strokeStyle: '#111827',
+        lineWidth: 3,
+      }));
+      engine.ecs.addComponent(e, new Components.Transform({ x, y }));
+      engine.ecs.addComponent(e, new Components.EventComponent());
+      engine.add(e);
+      return e;
+    }
+
+    const rectId = addRect(120, 120, 240, 140, 'rgba(59, 130, 246, 0.35)');
+    const circleId = addCircle(560, 200, 80, 'rgba(34, 197, 94, 0.35)');
+    const polyId = addPolyline(820, 260, 'rgba(239, 68, 68, 0.25)');
+
+    /** @type {number | null} */
+    let draggingEntityId = null;
+    let activePointerId = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function toCanvasXY(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      if ('touches' in e && e.touches && e.touches.length > 0) {
+        const t = e.touches[0];
+        return {
+          x: (t.clientX - rect.left) * scaleX,
+          y: (t.clientY - rect.top) * scaleY,
+        };
+      }
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
+      };
+    }
+
+    function bindDrag(entityId) {
+      const ev = engine.ecs.getComponent(entityId, Components.EventComponent);
+      const transform = engine.ecs.getComponent(entityId, Components.Transform);
+      if (!ev || !transform) return;
+
+      ev.on('pointerdown', (e) => {
+        e.preventDefault?.();
+        const { x, y } = toCanvasXY(e);
+        draggingEntityId = entityId;
+        activePointerId = ('pointerId' in e) ? e.pointerId : 0;
+        offsetX = x - transform.x;
+        offsetY = y - transform.y;
+      });
+
+      // EventSystem 已实现捕获：按下后 move/up 仍会发回当前实体
+      ev.on('pointermove', (e) => {
+        if (draggingEntityId !== entityId) return;
+        if (activePointerId != null && ('pointerId' in e) && e.pointerId !== activePointerId) return;
+        e.preventDefault?.();
+        const { x, y } = toCanvasXY(e);
+        transform.x = x - offsetX;
+        transform.y = y - offsetY;
+      });
+
+      ev.on('pointerup', (e) => {
+        if (draggingEntityId !== entityId) return;
+        if (activePointerId != null && ('pointerId' in e) && e.pointerId !== activePointerId) return;
+        draggingEntityId = null;
+        activePointerId = null;
+      });
+
+      ev.on('pointercancel', () => {
+        if (draggingEntityId !== entityId) return;
+        draggingEntityId = null;
+        activePointerId = null;
+      });
+    }
+
+    bindDrag(rectId);
+    bindDrag(circleId);
+    bindDrag(polyId);
+
+    engine.start();
+  </script>
+</body>
+
+</html>

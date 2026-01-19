@@ -19,24 +19,24 @@ export class EventSystem extends ISystem {
         const eventTypes: IEventType[] = [
             // 鼠标事件
             "click",
-            // "dblclick",
-            // "mousedown",
-            // "mouseup",
-            // "mousemove",
-            // "contextmenu",
-            // "wheel",
+            "dblclick",
+            "mousedown",
+            "mouseup",
+            "mousemove",
+            "contextmenu",
+            "wheel",
 
-            // // 触摸事件
-            // "touchstart",
-            // "touchmove",
-            // "touchend",
-            // "touchcancel",
+            // 触摸事件
+            "touchstart",
+            "touchmove",
+            "touchend",
+            "touchcancel",
 
-            // // 指针事件
-            // "pointerdown",
-            // "pointermove",
-            // "pointerup",
-            // "pointercancel",
+            // 指针事件
+            "pointerdown",
+            "pointermove",
+            "pointerup",
+            "pointercancel",
         ];
 
         for (const type of eventTypes) {

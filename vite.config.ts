@@ -11,12 +11,13 @@ import type { ViteUserConfigExport } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
-    deletePlugin({
+    // 仅在 build 时清理产物，避免 dev server 启动时删除 example/dist 导致示例页面 404
+    { ...deletePlugin({
       targets: ['dist', 'example/dist'],
       runOnce: true,
       hook: 'buildStart',
       verbose: false,
-    }),
+    }), apply: 'build' },
     dts({
       // 生成类型声明文件
       outDir: 'dist/types',

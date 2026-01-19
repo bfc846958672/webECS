@@ -5,10 +5,10 @@
   "type": "module",
   "main": "dist/web-ecs.umd.js",
   "module": "dist/web-ecs.es.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/types/main.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/types/main.d.ts",
       "import": "./dist/web-ecs.es.js",
       "require": "./dist/web-ecs.umd.js"
     }
