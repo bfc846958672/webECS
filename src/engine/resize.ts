@@ -28,7 +28,6 @@ function getCanvasCssSize(canvas: HTMLCanvasElement) {
  * - camera 的正交投影视口(left/right/top/bottom)
  */
 export function resizeEngineToCanvas(engine: Engine, size: {width: number, height: number}) {
-    console.log("resizeEngineToCanvas", size);
     const canvas = (engine.ecs as any).canvas as HTMLCanvasElement;
     if (!canvas) throw new Error("Engine.ecs.canvas 未设置");
 

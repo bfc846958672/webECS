@@ -90,6 +90,9 @@ export class SceneTree {
         this.displayList = this.build();
     }
     remove(entityId: number) {
+        if (entityId === this.rootEntityId) {
+            throw new Error("Cannot remove root node");
+        }
         this._version++;
         const node = this.nodes.get(entityId);
         if (!node) throw new Error(`remove fail, Entity ${entityId} not found`);

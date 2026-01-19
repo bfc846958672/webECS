@@ -18,17 +18,22 @@ export class Engine implements IEngine {
     public sceneTree: SceneTree;
     public rootEntity: RootEntity;
     public renderContext: IRenderContext
-    constructor(canvas: HTMLCanvasElement, options: { autoResize?: boolean } = {autoResize: true}) {
+    constructor(canvas: HTMLCanvasElement, options: { autoResize?: boolean } = { autoResize: true }) {
         this.ecs = new ECS();
         this.ecs.canvas = canvas;
         this.rootEntity = new RootEntity(this);
         this.sceneTree = new SceneTree(this.rootEntity.entityId);
         // webgl 相关
         this.renderContext = {
-            camera: new Camera(undefined, { left: 0,top: 0,  right: canvas.width, bottom: canvas.height, near: -1, far: 1, }),
+            camera: new Camera(undefined, {
+                left: 0, top: 0,
+                right: canvas.width,
+                bottom: canvas.height,
+                near: -1, far: 1,
+            }),
             renderer: new Renderer({
                 canvas, width: canvas.width,
-                height: canvas.height, webgl: 2, 
+                height: canvas.height, webgl: 2,
                 dpr: window.devicePixelRatio || 1,
                 alpha: false, depth: false,
                 antialias: true,
@@ -115,7 +120,13 @@ export class Engine implements IEngine {
         this.sceneTree.clear();
         // 通知系统清空场景树
     }
-    resize (size: {width: number, height: number}) {
+    all() {
+        return this.sceneTree.all();
+    }
+    root() {
+        return this.sceneTree.root.entityId;
+    }
+    resize(size: { width: number, height: number }) {
         const that = this;
         this.ecs.getSystem(PreRenderQueue).once(() => { resizeEngineToCanvas(that, size); })
     }
