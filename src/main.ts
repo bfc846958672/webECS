@@ -15,3 +15,4 @@ export { loadImageBitmap } from './utils/fetchImage.ts';
 export { Font } from './utils/font.ts';
 
 export { Draw } from './draw/index.ts';
+export type { DrawInstance } from './draw/index.ts';

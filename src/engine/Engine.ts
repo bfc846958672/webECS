@@ -9,6 +9,7 @@ import { IEngine } from "./IEngine.ts";
 import { BoxDebugSystem } from "../system/systems/BoxDebugSystem.ts";
 import { EventSystem } from "../system/systems/EventSystem.ts";
 import type { IRenderContext } from "../interface/IRender.ts";
+import { bindEngineResize } from "./resize.ts";
 export class Engine implements IEngine {
     public boxDebug: boolean = false;
     public ecs: ECS;
@@ -23,7 +24,7 @@ export class Engine implements IEngine {
         this.sceneTree = new SceneTree(this.rootEntity.entityId);
         // webgl 相关
         this.renderContext = {
-            camera: new Camera(undefined, { left: 0, right: canvas.width, bottom: canvas.height, top: 0, near: -1, far: 1, }),
+            camera: new Camera(undefined, { left: 0,top: 0,  right: canvas.width, bottom: canvas.height, near: -1, far: 1, }),
             renderer: new Renderer({
                 canvas, width: canvas.width,
                 height: canvas.height, webgl: 2, 
@@ -33,6 +34,9 @@ export class Engine implements IEngine {
                 premultipliedAlpha: false,
             })
         };
+
+        // 自动同步 canvas/CSS 尺寸变化到 renderer + camera
+        bindEngineResize(this, { canvas });
         // 注册系统
         this.ecs.addSystem(new SceneTreeRenderSystem(this, this.sceneTree));
         this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));

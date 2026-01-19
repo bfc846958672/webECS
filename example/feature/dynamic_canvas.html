@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Canvas Resize</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <script type="module">
+    import { Engine, Draw } from '../dist/web-ecs.es.js';
+
+    const canvas = document.getElementById('game-canvas');
+    const engine = new Engine(canvas);
+    const draw = new Draw(engine);
+
+    // Engine 初始化时会自动监听 canvas 尺寸变化并同步 renderer + camera
+
+    // 说明：Text 组件必须提供 font，因此本示例只用基础图形展示动态 resize
+    const bg = draw.rect(
+      { x: 0, y: 0 },
+      { width: 1, height: 1, fillStyle: 'rgba(59, 130, 246, 0.10)' }
+    );
+
+    const border = draw.rect(
+      { x: 0, y: 0 },
+      { width: 1, height: 1, fillStyle: 'rgba(0,0,0,0)', strokeStyle: '#111827', lineWidth: 2 }
+    );
+
+    const diagA = draw.line(
+      { x: 0, y: 0 },
+      { points: [[0, 0], [1, 1]], strokeStyle: 'rgba(17, 24, 39, 0.45)', alpha: 1 }
+    );
+
+    const diagB = draw.line(
+      { x: 0, y: 0 },
+      { points: [[0, 1], [1, 0]], strokeStyle: 'rgba(17, 24, 39, 0.45)', alpha: 1 }
+    );
+
+    const center = draw.circle(
+      { x: 0, y: 0 },
+      { radius: 10, fillStyle: 'rgba(34, 197, 94, 0.25)', strokeStyle: '#111827', lineWidth: 2 }
+    );
+
+    let lastW = -1;
+    let lastH = -1;
+    function tick() {
+      const w = engine.renderContext.renderer.width;
+      const h = engine.renderContext.renderer.height;
+      if (w !== lastW || h !== lastH) {
+        lastW = w;
+        lastH = h;
+
+        bg.shape.width = w;
+        bg.shape.height = h;
+        border.shape.width = w;
+        border.shape.height = h;
+
+        diagA.shape.points = [[0, 0], [w, h]];
+        diagB.shape.points = [[0, h], [w, 0]];
+
+        center.transform.x = w / 2;
+        center.transform.y = h / 2;
+
+        document.title = `(${w} x ${h})`;
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    tick();
+    engine.start();
+  </script>
+</body>
+
+</html>

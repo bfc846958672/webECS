@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "html": "vite",
+    "html": "vite ",
     "build": "vite build",
     "dev": "tsc --noEmit --watch"
   },

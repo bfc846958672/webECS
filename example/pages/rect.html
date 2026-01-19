@@ -18,13 +18,14 @@
     import { Engine, Draw } from '../dist/web-ecs.es.js';
 
     const canvas = document.getElementById('game-canvas');
+    console.log(canvas.width, canvas.height);
     const engine = new Engine(canvas);
 
     const draw = new Draw(engine);
 
     // 矩形
     {
-      draw.rect({ x: 220, y: 200 }, {
+      draw.rect({ x: 0, y: 0 }, {
         width: 260,
         height: 140,
         fillStyle: '#e74c3c',

@@ -225,12 +225,12 @@ export class Renderer {
         this.gl.canvas.height = height * this.dpr;
 
         // Only set style if canvas is an HTMLCanvasElement (not OffscreenCanvas)
-        if ('style' in this.gl.canvas) {
-            Object.assign((this.gl.canvas as HTMLCanvasElement).style, {
-                width: width + 'px',
-                height: height + 'px',
-            });
-        }
+        // if ('style' in this.gl.canvas) {
+        //     Object.assign((this.gl.canvas as HTMLCanvasElement).style, {
+        //         width: width + 'px',
+        //         height: height + 'px',
+        //     });
+        // }
     }
 
     setViewport(width: number, height: number, x: number = 0, y: number = 0): void {
