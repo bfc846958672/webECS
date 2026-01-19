@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 
 /**
  * Circle（兼容椭圆与圆弧）
@@ -32,7 +31,6 @@ export class Circle extends RenderComponent implements IComponent {
   clockwise: boolean;
 
   constructor(
-    engine: Engine | null,
     {
       radius = 10,
       radiusY, // 可选，不传时自动与 radius 相等
@@ -46,7 +44,7 @@ export class Circle extends RenderComponent implements IComponent {
       clockwise = true,
     }: Partial<Circle> = {}
   ) {
-    super(engine);
+    super();
     this.radius = radius;
     if (radiusY) this.radiusY = radiusY; // 默认与 radius 相等（圆形）
     this.fillStyle = fillStyle;

@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent";
 import { RenderComponent } from "./RenderComponent";
-import { Engine } from "../../engine/Engine";
 
 export class Curve extends RenderComponent implements IComponent {
   start: [number, number] = [0, 0];
@@ -15,8 +14,8 @@ export class Curve extends RenderComponent implements IComponent {
   // 填充图形
   fill: string | undefined;
 
-  constructor(engine: Engine | null, opts: Partial<Curve> = {}) {
-    super(engine);
+  constructor(opts: Partial<Curve> = {}) {
+    super();
     this.start = opts.start || this.start;
     this.cp1 = opts.cp1 || this.cp1;
     this.cp2 = opts.cp2 || this.cp2;

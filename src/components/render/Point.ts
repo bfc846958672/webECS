@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 
 /**
  * 点块组件（WebGL gl.POINTS）
@@ -20,7 +19,6 @@ export class Point extends RenderComponent implements IComponent {
   alpha: number;
 
   constructor(
-    engine: Engine | null,
     {
       size = 4,
       fillStyle = "#000000",
@@ -28,7 +26,7 @@ export class Point extends RenderComponent implements IComponent {
       render = true,
     }: Partial<Point> = {}
   ) {
-    super(engine);
+    super();
     this.size = size;
     this.fillStyle = fillStyle;
     this.alpha = alpha;

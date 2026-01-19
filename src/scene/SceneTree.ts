@@ -55,6 +55,9 @@ export class SceneTree {
         this.root = new SceneNode(rootEntityId);
 
         this.nodes.set(rootEntityId, this.root);
+
+        // 初始化 displayList，确保只存在 root 时也能遍历到根节点
+        this.displayList = this.build();
     }
 
     /**
@@ -69,8 +72,21 @@ export class SceneTree {
 
         const node = this.nodes.get(entityId)!;
         const parentNode = this.nodes.get(parentId)!;
-        node.parent = parentNode;
-        parentNode.children.push(node);
+        parentNode.addChild(node);
+        this.displayList = this.build();
+    }
+
+    /**
+     * 重新设置节点父子关系（会刷新 displayList）
+     */
+    reparent(entityId: number, parentId?: number) {
+        this._version++;
+        if (!this.nodes.has(entityId)) this.nodes.set(entityId, new SceneNode(entityId));
+        if (parentId === undefined) parentId = this.rootEntityId;
+        const parentNode = this.nodes.get(parentId);
+        if (!parentNode) throw new Error(`reparent fail, Parent entity ${parentId} not exists`);
+        const node = this.nodes.get(entityId)!;
+        parentNode.addChild(node);
         this.displayList = this.build();
     }
     remove(entityId: number) {

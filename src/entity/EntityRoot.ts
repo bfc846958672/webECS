@@ -7,7 +7,7 @@ export class RootEntity {
 
     constructor(private engine: Engine) {
         this.entityId = this.engine.ecs.createEntity();
-        this.engine.ecs.addComponent(this.entityId, new Transform(this.engine, { x: 0, y: 0, }));
+        this.engine.ecs.addComponent(this.entityId, new Transform({ x: 0, y: 0 }));
     }
 
     /**

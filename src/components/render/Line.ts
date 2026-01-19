@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 
 /**
  * 线组件（WebGL gl.LINES）
@@ -20,7 +19,6 @@ export class Line extends RenderComponent implements IComponent {
   render: boolean = true;
 
   constructor(
-    engine: Engine | null,
     {
       points = [],
       strokeStyle = "#000000",
@@ -28,7 +26,7 @@ export class Line extends RenderComponent implements IComponent {
       render = true,
     }: Partial<Line> = {}
   ) {
-    super(engine);
+    super();
     this.points = points;
     this.strokeStyle = strokeStyle;
     this.alpha = alpha;

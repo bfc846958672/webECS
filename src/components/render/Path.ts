@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 // todo 暂不支持
 /** 🧩 支持的路径命令 */
 export type IPathCommand =
@@ -24,8 +23,8 @@ export class Path extends RenderComponent implements IComponent {
   /** 🆕 缓存 Path2D 对象 */
   path2D?: Path2D;
 
-  constructor(engine: Engine | null, options: Partial<Path> & { commands?: IPathCommand[] } = {}) {
-    super(engine);
+  constructor(options: Partial<Path> & { commands?: IPathCommand[] } = {}) {
+    super();
     this.commands = options.commands || [];
     this.strokeStyle = options.strokeStyle || "#000000";
     this.fillStyle = options.fillStyle || undefined;

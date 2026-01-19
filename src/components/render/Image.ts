@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 
 /**
  * 图片组件，仅存储渲染数据
@@ -13,8 +12,8 @@ export class Image extends RenderComponent implements IComponent {
     alpha: number = 1.0;                  // 透明度
     render: boolean = true;               // 是否渲染
     clip?: [number, number, number, number] = undefined; // 裁剪区域 [x, y, w, h]
-    constructor(engine: Engine | null, params: Partial<Image> = {}) {
-        super(engine);
+    constructor(params: Partial<Image> = {}) {
+        super();
         if (params.clip !== undefined) this.clip = params.clip;
         if (params.bitmap !== undefined) this.bitmap = params.bitmap;
         if (params.width !== undefined) this.width = params.width;

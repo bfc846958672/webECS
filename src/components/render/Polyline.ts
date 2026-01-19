@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 
 /**
  * 折线 / 多边形组件
@@ -31,7 +30,6 @@ export class Polyline extends RenderComponent implements IComponent {
   render: boolean = true;
 
   constructor(
-    engine: Engine | null,
     {
       points = [],
       closed = false,
@@ -43,7 +41,7 @@ export class Polyline extends RenderComponent implements IComponent {
       lineJoin = "miter",
     }: Partial<Polyline> = {}
   ) {
-    super(engine);
+    super();
     this.points = points;
     this.closed = closed;
     this.fillStyle = fillStyle;

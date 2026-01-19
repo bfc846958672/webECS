@@ -74,10 +74,7 @@ export class Engine implements IEngine {
         // 检查树中是否存在
         if (!this.sceneTree.has(parentId))
             throw new Error(`Entity ${parentId} not exists`);
-        const parentNode = this.sceneTree.get(parentId);
-        const childNode = this.sceneTree.get(childId);
-
-        parentNode.addChild(childNode);
+        this.sceneTree.reparent(childId, parentId);
         // 通知系统设置父节点
     }
 

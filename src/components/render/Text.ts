@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 import type { IFont } from "../../interface/font.ts";
 /**
  * 文本组件，仅存储渲染数据
@@ -24,7 +23,7 @@ export class Text extends RenderComponent implements IComponent {
 	textAlign: CanvasTextAlign;
 	textBaseline: CanvasTextBaseline;
     debug: boolean = false;
-	constructor(engine: Engine | null, {
+	constructor({
 		font,
 		text = "",
 		size = 16,
@@ -34,7 +33,7 @@ export class Text extends RenderComponent implements IComponent {
 		textBaseline = "alphabetic",
         debug = false
 	}: Partial<Text> = {}) {
-		super(engine);
+		super();
 		this.font = font! ;
 		this.text = text || "";
 		this.size = size || 16;

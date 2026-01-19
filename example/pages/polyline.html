@@ -15,7 +15,7 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Components } from '/src/main.ts';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
@@ -23,7 +23,7 @@
     // 折线
     {
       const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Polyline(engine, {
+      engine.ecs.addComponent(e, new Components.Polyline({
         points: [
           [0, 0],
           [200, 60],
@@ -35,14 +35,14 @@
         strokeStyle: '#111827',
         lineWidth: 4,
       }));
-      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 160, y: 180 }));
+      engine.ecs.addComponent(e, new Components.Transform({ x: 160, y: 180 }));
       engine.add(e);
     }
 
     // 闭合多边形（填充）
     {
       const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Polyline(engine, {
+      engine.ecs.addComponent(e, new Components.Polyline({
         points: [
           [0, 0],
           [180, 30],
@@ -54,7 +54,7 @@
         strokeStyle: '#3b82f6',
         lineWidth: 3,
       }));
-      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 760, y: 260 }));
+      engine.ecs.addComponent(e, new Components.Transform({ x: 760, y: 260 }));
       engine.add(e);
     }
 

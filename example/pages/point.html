@@ -15,7 +15,7 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Components } from '/src/main.ts';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
@@ -29,11 +29,11 @@
 
     for (const p of points) {
       const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Point(engine, {
+      engine.ecs.addComponent(e, new Components.Point({
         size: p.size,
         fillStyle: p.fillStyle,
       }));
-      engine.ecs.addComponent(e, new Components.Transform(engine, { x: p.x, y: p.y }));
+      engine.ecs.addComponent(e, new Components.Transform({ x: p.x, y: p.y }));
       engine.add(e);
     }
 

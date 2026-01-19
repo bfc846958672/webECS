@@ -1,7 +1,6 @@
 import { IComponent } from "./IComponent.ts";
 import { Component } from "./Component.ts";
 import { mat3 } from "gl-matrix";
-import { Engine } from "../engine/Engine.ts";
 export class Transform extends Component implements IComponent {
   #x = 0;
   #y = 0;
@@ -16,11 +15,8 @@ export class Transform extends Component implements IComponent {
   localMatrix = mat3.create();
   worldMatrix = mat3.create();
   dirty = true;
-  #engine: Engine | null;
-  constructor(engine: Engine | null, params: Partial<Transform> = {}) {
+  constructor(params: Partial<Transform> = {}) {
     super();
-    this.#engine = engine;
-    this.#engine;
     const keys = ["x", "y", "scaleX", "scaleY", "rotation", "skewX", "skewY", "pivotX", "pivotY"] as const;
     for (const key of keys) {
       if (params[key] !== undefined) { this[key] = params[key]!; }

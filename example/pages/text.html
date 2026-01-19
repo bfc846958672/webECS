@@ -20,25 +20,24 @@
     <canvas id="game-canvas" width="1500" height="800"></canvas>
 
     <script type="module">
-      import { Engine, Components, Font } from "../dist/web-ecs.es.js";
+      import { Engine, Components, Font } from "/src/main.ts";
 
       const canvas = document.getElementById("game-canvas");
       const engine = new Engine(canvas);
 
       async function main() {
-        // 字体资源来自：example/dist/font/output/
-        // json 文件名目前是 mdsf.json，贴图约定为同目录 msdf.png
+        // 字体资源来自：/font/output/
         const fontLoader = new Font();
         const { font, images } = await fontLoader.init(
-          "../dist/font/output/atlas.json",
-          ["../dist/font/output/atlas.png"]
+          "/font/output/atlas.json",
+          ["/font/output/atlas.png"]
         );
         const ifont = { font, images };
 
         const e = engine.ecs.createEntity();
         engine.ecs.addComponent(
           e,
-          new Components.Text(engine, {
+          new Components.Text({
             font: ifont,
             text: " Hello 你好webECS MSDF Text: Hello 你好 123",
             size: 56,
@@ -50,7 +49,7 @@
         );
         engine.ecs.addComponent(
           e,
-          new Components.Transform(engine, { x: 80, y: 120, scaleX: 2, scaleY: 2 })
+          new Components.Transform({ x: 80, y: 120, scaleX: 2, scaleY: 2 })
         );
         engine.add(e);
 

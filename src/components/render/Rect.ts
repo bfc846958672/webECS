@@ -1,6 +1,5 @@
 import { IComponent } from "../IComponent.ts";
 import { RenderComponent } from "./RenderComponent.ts";
-import { Engine } from "../../engine/Engine.ts";
 
 /**
  * 矩形组件，仅存储渲染数据
@@ -15,7 +14,7 @@ export class Rect extends RenderComponent implements IComponent {
   lineWidth: number;
   alpha: number;
   radius: number;
-  constructor(engine: Engine | null, {
+  constructor({
     width = 0,
     height = 0,
     fillStyle = "#181b1dff",
@@ -25,7 +24,7 @@ export class Rect extends RenderComponent implements IComponent {
     render = true,
     radius = 0,
   }: Partial<Rect> = {}) {
-    super(engine);
+    super();
     this.width = width;
     this.height = height;
     this.fillStyle = fillStyle || "#181b1dff";
@@ -36,4 +35,3 @@ export class Rect extends RenderComponent implements IComponent {
     this.render = render;
   }
 }
-

@@ -15,7 +15,7 @@
   <canvas id="game-canvas" width="1200" height="800"></canvas>
 
   <script type="module">
-    import { Engine, Components } from '../dist/web-ecs.es.js';
+    import { Engine, Components } from '/src/main.ts';
 
     const canvas = document.getElementById('game-canvas');
     const engine = new Engine(canvas);
@@ -23,21 +23,21 @@
     // 二次贝塞尔（cp2 不传）
     {
       const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Curve(engine, {
+      engine.ecs.addComponent(e, new Components.Curve({
         start: [0, 240],
         cp1: [240, 0],
         end: [520, 240],
         strokeStyle: '#ef4444',
         lineWidth: 5,
       }));
-      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 160, y: 160 }));
+      engine.ecs.addComponent(e, new Components.Transform({ x: 160, y: 160 }));
       engine.add(e);
     }
 
     // 三次贝塞尔（cp2 传入）
     {
       const e = engine.ecs.createEntity();
-      engine.ecs.addComponent(e, new Components.Curve(engine, {
+      engine.ecs.addComponent(e, new Components.Curve({
         start: [0, 200],
         cp1: [160, 0],
         cp2: [360, 400],
@@ -45,7 +45,7 @@
         strokeStyle: '#3b82f6',
         lineWidth: 5,
       }));
-      engine.ecs.addComponent(e, new Components.Transform(engine, { x: 560, y: 200 }));
+      engine.ecs.addComponent(e, new Components.Transform({ x: 560, y: 200 }));
       engine.add(e);
     }
 
