@@ -17,8 +17,8 @@ export type EngineResizeController = {
 
 function getCanvasCssSize(canvas: HTMLCanvasElement) {
     const rect = canvas.getBoundingClientRect();
-    const width = Math.max(1, Math.round(rect.width));
-    const height = Math.max(1, Math.round(rect.height));
+    const width = Math.max(1, (rect.width));
+    const height = Math.max(1, (rect.height));
     return { width, height };
 }
 
@@ -58,15 +58,11 @@ export function bindEngineResize(engine: Engine): EngineResizeController {
     const canvas = (engine.ecs as any).canvas as HTMLCanvasElement;
     if (!canvas) throw new Error("Engine.ecs.canvas 未设置");
 
-    let ro: ResizeObserver | null = new ResizeObserver((entities) => {
-        const entity = entities[0]!;
-        const { width, height } = entity.contentRect;
+    let ro: ResizeObserver | null = new ResizeObserver(() => {
+        const { width, height } = getCanvasCssSize(canvas);
         engine.ecs.getSystem(PreRenderQueue).once(() => { resizeEngineToCanvas(engine, {width, height})});
     });
     ro.observe(canvas);
-    // 初次同步
-    resizeEngineToCanvas(engine, getCanvasCssSize(canvas));
-
     return {
         resize: (size: {width: number, height: number}) =>{ resizeEngineToCanvas(engine, size)},
         dispose: () => {
