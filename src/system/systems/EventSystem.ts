@@ -1,5 +1,5 @@
 import { ISystem } from "../../interface/System.ts";
-import { EventComponent, IEventType, IScreenEvent } from "../../components/Event.ts";
+import { EventComponent, IEngineEvent, IEventType, IScreenEvent } from "../../components/Event.ts";
 import { SceneNode } from "../../scene/SceneTree.ts";
 import { PickEntitySystem } from "./PickEntitySystem.ts";
 /**
@@ -73,12 +73,15 @@ export class EventSystem extends ISystem {
     /** 冒泡事件分发 */
     private propagateEvent(entityId: number, type: IEventType, e: IScreenEvent) {
         let node: SceneNode | null = this.sceneTree.get(entityId);
+        let path:number[] = []
         while (node) {
             const ev = this.ecs.getComponent(node.entityId, EventComponent);
             if (ev) {
-                const stop = ev.emit(type, e, node.entityId);
+                const engineEvent: IEngineEvent = { engineEvent: { entityId: node.entityId, path: [...path] } };
+                const stop = ev.emit(type, { ...e, ...engineEvent });
                 if (stop) break; // 阻止冒泡
             }
+            path.push(node.entityId);
             node = node.parent;
         }
     }
