@@ -10,10 +10,9 @@ export type IEventType =
 /**
  * engine事件, 会合原始event 合并到一起
  */
-export type IEngineEvent = {engineEvent: { entityId: number, path: number[] }}
-export type IRawEvent = MouseEvent | PointerEvent | WheelEvent | TouchEvent;
-export type IScreenEvent = IRawEvent & IEngineEvent;
-export type EventCallback = (event: IScreenEvent) => boolean | void;
+export type IEngineEvent = { entityId: number, path: number[] }
+export type IScreenEvent = MouseEvent | PointerEvent | WheelEvent | TouchEvent;
+export type EventCallback = (event: IScreenEvent, engineEvent: IEngineEvent) => boolean | void;
 
 export class EventComponent extends Component implements IComponent {
     public events = new Map<IEventType, EventCallback[]>();
@@ -36,13 +35,13 @@ export class EventComponent extends Component implements IComponent {
     }
 
     /** 触发事件，返回 true 表示阻止冒泡 */
-    emit(type: IEventType, event: IScreenEvent) {
+    emit(type: IEventType, event: IScreenEvent, engineEvent: IEngineEvent): boolean {
         const arr = this.events.get(type);
         if (!arr) return false;
 
         let stop = false;
         for (const cb of arr) {
-            const result = cb(event);
+            const result = cb(event, engineEvent);
             if (result === true) stop = true;
         }
         return stop;

@@ -77,8 +77,8 @@ export class EventSystem extends ISystem {
         while (node) {
             const ev = this.ecs.getComponent(node.entityId, EventComponent);
             if (ev) {
-                const engineEvent: IEngineEvent = { engineEvent: { entityId: node.entityId, path: [...path] } };
-                const stop = ev.emit(type, { ...e, ...engineEvent });
+                const engineEvent: IEngineEvent = { entityId: node.entityId, path: [...path] };
+                const stop = ev.emit(type,e, engineEvent);
                 if (stop) break; // 阻止冒泡
             }
             path.push(node.entityId);

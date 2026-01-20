@@ -18,14 +18,15 @@ export class Engine implements IEngine {
     
     public ecs: ECS;
     private ticker: Ticker;
+    #root: RootEntity;
     public sceneTree: SceneTree;
-    public rootEntity: RootEntity;
     public renderContext: IRenderContext
     constructor(canvas: HTMLCanvasElement, options: IEngineOption = { autoResize: true, performance: false }) {
         this.ecs = new ECS();
         this.ecs.canvas = canvas;
-        this.rootEntity = new RootEntity(this);
-        this.sceneTree = new SceneTree(this.rootEntity.entityId);
+        // 场景树相关
+        this.#root = new RootEntity(this);
+        this.sceneTree = new SceneTree(this.#root.entityId);
         // webgl 相关
         this.renderContext = {
             camera: new Camera(undefined, {
@@ -129,7 +130,7 @@ export class Engine implements IEngine {
         return this.sceneTree.all();
     }
     root() {
-        return this.sceneTree.root.entityId;
+        return this.#root;
     }
     resize(size: { width: number, height: number }) {
         const that = this;

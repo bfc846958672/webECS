@@ -75,9 +75,9 @@
     }
 
     function bindDrag(instance) {
-      instance.event.on('pointerdown', (e) => {
+      instance.event.on('pointerdown', (e, engineEvent) => {
         e.preventDefault?.();
-
+        console.log('pointerdown', e, engineEvent);
         // 尝试设置 pointer capture，确保 pointermove/up 会持续发给 canvas
         if ('pointerId' in e && typeof canvas.setPointerCapture === 'function') {
           try { canvas.setPointerCapture(e.pointerId); } catch {}
