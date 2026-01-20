@@ -6,3 +6,8 @@ export interface IEngine {
   remove: (entityId: number) => void;
   clear: () => void;
 }
+
+export interface IEngineOption {
+  autoResize?: boolean;
+  performance?: boolean;
+}

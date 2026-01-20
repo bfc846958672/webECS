@@ -3,24 +3,7 @@ import { Rect } from '../../../components/render/Rect';
 import { Transform } from '../../../components/Transform';
 import { parseColorStyle } from '../../../utils/color';
 
-export function renderRoundedRects(gl: WebGL2RenderingContext, camera: Camera, transform: Transform, rect: Rect) {
-    if (!rect) return;
-
-    const alpha = rect.alpha == null ? 1 : Math.max(0, Math.min(1, Number(rect.alpha)));
-    const radius = Math.max(0, Number(rect.radius || 0));
-    const fill = parseColorStyle(rect.fillStyle);
-    const stroke = rect.strokeStyle ? parseColorStyle(rect.strokeStyle) : [0, 0, 0, 0];
-
-    // aRect.xy previously stored x/y translation, but translation/scale/skew/rotation
-    // are now handled by Transform.worldMatrix on GPU. Keep zw as local size (w/h).
-    const aRect = new Float32Array([0, 0, rect.width || 0, rect.height || 0]);
-    const aWorldMatrix = new Float32Array(transform.worldMatrix);
-    const aRadius = new Float32Array([radius]);
-    const aColor = new Float32Array([fill[0], fill[1], fill[2], fill[3] * alpha]);
-    const aStrokeColor = new Float32Array([stroke[0], stroke[1], stroke[2], stroke[3] * alpha]);
-    const aLineWidth = new Float32Array([Math.max(0, Number(rect.lineWidth || 0))]);
-
-    const vertex = `#version 300 es
+const vertex = `#version 300 es
         precision highp float;
 
         // Unit quad (0..1) in local space
@@ -70,7 +53,7 @@ export function renderRoundedRects(gl: WebGL2RenderingContext, camera: Camera, t
         }
     `;
 
-    const fragment = `#version 300 es
+const fragment = `#version 300 es
         precision highp float;
 
         in vec2 vLocalPos;
@@ -115,35 +98,106 @@ export function renderRoundedRects(gl: WebGL2RenderingContext, camera: Camera, t
         }
     `;
 
-    const program = new Program(gl, {
-        vertex,
-        fragment,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-    });
+const unitQuad = new Float32Array([
+    0, 0,
+    1, 0,
+    0, 1,
 
-    const unitQuad = new Float32Array([
-        0, 0,
-        1, 0,
-        0, 1,
+    1, 0,
+    1, 1,
+    0, 1,
+]);
 
-        1, 0,
-        1, 1,
-        0, 1,
-    ]);
+let program: Program | null = null;
+let geometry: Geometry | null = null;
+let mesh: Mesh | null = null;
 
-    const geometry = new Geometry(gl, {
-        position: { data: unitQuad, size: 2 },
-        aRect: { data: aRect, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aRadius: { data: aRadius, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aStrokeColor: { data: aStrokeColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aLineWidth: { data: aLineWidth, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
-    });
-    geometry.setInstancedCount(1);
+// Pre-allocated Float32Arrays for attributes
+let positionData = unitQuad;
+let aRectData = new Float32Array(4);
+let aWorldMatrixData = new Float32Array(9);
+let aRadiusData = new Float32Array(1);
+let aColorData = new Float32Array(4);
+let aStrokeColorData = new Float32Array(4);
+let aLineWidthData = new Float32Array(1);
 
-    const mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
-    mesh.draw({ camera });
+export function renderRoundedRects(gl: WebGL2RenderingContext, camera: Camera, transform: Transform, rect: Rect) {
+    if (!rect) return;
+
+    if (!program) {
+        program = new Program(gl, {
+            vertex,
+            fragment,
+            transparent: true,
+            depthTest: false,
+            depthWrite: false,
+        });
+
+        geometry = new Geometry(gl, {
+            position: { data: positionData, size: 2 },
+            aRect: { data: aRectData, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aWorldMatrix: { data: aWorldMatrixData, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aRadius: { data: aRadiusData, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aColor: { data: aColorData, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aStrokeColor: { data: aStrokeColorData, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aLineWidth: { data: aLineWidthData, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
+        });
+        geometry.setInstancedCount(1);
+
+        mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
+    }
+
+    const alpha = rect.alpha == null ? 1 : Math.max(0, Math.min(1, Number(rect.alpha)));
+    const radius = Math.max(0, Number(rect.radius || 0));
+    const fill = parseColorStyle(rect.fillStyle);
+    const stroke = rect.strokeStyle ? parseColorStyle(rect.strokeStyle) : [0, 0, 0, 0];
+
+    // Update attribute data directly
+    // positionData is unitQuad, update if needed
+    // For example: positionData.set(newPositions);
+
+    aRectData[0] = 0;
+    aRectData[1] = 0;
+    aRectData[2] = rect.width || 0;
+    aRectData[3] = rect.height || 0;
+
+    aWorldMatrixData.set(transform.worldMatrix);
+
+    aRadiusData[0] = radius;
+
+    aColorData[0] = fill[0];
+    aColorData[1] = fill[1];
+    aColorData[2] = fill[2];
+    aColorData[3] = fill[3] * alpha;
+
+    aStrokeColorData[0] = stroke[0];
+    aStrokeColorData[1] = stroke[1];
+    aStrokeColorData[2] = stroke[2];
+    aStrokeColorData[3] = stroke[3] * alpha;
+
+    aLineWidthData[0] = Math.max(0, Number(rect.lineWidth || 0));
+
+    // Mark attributes as needing update
+    geometry!.attributes.position.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.position);
+
+    geometry!.attributes.aRect.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aRect);
+
+    geometry!.attributes.aWorldMatrix.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aWorldMatrix);
+
+    geometry!.attributes.aRadius.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aRadius);
+
+    geometry!.attributes.aColor.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aColor);
+
+    geometry!.attributes.aStrokeColor.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aStrokeColor);
+
+    geometry!.attributes.aLineWidth.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aLineWidth);
+
+    mesh!.draw({ camera });
 }

@@ -21,11 +21,11 @@ export class RectGraphics extends Graphics {
     const transform = ecs.getComponent(entityId, Transform)!;
     const rect = ecs.getComponent(entityId, Rect)!;
     if (!rect.render) return;
-    if (rect.radius > 0) {
-      renderRoundedRects(gl, this.renderContext!.camera, transform, rect);
-    } else {
-      renderSolidRects(gl, this.renderContext!.camera, transform, rect);
-    }
+    // if (rect.radius > 0) {
+    renderRoundedRects(gl, this.renderContext!.camera, transform, rect);
+    // } else {
+    //   renderSolidRects(gl, this.renderContext!.camera, transform, rect);
+    // }
   }
 
   computeAABB(ecs: ECS, entityId: number) {

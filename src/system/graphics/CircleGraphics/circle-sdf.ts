@@ -3,35 +3,7 @@ import { Circle } from '../../../components/render/Circle';
 import { Transform } from '../../../components/Transform';
 import { parseColorStyle } from '../../../utils/color';
 
-// 单个 Circle/椭圆/圆弧（扇形裁剪）渲染。
-// 约定：Transform.worldMatrix 为 3x3 仿射矩阵（包含平移/缩放/旋转/斜切）。
-// circle.radius/radiusY 为主/次半径（像素）。
-export function renderCircle(gl: WebGL2RenderingContext, camera: Camera, transform: Transform, circle: Circle) {
-    if (!circle) return;
-
-    const radius = Math.max(0, Number(circle.radius || 0));
-    const radiusY = circle.radiusY == null ? radius : Math.max(0, Number(circle.radiusY || 0));
-
-    const alpha = circle.alpha == null ? 1 : Math.max(0, Math.min(1, Number(circle.alpha)));
-    const fill = parseColorStyle(circle.fillStyle);
-    const stroke = circle.strokeStyle ? parseColorStyle(circle.strokeStyle) : [0, 0, 0, 0];
-
-    const lineWidth = Math.max(0, Number(circle.lineWidth || 0));
-
-    const startAngle = circle.startAngle == null ? 0 : Number(circle.startAngle);
-    const endAngle = circle.endAngle == null ? Math.PI * 2 : Number(circle.endAngle);
-    const clockwise = circle.clockwise == null ? true : Boolean(circle.clockwise);
-
-    // Instanced attribute layout（便于后期直接扩容批处理）：
-    const aWorldMatrix = new Float32Array(transform.worldMatrix);
-    const aRadii = new Float32Array([radius, radiusY]);
-    const aColor = new Float32Array([fill[0], fill[1], fill[2], fill[3] * alpha]);
-    const aStrokeColor = new Float32Array([stroke[0], stroke[1], stroke[2], stroke[3] * alpha]);
-    const aLineWidth = new Float32Array([lineWidth]);
-    const aAngles = new Float32Array([startAngle, endAngle]);
-    const aClockwise = new Float32Array([clockwise ? 1 : 0]);
-
-    const vertex = `#version 300 es
+const vertex = `#version 300 es
         precision highp float;
 
         // Unit quad (0..1) in local space
@@ -80,7 +52,7 @@ export function renderCircle(gl: WebGL2RenderingContext, camera: Camera, transfo
         }
     `;
 
-    const fragment = `#version 300 es
+const fragment = `#version 300 es
         precision highp float;
 
         in vec2 vLocalPos;
@@ -159,37 +131,114 @@ export function renderCircle(gl: WebGL2RenderingContext, camera: Camera, transfo
         }
     `;
 
-    const program = new Program(gl, {
-        vertex,
-        fragment,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-    });
+const unitQuad = new Float32Array([
+    0, 0,
+    1, 0,
+    0, 1,
 
-    const unitQuad = new Float32Array([
-        0, 0,
-        1, 0,
-        0, 1,
+    1, 0,
+    1, 1,
+    0, 1,
+]);
 
-        1, 0,
-        1, 1,
-        0, 1,
-    ]);
+let program: Program | null = null;
+let geometry: Geometry | null = null;
+let mesh: Mesh | null = null;
 
-    const geometry = new Geometry(gl, {
-        position: { data: unitQuad, size: 2 },
+// Pre-allocated Float32Arrays for attributes
+let positionData = unitQuad;
+let aWorldMatrixData = new Float32Array(9);
+let aRadiiData = new Float32Array(2);
+let aColorData = new Float32Array(4);
+let aStrokeColorData = new Float32Array(4);
+let aLineWidthData = new Float32Array(1);
+let aAnglesData = new Float32Array(2);
+let aClockwiseData = new Float32Array(1);
 
-        aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aRadii: { data: aRadii, size: 2, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aStrokeColor: { data: aStrokeColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aLineWidth: { data: aLineWidth, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aAngles: { data: aAngles, size: 2, instanced: 1, usage: gl.DYNAMIC_DRAW },
-        aClockwise: { data: aClockwise, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
-    });
-    geometry.setInstancedCount(1);
+// 单个 Circle/椭圆/圆弧（扇形裁剪）渲染。
+// 约定：Transform.worldMatrix 为 3x3 仿射矩阵（包含平移/缩放/旋转/斜切）。
+// circle.radius/radiusY 为主/次半径（像素）。
+export function renderCircle(gl: WebGL2RenderingContext, camera: Camera, transform: Transform, circle: Circle) {
+    if (!circle) return;
 
-    const mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
-    mesh.draw({ camera });
+    if (!program) {
+        program = new Program(gl, {
+            vertex,
+            fragment,
+            transparent: true,
+            depthTest: false,
+            depthWrite: false,
+        });
+
+        geometry = new Geometry(gl, {
+            position: { data: positionData, size: 2 },
+            aWorldMatrix: { data: aWorldMatrixData, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aRadii: { data: aRadiiData, size: 2, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aColor: { data: aColorData, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aStrokeColor: { data: aStrokeColorData, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aLineWidth: { data: aLineWidthData, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aAngles: { data: aAnglesData, size: 2, instanced: 1, usage: gl.DYNAMIC_DRAW },
+            aClockwise: { data: aClockwiseData, size: 1, instanced: 1, usage: gl.DYNAMIC_DRAW },
+        });
+        geometry.setInstancedCount(1);
+
+        mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
+    }
+
+    const radius = Math.max(0, Number(circle.radius || 0));
+    const radiusY = circle.radiusY == null ? radius : Math.max(0, Number(circle.radiusY || 0));
+
+    const alpha = circle.alpha == null ? 1 : Math.max(0, Math.min(1, Number(circle.alpha)));
+    const fill = parseColorStyle(circle.fillStyle);
+    const stroke = circle.strokeStyle ? parseColorStyle(circle.strokeStyle) : [0, 0, 0, 0];
+
+    const lineWidth = Math.max(0, Number(circle.lineWidth || 0));
+
+    const startAngle = circle.startAngle == null ? 0 : Number(circle.startAngle);
+    const endAngle = circle.endAngle == null ? Math.PI * 2 : Number(circle.endAngle);
+    const clockwise = circle.clockwise == null ? true : Boolean(circle.clockwise);
+
+    // Update attribute data directly
+    aWorldMatrixData.set(transform.worldMatrix);
+    aRadiiData[0] = radius;
+    aRadiiData[1] = radiusY;
+    aColorData[0] = fill[0];
+    aColorData[1] = fill[1];
+    aColorData[2] = fill[2];
+    aColorData[3] = fill[3] * alpha;
+    aStrokeColorData[0] = stroke[0];
+    aStrokeColorData[1] = stroke[1];
+    aStrokeColorData[2] = stroke[2];
+    aStrokeColorData[3] = stroke[3] * alpha;
+    aLineWidthData[0] = lineWidth;
+    aAnglesData[0] = startAngle;
+    aAnglesData[1] = endAngle;
+    aClockwiseData[0] = clockwise ? 1 : 0;
+
+    // Mark attributes as needing update
+    geometry!.attributes.position.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.position);
+
+    geometry!.attributes.aWorldMatrix.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aWorldMatrix);
+
+    geometry!.attributes.aRadii.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aRadii);
+
+    geometry!.attributes.aColor.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aColor);
+
+    geometry!.attributes.aStrokeColor.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aStrokeColor);
+
+    geometry!.attributes.aLineWidth.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aLineWidth);
+
+    geometry!.attributes.aAngles.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aAngles);
+
+    geometry!.attributes.aClockwise.needsUpdate = true;
+    geometry!.updateAttribute(geometry!.attributes.aClockwise);
+
+    mesh!.draw({ camera });
 }
