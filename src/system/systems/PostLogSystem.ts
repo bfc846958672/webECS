@@ -13,6 +13,10 @@ export class PostLogSystem extends ISystem {
   private updateInterval = 200; // ms
   private frameTimes: number[] = [];
   private maxSamples = 60;
+  // drag state
+  private isDragging = false;
+  private dragOffsetX = 0;
+  private dragOffsetY = 0;
 
   constructor(public engine: Engine, public sceneTree: SceneTree) {
     super(engine, sceneTree);
@@ -37,7 +41,9 @@ export class PostLogSystem extends ISystem {
       fontFamily: 'monospace, system-ui, Arial',
       fontSize: '12px',
       lineHeight: '1.3',
-      pointerEvents: 'none',
+      pointerEvents: 'auto',
+      touchAction: 'none',
+      userSelect: 'none',
       minWidth: '120px',
     } as Partial<CSSStyleDeclaration>);
 
@@ -51,6 +57,47 @@ export class PostLogSystem extends ISystem {
 
     document.body.appendChild(d);
     this.container = d;
+
+    // enable dragging
+    const onPointerDown = (e: PointerEvent) => {
+      if (!this.container) return;
+      // compute bounding rect and convert right->left when starting drag
+      const rect = this.container.getBoundingClientRect();
+      // If style.right is set, convert to left so we can move using left/top
+      if (this.container.style.right && this.container.style.right !== 'auto') {
+        this.container.style.left = `${rect.left}px`;
+        this.container.style.right = 'auto';
+      }
+      this.isDragging = true;
+      this.dragOffsetX = e.clientX - rect.left;
+      this.dragOffsetY = e.clientY - rect.top;
+      try { this.container.setPointerCapture?.(e.pointerId); } catch (err) {}
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onPointerUp);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!this.isDragging || !this.container) return;
+      const maxLeft = Math.max(0, window.innerWidth - this.container.offsetWidth);
+      const maxTop = Math.max(0, window.innerHeight - this.container.offsetHeight);
+      let left = e.clientX - this.dragOffsetX;
+      let top = e.clientY - this.dragOffsetY;
+      left = Math.min(Math.max(0, left), maxLeft);
+      top = Math.min(Math.max(0, top), maxTop);
+      this.container.style.left = `${left}px`;
+      this.container.style.top = `${top}px`;
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!this.container) return;
+      this.isDragging = false;
+      try { this.container.releasePointerCapture?.(e.pointerId); } catch (err) {}
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+    };
+
+    // Attach pointerdown to container so it can be dragged
+    this.container.addEventListener('pointerdown', onPointerDown);
   }
 
   update(delta: number): void {
