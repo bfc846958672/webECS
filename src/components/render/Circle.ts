@@ -7,6 +7,8 @@ import { RenderComponent } from "./RenderComponent.ts";
  * 可通过 startAngle、endAngle 和 clockwise 绘制圆弧。
  */
 export class Circle extends RenderComponent implements IComponent {
+  readonly type = "Circle";
+
   render = true;
 
   /** 主半径（x 方向） */

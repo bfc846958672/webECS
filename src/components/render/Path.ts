@@ -13,6 +13,7 @@ export type IPathCommand =
   | { type: "close" };
 
 export class Path extends RenderComponent implements IComponent {
+  readonly type = "Path";
   commands: IPathCommand[] = [];
   strokeStyle?: string;
   fillStyle?: string;

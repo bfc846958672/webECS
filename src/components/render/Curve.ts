@@ -2,6 +2,8 @@ import { IComponent } from "../IComponent";
 import { RenderComponent } from "./RenderComponent";
 
 export class Curve extends RenderComponent implements IComponent {
+  readonly type = "Curve";
+
   start: [number, number] = [0, 0];
   cp1: [number, number] = [0, 0];
   cp2?: [number, number];

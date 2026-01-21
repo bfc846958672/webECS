@@ -10,6 +10,7 @@ import { IAABB } from "../interface/AABB";
  * - totalAABB: self + children
  */
 export class BoundingBoxComponent extends Component implements IComponent {
+    readonly type = "BoundingBox";
     // 当前节点自身图形包围盒
     selfAABB: IAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
     childrenAABB: IAABB = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };

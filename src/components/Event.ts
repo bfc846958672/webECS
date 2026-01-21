@@ -15,6 +15,7 @@ export type IScreenEvent = MouseEvent | PointerEvent | WheelEvent | TouchEvent;
 export type EventCallback = (event: IScreenEvent, engineEvent: IEngineEvent) => boolean | void;
 
 export class EventComponent extends Component implements IComponent {
+    readonly type = "Event";
     public events = new Map<IEventType, EventCallback[]>();
 
     /** 注册事件 */

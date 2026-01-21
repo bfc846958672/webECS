@@ -7,6 +7,8 @@ import { RenderComponent } from "./RenderComponent.ts";
  * 系统（RenderSystem）负责渲染
  */
 export class Polyline extends RenderComponent implements IComponent {
+  readonly type = "Polyline";
+  
   /** 顶点列表，例如 [{x:0, y:0}, {x:100, y:50}] */
   points: [number,number][] = [];
 

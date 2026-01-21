@@ -6,6 +6,8 @@ import { RenderComponent } from "./RenderComponent.ts";
  * 不包含绘制逻辑，系统负责渲染
  */
 export class Rect extends RenderComponent implements IComponent {
+  readonly type = "Rect";
+
   width: number;
   height: number;
   render: boolean = true;

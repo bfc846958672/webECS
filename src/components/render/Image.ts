@@ -6,6 +6,8 @@ import { RenderComponent } from "./RenderComponent.ts";
  * 不包含绘制逻辑，系统负责渲染
  */
 export class Image extends RenderComponent implements IComponent {
+    readonly type = "Image";
+
     #bitmap: ImageBitmap | null = null;  // 私有 bitmap
     #width: number = 0;                   // 私有宽度
     #height: number = 0;                  // 私有高度

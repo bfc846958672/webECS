@@ -6,6 +6,7 @@ import type { IFont } from "../../interface/font.ts";
  * 不包含绘制逻辑，系统负责渲染
  */
 export class Text extends RenderComponent implements IComponent {
+	readonly type = "Text";
 	font: IFont;
 	text: string;
 	size: number;

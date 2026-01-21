@@ -2,6 +2,7 @@ import { IComponent } from "./IComponent.ts";
 import { Component } from "./Component.ts";
 import { mat3 } from "gl-matrix";
 export class Transform extends Component implements IComponent {
+  readonly type = "Transform";
   #x = 0;
   #y = 0;
   #scaleX = 1;

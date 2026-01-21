@@ -6,6 +6,8 @@ import { RenderComponent } from "./RenderComponent.ts";
  * 便于后续粒子模块：每个实体一个点
  */
 export class Point extends RenderComponent implements IComponent {
+  readonly type = "Point";
+
   /** 是否参与渲染 */
   render: boolean = true;
 
