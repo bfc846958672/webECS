@@ -4,6 +4,11 @@ import { Line } from '../../../components/render/Line';
 import { clamp01, parseColorStyleBlack } from '../../../utils/color';
 
 let lineProgram: Program | null = null;
+let geometry: Geometry | null = null;
+let mesh: Mesh | null = null;
+let positionsData = new Float32Array(0);
+let colorsData = new Float32Array(0);
+let aWorldMatrixData = new Float32Array(9);
 
 function getOrCreateLineProgram(gl: WebGL2RenderingContext): Program {
     if (lineProgram) return lineProgram;
@@ -57,7 +62,6 @@ function getOrCreateLineProgram(gl: WebGL2RenderingContext): Program {
 }
 
 function buildLineSegments(points: [number, number][]): Float32Array {
-    // 使用 gl.LINES：把折线展开成一段段线段（p0-p1, p1-p2, ...）
     const n = points.length;
     const out: number[] = [];
     for (let i = 0; i < n - 1; i++) {
@@ -90,14 +94,32 @@ export function renderLine(gl: WebGL2RenderingContext, camera: Camera, transform
         colors[i * 4 + 3] = color[3];
     }
 
-    const aWorldMatrix = new Float32Array(transform.worldMatrix);
-    const geometry = new Geometry(gl, {
-        position: { data: positions, size: 2, usage: gl.DYNAMIC_DRAW },
-        aColor: { data: colors, size: 4, usage: gl.DYNAMIC_DRAW },
-        aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
-    });
-    geometry.setInstancedCount(1);
+    aWorldMatrixData.set(transform.worldMatrix);
 
-    const mesh = new Mesh(gl, { geometry, program, mode: gl.LINES, frustumCulled: false });
-    mesh.draw({ camera });
+    // If geometry doesn't exist or sizes changed, recreate geometry+mesh
+    if (!geometry || geometry!.attributes.position.data.length !== positions.length) {
+        geometry = new Geometry(gl, {
+            position: { data: positions, size: 2, usage: gl.DYNAMIC_DRAW },
+            aColor: { data: colors, size: 4, usage: gl.DYNAMIC_DRAW },
+            aWorldMatrix: { data: aWorldMatrixData, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
+        });
+        geometry.setInstancedCount(1);
+
+        mesh = new Mesh(gl, { geometry, program, mode: gl.LINES, frustumCulled: false });
+    } else {
+        // reuse attribute buffers
+        geometry.attributes.position.data = positions;
+        geometry.attributes.position.needsUpdate = true;
+        geometry.updateAttribute(geometry.attributes.position);
+
+        geometry.attributes.aColor.data = colors;
+        geometry.attributes.aColor.needsUpdate = true;
+        geometry.updateAttribute(geometry.attributes.aColor);
+
+        geometry.attributes.aWorldMatrix.data = aWorldMatrixData;
+        geometry.attributes.aWorldMatrix.needsUpdate = true;
+        geometry.updateAttribute(geometry.attributes.aWorldMatrix);
+    }
+
+    mesh!.draw({ camera });
 }

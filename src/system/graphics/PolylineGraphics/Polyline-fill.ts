@@ -4,6 +4,9 @@ import type { RGBA } from '../../../utils/color';
 import { vec2, type Vec2 } from '../../../utils/vec2';
 
 let polylineFillProgram: Program | null = null;
+let geometry: Geometry | null = null;
+let mesh: Mesh | null = null;
+let lastIndexCount = 0;
 
 function getOrCreatePolylineFillProgram(gl: WebGL2RenderingContext): Program {
 	if (polylineFillProgram) return polylineFillProgram;
@@ -97,14 +100,32 @@ export function renderPolylineFill(
 
 	const aColor = new Float32Array([fillColor[0], fillColor[1], fillColor[2], fillColor[3] * alpha]);
 	const program = getOrCreatePolylineFillProgram(gl);
-	const geometry = new Geometry(gl, {
-		position: { data: fillMesh.positions, size: 2, usage: gl.DYNAMIC_DRAW },
-		aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
-		aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-	});
-	geometry.setIndex({ data: fillMesh.indices, size: 1 });
-	geometry.setInstancedCount(1);
 
-	const mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
-	mesh.draw({ camera });
+	// recreate geometry/mesh if index count changed
+	if (!geometry || lastIndexCount !== fillMesh.indices.length) {
+		geometry = new Geometry(gl, {
+			position: { data: fillMesh.positions, size: 2, usage: gl.DYNAMIC_DRAW },
+			aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
+			aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+		});
+		geometry.setIndex({ data: fillMesh.indices, size: 1 });
+		geometry.setInstancedCount(1);
+
+		mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
+		lastIndexCount = fillMesh.indices.length;
+	} else {
+		geometry.attributes.position.data = fillMesh.positions;
+		geometry.attributes.position.needsUpdate = true;
+		geometry.updateAttribute(geometry.attributes.position);
+
+		geometry.attributes.aWorldMatrix.data = aWorldMatrix;
+		geometry.attributes.aWorldMatrix.needsUpdate = true;
+		geometry.updateAttribute(geometry.attributes.aWorldMatrix);
+
+		geometry.attributes.aColor.data = aColor;
+		geometry.attributes.aColor.needsUpdate = true;
+		geometry.updateAttribute(geometry.attributes.aColor);
+	}
+
+	mesh!.draw({ camera });
 }

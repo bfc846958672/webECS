@@ -4,6 +4,8 @@ import { Image } from '../../../components/render/Image';
 import { clamp01 } from '../../../utils/color';
 
 const textureCache = new WeakMap<ImageBitmap, Texture>();
+const programCache = new WeakMap<Texture, Program>();
+const meshCache = new WeakMap<Texture, Mesh>();
 
 function getOrCreateTexture(gl: WebGL2RenderingContext, bitmap: ImageBitmap): Texture {
 	const cached = textureCache.get(bitmap);
@@ -27,7 +29,12 @@ function getOrCreateTexture(gl: WebGL2RenderingContext, bitmap: ImageBitmap): Te
 	return tex;
 }
 
+let geometry: Geometry | null = null; // shared unit quad geometry
+
 function createImageProgram(gl: WebGL2RenderingContext, texture: Texture) {
+	const cached = programCache.get(texture);
+	if (cached) return cached;
+
 	const vertex = `#version 300 es
 		precision highp float;
 
@@ -74,7 +81,7 @@ function createImageProgram(gl: WebGL2RenderingContext, texture: Texture) {
 		}
 	`;
 
-	return new Program(gl, {
+	const program = new Program(gl, {
 		vertex,
 		fragment,
 		transparent: true,
@@ -84,6 +91,9 @@ function createImageProgram(gl: WebGL2RenderingContext, texture: Texture) {
 			uTexture: { value: texture },
 		},
 	});
+
+	programCache.set(texture, program);
+	return program;
 }
 
 export function renderImage(gl: WebGL2RenderingContext, camera: Camera, transform: Transform, image: Image) {
@@ -123,15 +133,42 @@ export function renderImage(gl: WebGL2RenderingContext, camera: Camera, transfor
 	const alpha = image.alpha == null ? 1 : clamp01(Number(image.alpha));
 	const aColor = new Float32Array([1, 1, 1, alpha]);
 
-	const geometry = new Geometry(gl, {
-		position: { data: unitQuad, size: 2 },
-		aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
-		aSize: { data: aSize, size: 2, instanced: 1, usage: gl.DYNAMIC_DRAW },
-		aUVRect: { data: aUVRect, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-		aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
-	});
-	geometry.setInstancedCount(1);
+	if (!geometry) {
+		geometry = new Geometry(gl, {
+			position: { data: unitQuad, size: 2 },
+			aWorldMatrix: { data: aWorldMatrix, size: 9, instanced: 1, usage: gl.DYNAMIC_DRAW },
+			aSize: { data: aSize, size: 2, instanced: 1, usage: gl.DYNAMIC_DRAW },
+			aUVRect: { data: aUVRect, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+			aColor: { data: aColor, size: 4, instanced: 1, usage: gl.DYNAMIC_DRAW },
+		});
+		geometry.setInstancedCount(1);
+	}
 
-	const mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
+	let mesh = meshCache.get(texture);
+	if (!mesh) {
+		mesh = new Mesh(gl, { geometry, program, frustumCulled: false });
+		meshCache.set(texture, mesh);
+	}
+
+	// update per-instance attributes
+	geometry.attributes.aWorldMatrix.data = aWorldMatrix;
+	geometry.attributes.aWorldMatrix.needsUpdate = true;
+	geometry.updateAttribute(geometry.attributes.aWorldMatrix);
+
+	geometry.attributes.aSize.data = aSize;
+	geometry.attributes.aSize.needsUpdate = true;
+	geometry.updateAttribute(geometry.attributes.aSize);
+
+	geometry.attributes.aUVRect.data = aUVRect;
+	geometry.attributes.aUVRect.needsUpdate = true;
+	geometry.updateAttribute(geometry.attributes.aUVRect);
+
+	geometry.attributes.aColor.data = aColor;
+	geometry.attributes.aColor.needsUpdate = true;
+	geometry.updateAttribute(geometry.attributes.aColor);
+
+	geometry.attributes.position.needsUpdate = true;
+	geometry.updateAttribute(geometry.attributes.position);
+
 	mesh.draw({ camera });
 }
