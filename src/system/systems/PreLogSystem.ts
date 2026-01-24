@@ -1,5 +1,5 @@
 import { ISystem } from "../../interface/System.ts";
-import { SceneTree } from "../../scene/SceneTree.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 import { Engine } from "../../engine/Engine.ts";
 
 /** 前置打点系统：在每帧开始记录时间戳（可扩展为多个标签） */
@@ -9,7 +9,7 @@ export class PreLogSystem extends ISystem {
   /** 由后置系统写入的最近一次测量（ms） */
   public lastMeasureMs?: number;
 
-  constructor(public engine: Engine, public sceneTree: SceneTree) {
+  constructor(public engine: Engine, public sceneTree: SceneNode) {
     super(engine, sceneTree);
   }
 

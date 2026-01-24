@@ -24,7 +24,7 @@
 
     // 一条折线（Line 组件是点列表）
     {
-      draw.line({ x: 120, y: 160 }, {
+      const node = draw.line({ x: 120, y: 160 }, {
         points: [
           [0, 0],
           [260, 120],
@@ -34,6 +34,7 @@
         strokeStyle: '#2563eb',
         alpha: 1,
       });
+      engine.root.add(node);
     }
 
     engine.start();

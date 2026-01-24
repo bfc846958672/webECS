@@ -1,6 +1,6 @@
 import type { ECS } from "../ecs/ECS.ts";
 import { Engine } from "../engine/Engine.ts";
-import { SceneTree } from "../scene/SceneTree.ts";
+import { SceneNode } from "../scene/SceneTree.ts";
 import { IAABB } from "./AABB.ts";
 
 export interface IShareContext { 
@@ -10,13 +10,13 @@ export interface IShareContext {
 
 
 export interface IProcess<TContext = IShareContext, TParentContext = IShareContext> {
-    match: (ecs: ECS, entityId: number) => boolean;
+    match: (ecs: ECS, node: SceneNode) => boolean;
     /** 判断该渲染器是否能处理此实体 */
     /** 渲染该实体 */
-    exec: (system: ISystem, entityId: number, parentEntityId: number | null, context: TContext, parentContext: TParentContext | null) => void;
+    exec: (system: ISystem, node: SceneNode, parentNode: SceneNode | null, context: TContext, parentContext: TParentContext | null) => void;
 }export abstract class ISystem {
     ecs!: ECS;
-    constructor(public engine: Engine, public sceneTree: SceneTree) { }
+    constructor(public engine: Engine, public sceneTree: SceneNode) { }
     init(ecs: ECS): void {
         this.ecs = ecs;
         this.onInit();
@@ -30,4 +30,4 @@ export interface IProcess<TContext = IShareContext, TParentContext = IShareConte
  * 系统类构造函数类型
  * T 是 ISystem 的子类
  */
-export type ISystemClass<T extends ISystem = ISystem> = new (engine: Engine, sceneTree: SceneTree) => T;
+export type ISystemClass<T extends ISystem = ISystem> = new (engine: Engine, sceneTree: SceneNode) => T;

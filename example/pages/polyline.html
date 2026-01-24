@@ -24,7 +24,7 @@
 
     // 折线
     {
-      draw.polyline({ x: 160, y: 180 }, {
+      const node = draw.polyline({ x: 160, y: 180 }, {
         points: [
           [0, 0],
           [200, 60],
@@ -36,11 +36,12 @@
         strokeStyle: '#111827',
         lineWidth: 4,
       });
+      engine.root.add(node);
     }
 
     // 闭合多边形（填充）
     {
-      draw.polyline({ x: 760, y: 260 }, {
+      const node = draw.polyline({ x: 760, y: 260 }, {
         points: [
           [0, 0],
           [180, 30],
@@ -52,6 +53,7 @@
         strokeStyle: '#3b82f6',
         lineWidth: 3,
       });
+      engine.root.add(node);
     }
 
     engine.start();

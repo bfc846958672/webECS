@@ -4,18 +4,20 @@ import { IProcess } from "../../interface/System.ts";
 import { mat3 } from "gl-matrix";
 import { BoundingBoxComponent } from "../../components/BoundingBoxComponent.ts";
 import type { ISystem } from "../../interface/System.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 
 const unit = mat3.create();
 export class TransformProcess implements IProcess<{ dirty: boolean }, { dirty: boolean }> {
-    match(ecs: ECS, entityId: number) {
-        return true || ecs.hasComponent(entityId, Transform);
+    match(ecs: ECS, node: SceneNode) {
+        return true || ecs.hasComponent(node.entityId, Transform);
     }
     /**
      * 执行渲染逻辑
      */
-    exec(system: ISystem, entityId: number, _parentEntityId: number | null, context: { dirty: boolean }, parentContext: { dirty: boolean } | null) {
+    exec(system: ISystem, node: SceneNode, _parentNode: SceneNode | null, context: { dirty: boolean }, parentContext: { dirty: boolean } | null) {
+
         const ecs = system.ecs;
-        const transform = ecs.getComponent(entityId, Transform)!;
+        const transform = ecs.getComponent(node.entityId, Transform)!;
         context.dirty = transform.dirty;
         const needUpdate = context.dirty || (parentContext ? parentContext.dirty : false);
         if (!needUpdate) return;
@@ -23,13 +25,13 @@ export class TransformProcess implements IProcess<{ dirty: boolean }, { dirty: b
         context.dirty = true;
         transform.dirty = false;
         // 标记包围盒
-        const boundingBox = system.ecs.getComponent(entityId, BoundingBoxComponent);
+        const boundingBox = system.ecs.getComponent(node.entityId, BoundingBoxComponent);
         if (boundingBox) boundingBox.dirty = true
-        this.updateEntityMatrix(system, entityId);
+        this.updateEntityMatrix(system, node);
     }
-    updateEntityMatrix(system: ISystem, entityId: number) {
+    updateEntityMatrix(system: ISystem, node: SceneNode) {
         const ecs = system.ecs;
-        const transform = ecs.getComponent(entityId, Transform)!;
+        const transform = ecs.getComponent(node.entityId, Transform)!;
 
         mat3.identity(transform.localMatrix);
 
@@ -51,7 +53,7 @@ export class TransformProcess implements IProcess<{ dirty: boolean }, { dirty: b
         mat3.translate(transform.localMatrix, transform.localMatrix, [-px, -py]);
 
         // 计算世界矩阵
-        const parent = system.sceneTree.getParent(entityId);
+        const parent = node.parent;
         if (parent != null) {
             const parentTransform = ecs.getComponent(parent.entityId, Transform);
             const parentMatrix = parentTransform?.worldMatrix || unit;

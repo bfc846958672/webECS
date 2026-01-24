@@ -1,5 +1,5 @@
 import { ISystem } from "../../interface/System.ts";
-import { SceneTree } from "../../scene/SceneTree.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 import { IProcess } from "../../interface/System.ts";
 import { TransformProcess } from '../processor/TransformProcess.ts'
 import { Engine } from "../../engine/Engine.ts";
@@ -9,7 +9,7 @@ import { RenderProcess } from "../processor/renderProcess.ts";
 export class SceneTreeRenderSystem extends ISystem {
 
     ctx!: CanvasRenderingContext2D;
-    constructor(public engine: Engine, public sceneTree: SceneTree) {
+    constructor(public engine: Engine, public sceneTree: SceneNode) {
         super(engine, sceneTree);
     }
     processes: IProcess<{ dirty: boolean }, { dirty: boolean }>[] = [];
@@ -31,24 +31,23 @@ export class SceneTreeRenderSystem extends ISystem {
         const gl = this.engine.renderContext.renderer.gl as WebGL2RenderingContext;
         gl.clearColor(1, 1, 1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        const map = new Map<number | null, IShareContext>();
+        const map = new Map<SceneNode | null, IShareContext>();
         // 根节点的父节点的上下文
         map.set(null, { dirty: false } as IShareContext);
         const displayList = this.sceneTree.displayList;
         for (let i = 0; i < displayList.length; i++) {
-            const [entityId, parentEntityId] = displayList[i];
-            if (!map.has(entityId)) map.set(entityId, {} as IShareContext);
-            const context = map.get(entityId)!;
-            const parentContext = map.get(parentEntityId)!;
-            this.transformProcess.exec(this, entityId, parentEntityId, context, parentContext);
-            this.renderProcess.exec(this, entityId);
-
+            const [node, parentNode] = displayList[i];
+            if (!map.has(node)) map.set(node, {} as IShareContext);
+            const context = map.get(node)!;
+            const parentContext = map.get(parentNode)!;
+            this.transformProcess.exec(this, node, parentNode, context, parentContext);
+            this.renderProcess.exec(this, node);
         }
         for (let i = displayList.length - 1; i >= 0; i--) {
-            const [entityId, parentEntityId] = displayList[i];
-            const context = map.get(entityId)!;
-            const parentContext = map.get(parentEntityId)!;
-            this.bboxProcess.exec(this, entityId, parentEntityId, context, parentContext);
+            const [node, parentNode] = displayList[i];
+            const context = map.get(node)!;
+            const parentContext = map.get(parentNode)!;
+            this.bboxProcess.exec(this, node, parentNode, context, parentContext);
         }
     }
 }

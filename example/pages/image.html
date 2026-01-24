@@ -25,10 +25,11 @@
     async function main() {
       const bitmap = await loadImageBitmap('../assets/cat.png');
 
-      draw.image(
+      const node = draw.image(
         { x: 280, y: 240, rotation: Math.PI / 18 },
         { bitmap, width: 320, height: 320 }
       );
+      engine.root.add(node);
 
       engine.start();
     }

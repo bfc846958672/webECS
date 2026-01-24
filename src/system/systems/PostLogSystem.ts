@@ -1,5 +1,5 @@
 import { ISystem } from "../../interface/System.ts";
-import { SceneTree } from "../../scene/SceneTree.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 import { Engine } from "../../engine/Engine.ts";
 import { PreLogSystem } from "./PreLogSystem.ts";
 
@@ -18,7 +18,7 @@ export class PostLogSystem extends ISystem {
   private dragOffsetX = 0;
   private dragOffsetY = 0;
 
-  constructor(public engine: Engine, public sceneTree: SceneTree) {
+  constructor(public engine: Engine, public sceneTree: SceneNode) {
     super(engine, sceneTree);
   }
 

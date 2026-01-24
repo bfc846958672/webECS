@@ -1,11 +1,11 @@
 import { ISystem } from "../../interface/System.ts";
-import { SceneTree } from "../../scene/SceneTree.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 import { Engine } from "../../engine/Engine.ts";
 
 export class RenderQueue extends ISystem {
     private callbacks: Map<() => void, boolean> = new Map();
 
-    constructor(public engine: Engine, public sceneTree: SceneTree) {
+    constructor(public engine: Engine, public sceneTree: SceneNode) {
         super(engine, sceneTree);
     }
 

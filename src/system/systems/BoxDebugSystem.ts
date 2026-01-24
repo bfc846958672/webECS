@@ -1,5 +1,5 @@
 import { ISystem } from "../../interface/System.ts";
-import { SceneTree } from "../../scene/SceneTree.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 import { IProcess } from "../../interface/System.ts";
 import { Engine } from "../../engine/Engine.ts";
 import { IShareContext } from "../../interface/System.ts";
@@ -85,7 +85,7 @@ function drawAABBs(gl: WebGL2RenderingContext, camera: any, aabbs: IAABB[], colo
     mesh.draw({ camera });
 }
 export class BoxDebugSystem extends ISystem {
-    constructor(public engine: Engine, public sceneTree: SceneTree) {
+    constructor(public engine: Engine, public sceneTree: SceneNode) {
         super(engine, sceneTree);
     }
     processes: IProcess<{ dirty: boolean }, { dirty: boolean }>[] = [];
@@ -105,8 +105,8 @@ export class BoxDebugSystem extends ISystem {
         const displayList = this.sceneTree.displayList;
         // 逆序遍历：尽量让后渲染的框在上面（虽然线段没有 depth）
         for (let i = displayList.length - 1; i >= 0; i--) {
-            const [entityId] = displayList[i];
-            const bbox = this.ecs.getComponent(entityId, BoundingBoxComponent);
+            const [node] = displayList[i];
+            const bbox = this.ecs.getComponent(node.entityId, BoundingBoxComponent);
             if (!bbox) continue;
             totalAABBs.push(bbox.totalAABB);
             selfAABBs.push(bbox.selfAABB);

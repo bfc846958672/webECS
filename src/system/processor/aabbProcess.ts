@@ -14,8 +14,9 @@ import { PathGraphics } from "../graphics/PathGraphics.ts";
 import { TextGraphics } from "../graphics/TextGraphics.ts";
 import { PointGraphics } from "../graphics/PointGraphics.ts";
 import { LineGraphics } from "../graphics/LineGraphics.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 export class BoundingBoxProcess implements IProcess {
-    match(_ecs: ECS, _entityId: number) {
+    match(_ecs: ECS, _entityId: SceneNode) {
         return true
     }
     private strategies: IBoundingBoxStrategy[];
@@ -42,27 +43,27 @@ export class BoundingBoxProcess implements IProcess {
         }
         return { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity } as IAABB;
     }
-    exec(system: ISystem, entityId: number, parentEntityId: number | null, context: IShareContext, parentContext: IShareContext | null) {
-        let bbox = system.ecs.getComponent(entityId, BoundingBoxComponent);
+    exec(system: ISystem, node: SceneNode, parentNode: SceneNode | null, context: IShareContext, parentContext: IShareContext | null) {
+        let bbox = system.ecs.getComponent(node.entityId, BoundingBoxComponent);
         if (!bbox) {
             bbox = new BoundingBoxComponent();
-            system.ecs.addComponent(entityId, bbox);
+            system.ecs.addComponent(node.entityId, bbox);
         }
         // 更新当前节点的包围盒
         const dirty = bbox.dirty
         if (dirty) {
-            const selfAABB = this.compute(system.ecs, entityId);
+            const selfAABB = this.compute(system.ecs, node.entityId);
             bbox.setSelf(selfAABB);
             bbox.setChildren(context.childrenAABB || this.none());
             bbox.updateTotalAABB();
         }
 
         // 不确定兄弟节点是否包围盒更新，所以一定向父节点更新子节点包围盒
-        if (parentEntityId === null || parentContext === null) return;
-        let parentBBox = system.ecs.getComponent(parentEntityId!, BoundingBoxComponent);
+        if (parentNode === null || parentContext === null) return;
+        let parentBBox = system.ecs.getComponent(parentNode.entityId, BoundingBoxComponent);
         if (!parentBBox) {
             parentBBox = new BoundingBoxComponent();
-            system.ecs.addComponent(parentEntityId!, parentBBox);
+            system.ecs.addComponent(parentNode.entityId, parentBBox);
         }
         if (!parentContext.childrenAABB) { parentContext.childrenAABB = this.none(); }
         this.merge(parentContext.childrenAABB, bbox.totalAABB);

@@ -24,28 +24,30 @@
 
     // 1) 标准圆
     {
-      draw.circle({ x: 180, y: 180 }, {
+      const node = draw.circle({ x: 180, y: 180 }, {
         radius: 70,
         fillStyle: '#2ecc71',
         strokeStyle: '#145a32',
         lineWidth: 6,
       });
+      engine.root.add(node);
     }
 
     // 2) 椭圆
     {
-      draw.circle({ x: 560, y: 180 }, {
+      const node = draw.circle({ x: 560, y: 180 }, {
         radius: 110,
         radiusY: 55,
         fillStyle: '#3498db',
         strokeStyle: '#1b4f72',
         lineWidth: 4,
       });
+      engine.root.add(node);
     }
 
     // 3) 圆弧
     {
-      draw.circle({ x: 920, y: 180 }, {
+      const node = draw.circle({ x: 920, y: 180 }, {
         radius: 90,
         fillStyle: 'rgba(231, 76, 60, 0.85)',
         strokeStyle: '#922b21',
@@ -54,6 +56,7 @@
         endAngle: Math.PI * 1.5,
         clockwise: true,
       });
+      engine.root.add(node);
     }
 
     engine.start();

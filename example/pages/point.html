@@ -30,7 +30,8 @@
     ];
 
     for (const p of points) {
-      draw.point({ x: p.x, y: p.y }, { size: p.size, fillStyle: p.fillStyle });
+      const node = draw.point({ x: p.x, y: p.y }, { size: p.size, fillStyle: p.fillStyle });
+      engine.root.add(node);
     }
 
     engine.start();

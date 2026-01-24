@@ -24,3 +24,5 @@ export class EntityManager {
         return Array.from(this.entities);
     }
 }
+
+export const entityManager = new EntityManager();

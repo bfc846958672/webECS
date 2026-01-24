@@ -36,7 +36,7 @@
         );
         const ifont = { font, images };
 
-        draw.text(
+        const node = draw.text(
           { x: 80, y: 120, scaleX: 2, scaleY: 2 },
           {
             font: ifont,
@@ -48,6 +48,7 @@
             debug: true,
           }
         );
+        engine.root.add(node);
 
         engine.start();
       }

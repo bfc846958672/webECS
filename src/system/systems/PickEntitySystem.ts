@@ -41,8 +41,8 @@ export class PickEntitySystem extends ISystem {
             }
             return null
         }
-        const node = visitHit(tree.root);
-        return node !== null ? node.entityId : null
+        const node = visitHit(tree);
+        return node 
     }
     pickEntityAt(x: number, y: number) {
         this.updateTree();
@@ -50,22 +50,22 @@ export class PickEntitySystem extends ISystem {
     }
 
     updateTree() {
-        const map = new Map<number | null, IShareContext>();
+        const map = new Map<SceneNode | null, IShareContext>();
         // 根节点的父节点的上下文
         map.set(null, { dirty: false } as IShareContext);
         const displayList = this.sceneTree.displayList;
         for (let i = 0; i < displayList.length; i++) {
-            const [entityId, parentEntityId] = displayList[i];
-            if (!map.has(entityId)) map.set(entityId, {} as IShareContext);
-            const context = map.get(entityId)!;
-            const parentContext = map.get(parentEntityId)!;
-            this.transformProcess.exec(this, entityId, parentEntityId, context, parentContext);
+            const [node, parentNode] = displayList[i];
+            if (!map.has(node)) map.set(node, {} as IShareContext);
+            const context = map.get(node)!;
+            const parentContext = map.get(parentNode)!;
+            this.transformProcess.exec(this, node, parentNode, context, parentContext);
         }
         for (let i = displayList.length - 1; i >= 0; i--) {
-            const [entityId, parentEntityId] = displayList[i];
-            const context = map.get(entityId)!;
-            const parentContext = map.get(parentEntityId)!;
-            this.bboxProcess.exec(this, entityId, parentEntityId, context, parentContext);
+            const [node, parentNode] = displayList[i];
+            const context = map.get(node)!;
+            const parentContext = map.get(parentNode)!;
+            this.bboxProcess.exec(this, node, parentNode, context, parentContext);
         }
     }
     update() { }

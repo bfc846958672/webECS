@@ -10,6 +10,7 @@ import { Path } from "../components/render/Path.ts";
 import { Image } from "../components/render/Image.ts";
 import { Text } from "../components/render/Text.ts";
 import { EventComponent } from "../components/Event.ts";
+import { SceneNode } from "../scene/SceneTree.ts";
 
 export type DrawInstance<TShape> = {
   id: number;
@@ -23,14 +24,19 @@ export type DrawInstance<TShape> = {
 export class Draw {
   constructor(private engine: Engine) {}
 
-  private create<TShape>(shape: TShape, transform: Transform): DrawInstance<TShape> {
-    const entityId = this.engine.ecs.createEntity();
+  private create<TShape>(shape: TShape, transform: Transform): SceneNode {
+    const node = new SceneNode();
+    const entityId = node.entityId;
     const event = new EventComponent();
     this.engine.ecs.addComponent(entityId, shape as any);
     this.engine.ecs.addComponent(entityId, transform);
     this.engine.ecs.addComponent(entityId, event);
-    this.engine.add(entityId);
-    return { id: entityId, transform, trasform: transform, shape, event };
+    // attach convenience properties to keep backward compatibility with examples
+    (node as any).id = entityId;
+    (node as any).transform = transform;
+    (node as any).event = event;
+    (node as any).shape = shape;
+    return node;
   }
 
   rect(pos: Partial<Transform> = {}, props: Partial<Rect> = {}) {

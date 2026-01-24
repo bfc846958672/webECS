@@ -36,7 +36,7 @@
 
     // 矩形
     {
-      draw.rect({ x: 0, y: 0 }, {
+      const node = draw.rect({ x: 0, y: 0 }, {
         width: 260,
         height: 140,
         fillStyle: '#e74c3c',
@@ -44,11 +44,12 @@
         lineWidth: 6,
         radius: 16,
       });
+      engine.root.add(node);
     }
 
     // 旋转矩形
     {
-      draw.rect({ x: 650, y: 380, rotation: Math.PI / 10 }, {
+      const node = draw.rect({ x: 650, y: 380, rotation: Math.PI / 10 }, {
         width: 260,
         height: 140,
         fillStyle: '#f1c40f',
@@ -56,6 +57,7 @@
         lineWidth: 4,
         radius: 0,
       });
+      engine.root.add(node);
     }
 
     // // 按钮事件：动态调整 container 尺寸

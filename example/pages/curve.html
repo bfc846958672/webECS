@@ -24,18 +24,19 @@
 
     // 二次贝塞尔（cp2 不传）
     {
-      draw.curve({ x: 160, y: 160 }, {
+      const node = draw.curve({ x: 160, y: 160 }, {
         start: [0, 240],
         cp1: [240, 0],
         end: [520, 240],
         strokeStyle: '#ef4444',
         lineWidth: 5,
       });
+      engine.root.add(node);
     }
 
     // 三次贝塞尔（cp2 传入）
     {
-      draw.curve({ x: 560, y: 200 }, {
+      const node = draw.curve({ x: 560, y: 200 }, {
         start: [0, 200],
         cp1: [160, 0],
         cp2: [360, 400],
@@ -43,6 +44,7 @@
         strokeStyle: '#3b82f6',
         lineWidth: 5,
       });
+      engine.root.add(node);
     }
 
     engine.start();

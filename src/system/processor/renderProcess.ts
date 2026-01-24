@@ -12,13 +12,14 @@ import { PointGraphics } from "../graphics/PointGraphics.ts";
 import { LineGraphics } from "../graphics/LineGraphics.ts";
 import type { IShareContext } from "../../interface/System.ts";
 import type { IRenderContext } from "../../interface/IRender.ts";
+import { SceneNode } from "../../scene/SceneTree.ts";
 /**
  * 统一渲染进程：根据具体策略渲染图形
  * 与 AABB 的 BoundingBoxProcess 类似
  */
 export class RenderProcess implements IProcess<IShareContext, IShareContext> {
 
-  match(_ecs: ECS, _entityId: number) {
+  match(_ecs: ECS, _entityId: SceneNode): boolean {
     return true;
   }
   private strategies: IRenderStrategy[] = [];
@@ -44,7 +45,7 @@ export class RenderProcess implements IProcess<IShareContext, IShareContext> {
     }
   }
 
-  exec(system: ISystem, entityId: number): void {
-    this.renderWithStrategy(system, entityId);
+  exec(system: ISystem, node: SceneNode): void {
+    this.renderWithStrategy(system, node.entityId);
   }
 }

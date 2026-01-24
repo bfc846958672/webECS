@@ -1,8 +1,8 @@
 import { ECS } from "../ecs/ECS.ts";
 import { Camera, Renderer } from "../webgl/index.ts";
 import { Ticker } from "./Ticker.ts";
-import { SceneTree } from "../scene/SceneTree.ts";
-import { RootEntity } from "../entity/EntityRoot.ts";
+import { SceneNode } from "../scene/SceneTree.ts";
+import { Root } from "../entity/root.ts";
 import { SceneTreeRenderSystem } from "../system/systems/SceneTreeRenderSystem.ts";
 import { PreLogSystem } from "../system/systems/PreLogSystem.ts";
 import { PostLogSystem } from "../system/systems/PostLogSystem.ts";
@@ -18,15 +18,13 @@ export class Engine implements IEngine {
     
     public ecs: ECS;
     private ticker: Ticker;
-    #root: RootEntity;
-    public sceneTree: SceneTree;
+    root!: SceneNode;
     public renderContext: IRenderContext
     constructor(canvas: HTMLCanvasElement, options: IEngineOption = { autoResize: true, performance: false }) {
         this.ecs = new ECS();
         this.ecs.canvas = canvas;
-        // 场景树相关
-        this.#root = new RootEntity(this);
-        this.sceneTree = new SceneTree(this.#root.entityId);
+        // 场景树根节点
+        this.root = Root.create(this);
         // webgl 相关
         this.renderContext = {
             camera: new Camera(undefined, {
@@ -48,14 +46,14 @@ export class Engine implements IEngine {
         // 自动同步 canvas/CSS 尺寸变化到 renderer + camera
         if (options.autoResize) bindEngineResize(this);
         // 注册系统
-        if (options.performance) this.ecs.addSystem(new PreLogSystem(this, this.sceneTree));
-        this.ecs.addSystem(new PreRenderQueue(this, this.sceneTree));
-        this.ecs.addSystem(new SceneTreeRenderSystem(this, this.sceneTree));
-        this.ecs.addSystem(new BoxDebugSystem(this, this.sceneTree));
-        this.ecs.addSystem(new PickEntitySystem(this, this.sceneTree));
-        this.ecs.addSystem(new EventSystem(this, this.sceneTree));
-        this.ecs.addSystem(new PostRenderQueue(this, this.sceneTree));
-        if (options.performance) this.ecs.addSystem(new PostLogSystem(this, this.sceneTree));
+        if (options.performance) this.ecs.addSystem(new PreLogSystem(this, this.root));
+        this.ecs.addSystem(new PreRenderQueue(this, this.root));
+        this.ecs.addSystem(new SceneTreeRenderSystem(this, this.root));
+        this.ecs.addSystem(new BoxDebugSystem(this, this.root));
+        this.ecs.addSystem(new PickEntitySystem(this, this.root));
+        this.ecs.addSystem(new EventSystem(this, this.root));
+        this.ecs.addSystem(new PostRenderQueue(this, this.root));
+        if (options.performance) this.ecs.addSystem(new PostLogSystem(this, this.root));
         // 绑定 Ticker → ECS
         this.ticker = new Ticker();
         this.ticker.add((dt) => this.ecs.update(dt));
@@ -68,70 +66,7 @@ export class Engine implements IEngine {
         this.ticker.stop();
     }
 
-    /**
-     * 在场景树中添加一个实体
-     * @param entityId 新实体ID
-     * @param parentId 父实体ID, 默认挂到根节点
-     */
-    add(entityId: number, parentId?: number) {
-        if (!this.ecs.hasEntity(entityId)) throw new Error(`Entity ${entityId} not exists`);
-        if (parentId && !this.ecs.hasEntity(parentId)) throw new Error(`Parent entity ${parentId} not found`);
-        // 检查是否已存在
-        if (parentId && !this.sceneTree.has(parentId))
-            throw new Error(`Entity ${parentId} not exists`);
-        this.sceneTree.add(entityId, parentId);
-        // 通知系统添加实体
-    }
 
-    /**
-     * 将子节点添加到父节点
-     */
-    setParent(parentId: number, childId: number,) {
-        if (!this.ecs.hasEntity(childId)) throw new Error(`Entity ${childId} not exists`);
-        if (parentId && !this.ecs.hasEntity(parentId)) throw new Error(`Parent entity ${parentId} not found`);
-        // 检查树中是否存在
-        if (!this.sceneTree.has(parentId))
-            throw new Error(`Entity ${parentId} not exists`);
-        this.sceneTree.reparent(childId, parentId);
-        // 通知系统设置父节点
-    }
-
-    /**
-     * 删除实体及其子节点
-     */
-    remove(entityId: number) {
-        this.sceneTree.destory(entityId);
-        this.ecs.removeEntity(entityId);
-        // 通知系统删除实体
-    }
-
-    /**
-     * 获取实体的父节点
-     */
-    getParent(entityId: number) {
-        return this.sceneTree.getParent(entityId);
-    }
-
-    /**
-     * 获取实体对应的 SceneNode
-     */
-    getNode(entityId: number) {
-        return this.sceneTree.get(entityId);
-    }
-
-    /**
-     * 清空场景树（保留根节点）
-     */
-    clear() {
-        this.sceneTree.clear();
-        // 通知系统清空场景树
-    }
-    all() {
-        return this.sceneTree.all();
-    }
-    root() {
-        return this.#root;
-    }
     resize(size: { width: number, height: number }) {
         const that = this;
         this.ecs.getSystem(PreRenderQueue).once(() => { resizeEngineToCanvas(that, size); })

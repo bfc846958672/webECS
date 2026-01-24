@@ -64,15 +64,15 @@ export class EventSystem extends ISystem {
         }
 
         // 命中检测
-        const entityId = this.ecs.getSystem(PickEntitySystem).pickEntityAt(x, y);
-        if (entityId == null) return;
+        const node = this.ecs.getSystem(PickEntitySystem).pickEntityAt(x, y);
+        if (node == null) return;
 
-        this.propagateEvent(entityId, type, e);
+        this.propagateEvent(node, type, e);
     }
 
     /** 冒泡事件分发 */
-    private propagateEvent(entityId: number, type: IEventType, e: IScreenEvent) {
-        let node: SceneNode | null = this.sceneTree.get(entityId);
+    private propagateEvent(hitNode: SceneNode, type: IEventType, e: IScreenEvent) {
+        let node: SceneNode | null = hitNode;
         let path:number[] = []
         while (node) {
             const ev = this.ecs.getComponent(node.entityId, EventComponent);

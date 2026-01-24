@@ -1,4 +1,4 @@
-import { EntityManager } from "../entity/EntityManager.ts";
+import { entityManager } from "../entity/EntityManager.ts";
 import type { ISystem, ISystemClass } from "../interface/System.ts";
 import { IComponent, ComponentConstructor } from "../components/IComponent.ts";
 import { ArchetypeManager } from "../archetype/ArchetypeManager.ts";
@@ -6,7 +6,7 @@ import { EntityComponentManager } from "./EntityComponentManager.ts";
 import { Component } from "../components/Component.ts";
 export class ECS {
     public canvas!: HTMLCanvasElement;  // 挂载 Canvas
-    public entities = new EntityManager();
+    public entities = entityManager;
     // 简单 Map：实体ID -> 组件名 -> 组件实例
     private entityComponents = new EntityComponentManager();
     private systems: ISystem[] = [];
@@ -85,5 +85,3 @@ export class ECS {
         return this.entityComponents.getEntityIdByComponent(component);
     }
 }
-
-
