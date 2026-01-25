@@ -8,8 +8,12 @@ export class Root {
     static create(engine: Engine): SceneNode {
         const node = new SceneNode();
         const entityId = node.entityId;
-        engine.ecs.addComponent(entityId, new Transform({ x: 0, y: 0 }));
-        engine.ecs.addComponent(entityId, new EventComponent());
+        const transform = new Transform({ x: 0, y: 0 })
+        const event = new EventComponent();
+        engine.ecs.addComponent(entityId, transform);
+        engine.ecs.addComponent(entityId, event);
+        node.event = event;
+        node.transform = transform;
         return node
     }
 }

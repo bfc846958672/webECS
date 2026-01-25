@@ -1,10 +1,14 @@
 import { entityManager } from "../entity/EntityManager";
+import { EventComponent } from "../components/Event.ts";
+import { Transform } from "../components/Transform.ts";
 
 // SceneNode.ts
 export class SceneNode {
     parent: SceneNode | null = null;
     children: SceneNode[] = [];
     entityId: number;
+    event?: EventComponent = undefined;
+    transform?: Transform = undefined;
     constructor() {
         this.entityId = entityManager.create();
     }
