@@ -77,49 +77,42 @@
       };
     }
 
-    function bindDrag(instance) {
-      instance.event.on('pointerdown', (e, engineEvent) => {
-        e.preventDefault?.();
-        console.log('pointerdown', e, engineEvent);
-        // 尝试设置 pointer capture，确保 pointermove/up 会持续发给 canvas
-        if ('pointerId' in e && typeof canvas.setPointerCapture === 'function') {
-          try { canvas.setPointerCapture(e.pointerId); } catch {}
-        }
-
-        const { x, y } = toCanvasXY(e);
-        dragging = {
-          id: instance.id,
-          pointerId: ('pointerId' in e) ? e.pointerId : null,
-          transform: instance.transform,
-          offsetX: x - instance.transform.x,
-          offsetY: y - instance.transform.y,
-        };
-      });
-    }
-
-    bindDrag(rect);
-    bindDrag(circle);
-    bindDrag(polyline);
+    // 通过监听 engine.root 来决定哪个 node 被按下，然后使用全局 pointermove 更新该 node.transform
+    engine.root.event.on('pointerdown', (e, engineEvent) => {
+      console.log(engineEvent);
+      e.preventDefault?.();
+      // 尝试设置 pointer capture，确保 pointermove/up 会持续发给 canvas
+      if ('pointerId' in e && typeof canvas.setPointerCapture === 'function') {
+        try { canvas.setPointerCapture(e.pointerId); } catch {}
+      }
+      const { x, y } = toCanvasXY(e);
+      const node = engineEvent.path[0];
+      if (!node || !node.transform) return;
+      dragging = {
+        node,
+        offsetX: x - node.transform.x,
+        offsetY: y - node.transform.y,
+      };
+    });
 
     // 用全局 pointermove/up 做拖拽，不依赖 EventSystem 的“捕获”
     canvas.addEventListener('pointermove', (e) => {
       if (!dragging) return;
-      if (dragging.pointerId != null && e.pointerId !== dragging.pointerId) return;
       e.preventDefault();
       const { x, y } = toCanvasXY(e);
-      dragging.transform.x = x - dragging.offsetX;
-      dragging.transform.y = y - dragging.offsetY;
+      dragging.node.transform.x = x - dragging.offsetX;
+      dragging.node.transform.y = y - dragging.offsetY;
     }, { passive: false });
 
     canvas.addEventListener('pointerup', (e) => {
       if (!dragging) return;
-      if (dragging.pointerId != null && e.pointerId !== dragging.pointerId) return;
+      try { canvas.releasePointerCapture?.(e.pointerId); } catch {}
       dragging = null;
     });
 
     canvas.addEventListener('pointercancel', (e) => {
       if (!dragging) return;
-      if (dragging.pointerId != null && e.pointerId !== dragging.pointerId) return;
+      try { canvas.releasePointerCapture?.(e.pointerId); } catch {}
       dragging = null;
     });
 

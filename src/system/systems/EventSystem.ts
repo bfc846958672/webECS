@@ -73,15 +73,15 @@ export class EventSystem extends ISystem {
     /** 冒泡事件分发 */
     private propagateEvent(hitNode: SceneNode, type: IEventType, e: IScreenEvent) {
         let node: SceneNode | null = hitNode;
-        let path:number[] = []
+        let path:SceneNode[] = []
         while (node) {
             const ev = this.ecs.getComponent(node.entityId, EventComponent);
             if (ev) {
-                const engineEvent: IEngineEvent = { entityId: node.entityId, path: [...path] };
+                const engineEvent: IEngineEvent = { node, path: [...path] };
                 const stop = ev.emit(type,e, engineEvent);
                 if (stop) break; // 阻止冒泡
             }
-            path.push(node.entityId);
+            path.push(node);
             node = node.parent;
         }
     }

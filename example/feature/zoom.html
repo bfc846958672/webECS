@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoom & Pan</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+    .hint { position: absolute; left: 12px; top: 12px; background: rgba(0,0,0,0.5); color: #fff; padding:6px 10px; border-radius:6px; font-family: sans-serif }
+  </style>
+</head>
+
+<body>
+  <div class="hint">滚轮缩放；在空白处按住拖动平移画布</div>
+  <canvas id="game-canvas" width="1200" height="800"></canvas>
+
+  <script type="module">
+    import { Engine, Draw } from '../dist/web-ecs.es.js';
+
+    const canvas = document.getElementById('game-canvas');
+
+
+    const engine = new Engine(canvas);
+    const draw = new Draw(engine);
+
+    // create some demo objects
+    const rect = draw.rect({ x: 10, y: 80 }, { width: 240, height: 160, fillStyle: 'rgba(59,130,246,0.35)', strokeStyle: '#111827', lineWidth: 3 });
+    engine.root.add(rect);
+    const circle = draw.circle({ x: 220, y: 40 }, { radius: 80, fillStyle: 'rgba(34,197,94,0.35)', strokeStyle: '#111827', lineWidth: 3 });
+    engine.root.add(circle);
+
+    // camera reference (no zoom/resize handling per request)
+    const cam = engine.renderContext.camera;
+
+
+    function toCanvasXY(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      if ('touches' in e && e.touches && e.touches.length > 0) {
+        const t = e.touches[0];
+        return { x: (t.clientX - rect.left) * scaleX, y: (t.clientY - rect.top) * scaleY };
+      }
+      return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+    }
+
+    // map screen -> world (based on centered camera)
+    function screenToWorld(x, y) {
+      const w = canvas.width, h = canvas.height;
+      const worldX = (x - w / 2)  + cam.position.x;
+      const worldY = (h / 2 - y)  + cam.position.y;
+      return { x: worldX, y: worldY };
+    }
+
+    // wheel zoom temporarily disabled — focus on canvas panning
+
+    // Simple canvas-only panning: drag anywhere to move the camera
+    let panning = null;
+    canvas.addEventListener('pointerdown', (e) => {
+      const { x, y } = toCanvasXY(e);
+      try { canvas.setPointerCapture?.(e.pointerId); } catch {}
+      panning = { startX: x, startY: y, camX: cam.position.x, camY: cam.position.y };
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      if (!panning) return;
+      const { x, y } = toCanvasXY(e);
+      const dx = x - panning.startX;
+      const dy = y - panning.startY;
+      // move camera opposite to pointer delta so content follows the pointer (grab-to-pan)
+      cam.position.x = panning.camX - dx;
+      cam.position.y = panning.camY - dy;
+      // ensure matrices are recalculated
+      cam.worldMatrixNeedsUpdate = true;
+      cam.updateMatrixWorld();
+    });
+
+    canvas.addEventListener('pointerup', (e) => {
+      try { canvas.releasePointerCapture?.(e.pointerId); } catch {}
+      panning = null;
+    });
+    canvas.addEventListener('pointercancel', (e) => {
+      try { canvas.releasePointerCapture?.(e.pointerId); } catch {}
+      panning = null;
+    });
+
+    engine.start();
+  </script>
+</body>
+
+</html>

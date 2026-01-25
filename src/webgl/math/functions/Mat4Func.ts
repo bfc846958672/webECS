@@ -365,13 +365,13 @@ export function set(out: mat4, m00: number, m01: number, m02: number, m03: numbe
  *
  * @param {mat4} out the receiving matrix
  * @param {mat4} a the source matrix
- * @returns {mat4} out
+ * @returns {mat4 | null} out or null if matrix is not invertible
  */
 export function invert(out: mat4, a: mat4): mat4 | null {
-    let a00 = a[0], a01 = a[0 + 1], a02 = a[0 + 2], a03 = a[0 + 3];
-    let a10 = a[1 * 4 + 0], a11 = a[1 * 4 + 1], a12 = a[1 * 4 + 2], a13 = a[1 * 4 + 3];
-    let a20 = a[2 * 4 + 0], a21 = a[2 * 4 + 1], a22 = a[2 * 4 + 2], a23 = a[2 * 4 + 3];
-    let a30 = a[3 * 4 + 0], a31 = a[3 * 4 + 1], a32 = a[3 * 4 + 2], a33 = a[3 * 4 + 3];
+    let a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+    let a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+    let a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+    let a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
 
     let b00 = a00 * a11 - a01 * a10;
     let b01 = a00 * a12 - a02 * a10;
@@ -394,22 +394,22 @@ export function invert(out: mat4, a: mat4): mat4 | null {
     }
     det = 1.0 / det;
 
-    out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
-    out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
-    out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
-    out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
-    out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
-    out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
-    out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
-    out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
-    out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
-    out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
-    out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
-    out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
-    out[12] = (a11 * b08 - a10 * b09 - a12 * b06) * det;
-    out[13] = (a00 * b09 - a01 * b08 + a02 * b06) * det;
-    out[14] = (a31 * b02 - a30 * b03 - a32 * b00) * det;
-    out[15] = (a20 * b03 - a21 * b02 + a22 * b00) * det;
+    out[0]  = ( a11 * b11 - a12 * b10 + a13 * b09) * det;
+    out[1]  = (-a01 * b11 + a02 * b10 - a03 * b09) * det;
+    out[2]  = ( a31 * b05 - a32 * b04 + a33 * b03) * det;
+    out[3]  = (-a21 * b05 + a22 * b04 - a23 * b03) * det;
+    out[4]  = (-a10 * b11 + a12 * b08 - a13 * b07) * det;
+    out[5]  = ( a00 * b11 - a02 * b08 + a03 * b07) * det;
+    out[6]  = (-a30 * b05 + a32 * b02 - a33 * b01) * det;
+    out[7]  = ( a20 * b05 - a22 * b02 + a23 * b01) * det;
+    out[8]  = ( a10 * b10 - a11 * b08 + a13 * b06) * det;
+    out[9]  = (-a00 * b10 + a01 * b08 - a03 * b06) * det;
+    out[10] = ( a30 * b04 - a31 * b02 + a33 * b00) * det;
+    out[11] = (-a20 * b04 + a21 * b02 - a23 * b00) * det;
+    out[12] = (-a10 * b09 + a11 * b07 - a12 * b06) * det;
+    out[13] = ( a00 * b09 - a01 * b07 + a02 * b06) * det;
+    out[14] = (-a30 * b03 + a31 * b01 - a32 * b00) * det;
+    out[15] = ( a20 * b03 - a21 * b01 + a22 * b00) * det;
 
     return out;
 }

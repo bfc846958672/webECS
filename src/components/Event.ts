@@ -1,3 +1,4 @@
+import { SceneNode } from "../scene/SceneTree.ts";
 import { Component } from "./Component.ts";
 import { IComponent } from "./IComponent.ts";
 
@@ -10,7 +11,7 @@ export type IEventType =
 /**
  * engine事件, 会合原始event 合并到一起
  */
-export type IEngineEvent = { entityId: number, path: number[] }
+export type IEngineEvent = { node: SceneNode | null, path: SceneNode[] }
 export type IScreenEvent = MouseEvent | PointerEvent | WheelEvent | TouchEvent;
 export type EventCallback = (event: IScreenEvent, engineEvent: IEngineEvent) => boolean | void;
 
