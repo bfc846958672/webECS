@@ -28,7 +28,6 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
     const alpha = rect.alpha == null ? 1 : Math.max(0, Math.min(1, Number(rect.alpha)));
     const fill = parseColorStyle(rect.fillStyle);
     const stroke = rect.strokeStyle ? parseColorStyle(rect.strokeStyle) : [0, 0, 0, 0];
-
     aRectData[0] = 0;
     aRectData[1] = 0;
     aRectData[2] = rect.width || 0;
@@ -102,6 +101,9 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
         in float vLineWidth;
         out vec4 fragColor;
 
+        // pixels per world-unit (includes DPR) - set from JS each frame
+        uniform float uPixelScale;
+
         float sdBox(vec2 p, vec2 halfSize) {
             vec2 q = abs(p) - halfSize;
             return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);
@@ -112,12 +114,13 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
             vec2 p = vLocalPos - 0.5 * vSize;
             float d = sdBox(p, halfSize);
 
-            float aa = fwidth(d);
-            float lw = clamp(vLineWidth, 0.0, min(halfSize.x, halfSize.y));
-            float aaStroke = max(aa, 1.0);
+            // convert distance to pixel units for stable AA regardless of zoom
+            float d_px = d * uPixelScale;
+            float aa_px = max(fwidth(d) * uPixelScale, 0.5);
+            float lw_px = clamp(vLineWidth, 0.0, min(halfSize.x, halfSize.y) * uPixelScale);
 
-            float alphaOuter = 1.0 - smoothstep(0.0, aaStroke, d);
-            float alphaInner = 1.0 - smoothstep(0.0, aaStroke, d + lw);
+            float alphaOuter = 1.0 - smoothstep(0.0, aa_px, d_px);
+            float alphaInner = 1.0 - smoothstep(0.0, aa_px, d_px + lw_px);
             float alphaStrokeMask = max(0.0, alphaOuter - alphaInner);
 
             float fillA = vColor.a * alphaInner;
@@ -173,6 +176,14 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
     // position is static unitQuad, ensure uploaded
     geometry!.attributes.position.needsUpdate = true;
     geometry!.updateAttribute(geometry!.attributes.position);
+
+    // update pixel scale uniform so AA is stable under camera zoom
+    if (program) {
+        const pixelScale = (camera.right !== undefined && camera.left !== undefined)
+            ? (gl.canvas.width) * (camera.zoom || 1) / (camera.right - camera.left)
+            : 1.0;
+        program.uniforms.uPixelScale = { value: pixelScale };
+    }
 
     mesh!.draw({ camera });
 }

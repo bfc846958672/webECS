@@ -2,92 +2,140 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zoom & Pan</title>
-  <style>
-    body { margin: 0; }
-    canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
-    .hint { position: absolute; left: 12px; top: 12px; background: rgba(0,0,0,0.5); color: #fff; padding:6px 10px; border-radius:6px; font-family: sans-serif }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zoom & Pan</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+            touch-action: none;
+            border: 1px solid red;
+        }
+
+        .hint {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-family: sans-serif;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="hint">滚轮缩放；在空白处按住拖动平移画布</div>
-  <canvas id="game-canvas" width="1200" height="800"></canvas>
+    <div class="hint">滚轮缩放；在空白处按住拖动平移画布</div>
+    <canvas id="game-canvas" width="1000" height="1000"></canvas>
+    <button id="reset-zoom">Reset Zoom</button>
+    <div>缩放比例: <span id="zoom-level">1.0</span></div>
+    <script type="module">
+        import { Engine, Draw } from '../dist/web-ecs.es.js';
 
-  <script type="module">
-    import { Engine, Draw } from '../dist/web-ecs.es.js';
+        const canvas = document.getElementById('game-canvas');
+        const engine = new Engine(canvas, { autoResize: false });
+        const draw = new Draw(engine);
 
-    const canvas = document.getElementById('game-canvas');
+        // Demo objects
+        const rect = draw.rect({ x: 100, y: 100 }, { width: 100, height: 100, fillStyle: '#00d', strokeStyle: '#111827', lineWidth: 0 });
+        engine.root.add(rect);
+        const circle = draw.circle({ x: 770, y: 140 }, { radius: 80, fillStyle: 'rgba(34,197,94,0.35)', strokeStyle: '#111827', lineWidth: 4 });
+        engine.root.add(circle);
 
+        const cam = engine.renderContext.camera;
 
-    const engine = new Engine(canvas);
-    const draw = new Draw(engine);
+        // ---------------- 工具函数 ----------------
+        function toCanvasXY(e) {
+            const rect = canvas.getBoundingClientRect();
+            if ('touches' in e && e.touches && e.touches.length > 0) {
+                const t = e.touches[0];
+                return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+            }
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
 
-    // create some demo objects
-    const rect = draw.rect({ x: 10, y: 80 }, { width: 240, height: 160, fillStyle: 'rgba(59,130,246,0.35)', strokeStyle: '#111827', lineWidth: 3 });
-    engine.root.add(rect);
-    const circle = draw.circle({ x: 220, y: 40 }, { radius: 80, fillStyle: 'rgba(34,197,94,0.35)', strokeStyle: '#111827', lineWidth: 3 });
-    engine.root.add(circle);
+        // Canvas屏幕坐标 -> Camera世界坐标
+        // 相机坐标系：左上角 (cam.left, cam.top)
+        function screenToWorld(screenX, screenY) {
+            const viewWidth = (cam.right - cam.left) / cam.zoom;
+            const viewHeight = (cam.bottom - cam.top) / cam.zoom;
+            const worldX = cam.position.x + cam.left / cam.zoom + (screenX / canvas.width) * viewWidth;
+            const worldY = cam.position.y + cam.top / cam.zoom + (screenY / canvas.height) * viewHeight;
+            return { x: worldX, y: worldY };
+        }
 
-    // camera reference (no zoom/resize handling per request)
-    const cam = engine.renderContext.camera;
+        // ---------------- 拖拽平移 ----------------
+        let panning = null;
+        canvas.addEventListener('pointerdown', e => {
+            const { x, y } = toCanvasXY(e);
+            try { canvas.setPointerCapture?.(e.pointerId); } catch { }
+            panning = {
+                startWorld: screenToWorld(x, y),
+            };
+        });
 
+        canvas.addEventListener('pointermove', e => {
+            if (!panning) return;
+            const { x, y } = toCanvasXY(e);
+            const worldNow = screenToWorld(x, y);
+            cam.position.x += panning.startWorld.x - worldNow.x;
+            cam.position.y += panning.startWorld.y - worldNow.y;
+            cam.worldMatrixNeedsUpdate = true;
+            cam.updateMatrixWorld();
+        });
 
-    function toCanvasXY(e) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      if ('touches' in e && e.touches && e.touches.length > 0) {
-        const t = e.touches[0];
-        return { x: (t.clientX - rect.left) * scaleX, y: (t.clientY - rect.top) * scaleY };
-      }
-      return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
-    }
+        canvas.addEventListener('pointerup', e => {
+            try { canvas.releasePointerCapture?.(e.pointerId); } catch { }
+            panning = null;
+        });
+        canvas.addEventListener('pointercancel', e => {
+            try { canvas.releasePointerCapture?.(e.pointerId); } catch { }
+            panning = null;
+        });
 
-    // map screen -> world (based on centered camera)
-    function screenToWorld(x, y) {
-      const w = canvas.width, h = canvas.height;
-      const worldX = (x - w / 2)  + cam.position.x;
-      const worldY = (h / 2 - y)  + cam.position.y;
-      return { x: worldX, y: worldY };
-    }
+        // ---------------- 鼠标为中心缩放 ----------------
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            const { x, y } = toCanvasXY(e);
+            // 缩放前世界坐标
+            const before = screenToWorld(x, y);
+            // 缩放因子
+            const factor = e.deltaY < 0 ? 1.1 : 0.9;
+            cam.zoom *= factor;
+            document.getElementById('zoom-level').textContent = cam.zoom.toFixed(2);
+            // 缩放后世界坐标
+            const after = screenToWorld(x, y);
 
-    // wheel zoom temporarily disabled — focus on canvas panning
+            // 修正 position 保持鼠标为缩放中心
+            cam.position.x += before.x - after.x;
+            cam.position.y += before.y - after.y;
 
-    // Simple canvas-only panning: drag anywhere to move the camera
-    let panning = null;
-    canvas.addEventListener('pointerdown', (e) => {
-      const { x, y } = toCanvasXY(e);
-      try { canvas.setPointerCapture?.(e.pointerId); } catch {}
-      panning = { startX: x, startY: y, camX: cam.position.x, camY: cam.position.y };
-    });
+            cam.updateProjectionMatrix();
+            cam.worldMatrixNeedsUpdate = true;
+            cam.updateMatrixWorld();
+        });
+        document.getElementById('reset-zoom').addEventListener('click', () => {
+            cam.zoom = 2;
+            cam.position.x = 0;
+            cam.position.y = 0;
+            document.getElementById('zoom-level').textContent = cam.zoom.toFixed(2);
+            cam.updateProjectionMatrix();
+            cam.worldMatrixNeedsUpdate = true;
+            cam.updateMatrixWorld();
 
-    canvas.addEventListener('pointermove', (e) => {
-      if (!panning) return;
-      const { x, y } = toCanvasXY(e);
-      const dx = x - panning.startX;
-      const dy = y - panning.startY;
-      // move camera opposite to pointer delta so content follows the pointer (grab-to-pan)
-      cam.position.x = panning.camX - dx;
-      cam.position.y = panning.camY - dy;
-      // ensure matrices are recalculated
-      cam.worldMatrixNeedsUpdate = true;
-      cam.updateMatrixWorld();
-    });
-
-    canvas.addEventListener('pointerup', (e) => {
-      try { canvas.releasePointerCapture?.(e.pointerId); } catch {}
-      panning = null;
-    });
-    canvas.addEventListener('pointercancel', (e) => {
-      try { canvas.releasePointerCapture?.(e.pointerId); } catch {}
-      panning = null;
-    });
-
-    engine.start();
-  </script>
+            console.log(screenToWorld(500, 500));
+            console.log(screenToWorld(100, 100));
+        });
+        document.getElementById('zoom-level').textContent = cam.zoom.toFixed(2);
+        console.log(screenToWorld(500, 500));
+        console.log(screenToWorld(100, 100));
+        engine.start();
+    </script>
 </body>
 
 </html>

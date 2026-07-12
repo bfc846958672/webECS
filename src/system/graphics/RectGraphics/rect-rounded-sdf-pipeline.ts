@@ -123,7 +123,7 @@ let aLineWidthData = new Float32Array(1);
 
 export function renderRoundedRects(gl: WebGL2RenderingContext, camera: Camera, transform: Transform, rect: Rect) {
     if (!rect) return;
-
+    console.warn('renderRoundedRects1', camera);
     if (!program) {
         program = new Program(gl, {
             vertex,
