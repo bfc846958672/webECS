@@ -116,7 +116,8 @@ export function renderSolidRects(gl: WebGL2RenderingContext, camera: Camera, tra
 
             // convert distance to pixel units for stable AA regardless of zoom
             float d_px = d * uPixelScale;
-            float aa_px = max(fwidth(d) * uPixelScale, 0.5);
+            // AA width in pixel units (uPixelScale-only version, no derivatives)
+            float aa_px = 0.5;
             float lw_px = clamp(vLineWidth, 0.0, min(halfSize.x, halfSize.y) * uPixelScale);
 
             float alphaOuter = 1.0 - smoothstep(0.0, aa_px, d_px);
