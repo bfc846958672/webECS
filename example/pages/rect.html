@@ -34,22 +34,11 @@
 
     const draw = new Draw(engine);
 
-    // 矩形
-    {
-      const node = draw.rect({ x: 0, y: 0 }, {
-        width: 260,
-        height: 140,
-        fillStyle: '#e74c3c',
-        strokeStyle: '#111827',
-        lineWidth: 6,
-        radius: 16,
-      });
-      engine.root.add(node);
-    }
+   
 
     // 旋转矩形
     {
-      const node = draw.rect({ x: 650, y: 380, rotation: Math.PI / 10 }, {
+      const node = draw.rect({ x: 0, y: 0, rotation: Math.PI / 10 }, {
         width: 260,
         height: 140,
         fillStyle: '#f1c40f',
@@ -59,7 +48,18 @@
       });
       engine.root.add(node);
     }
-
+ // 矩形
+    {
+      const node = draw.rect({ x: 0, y: 0 }, {
+        width: 260,
+        height: 140,
+        fillStyle: 'rgba(59, 130, 246, 1)',
+        strokeStyle: '#111827',
+        lineWidth: 6,
+        radius: 16,
+      });
+      engine.root.add(node);
+    }
     // // 按钮事件：动态调整 container 尺寸
     // document.getElementById('btn-800x600').addEventListener('click', () => {
     //   container.style.width = '800px';
